@@ -1,0 +1,109 @@
+/*
+ * Network packet analysis framework.
+ *
+ * Copyright (c) 2014, Alessandro Ghedini
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+// Provides encoding and decoding for UDP packets.
+package udp
+
+import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/ipv4"
+
+type Packet struct {
+	SrcPort     uint16        `name:"sport"`
+	DstPort     uint16        `name:"dport"`
+	Length      uint16        `name:"len"`
+	Checksum    uint16        `name:"sum"`
+	csum_seed   uint32        `name:"skip"`
+	pkt_payload packet.Packet `name:"skip"`
+}
+
+func Make() *Packet {
+	return &Packet{
+		Length: 8,
+	}
+}
+
+func (p *Packet) GetType() packet.Type {
+	return packet.UDP
+}
+
+func (p *Packet) GetLength() uint16 {
+	return p.Length
+}
+
+func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
+	raw_pkt.WriteI(p.SrcPort)
+	raw_pkt.WriteI(p.DstPort)
+	raw_pkt.WriteI(p.Length)
+
+	if p.csum_seed != 0 {
+		p.Checksum =
+		  ipv4.CalculateChecksum(raw_pkt.BytesOff(), p.csum_seed)
+	}
+
+	raw_pkt.WriteI(p.Checksum)
+
+	return nil
+}
+
+func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
+	raw_pkt.ReadI(&p.SrcPort)
+	raw_pkt.ReadI(&p.DstPort)
+	raw_pkt.ReadI(&p.Length)
+	raw_pkt.ReadI(&p.Checksum)
+
+	return nil
+}
+
+func (p *Packet) Payload() packet.Packet {
+	return p.pkt_payload
+}
+
+func (p *Packet) PayloadType() packet.Type {
+	if p.pkt_payload != nil {
+		return p.pkt_payload.GetType()
+	}
+
+	return packet.None
+}
+
+func (p *Packet) SetPayload(pl packet.Packet) error {
+	p.pkt_payload = pl
+	p.Length     += pl.GetLength()
+
+	return nil
+}
+
+func (p *Packet) InitChecksum(csum uint32) {
+	p.csum_seed = csum
+}
+
+func (p *Packet) String() string {
+	return packet.Stringify(p)
+}

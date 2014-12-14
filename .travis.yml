@@ -1,0 +1,14 @@
+language: go
+
+install:
+ - sudo apt-get install libpcap0.8-dev
+
+script:
+ - go test -v ./...
+
+notifications:
+  recipient:
+   - alessandro@ghedini.me
+  email:
+    on_success: change
+    on_failure: always
