@@ -116,7 +116,31 @@ func main() {
 
 ### Filtering
 
-TODO
+Packet filtering is done by creating a filter (e.g. by compiling it from an
+expression) which can be either applied to a capture handle (by using the
+`ApplyFilter()` method) or used directly against a data buffer.
+
+In the following example we create a filter by compiling a tcpdump-like
+expression and then try to match some data against it.
+
+```go
+package main
+
+import "log"
+
+import "github.com/ghedo/hype/filter"
+
+func main() {
+	flt, err := filter.Compile("udp or tcp") // match udp and tcp packets
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if flt.Match([]byte{"random data"}) {
+		log.Println("MATCH!!!")
+	}
+}
+```
 
 ### Encoding
 
