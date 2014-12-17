@@ -2,6 +2,7 @@ language: go
 
 install:
  - sudo apt-get install libpcap0.8-dev
+ - go get -d -v ./... && go build -v ./...
 
 script:
  - go test -v ./...
