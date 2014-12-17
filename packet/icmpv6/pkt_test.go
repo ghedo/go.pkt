@@ -36,7 +36,6 @@ import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv6"
-import "github.com/ghedo/hype/packet/util"
 
 var test_simple = []byte{
 	0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -136,7 +135,7 @@ func TestPackWithIPv6(t *testing.T) {
 		Type: EchoRequest,
 	}
 
-	util.Compose(ip6, icmp6)
+	ip6.SetPayload(icmp6)
 
 	err := icmp6.Pack(&b)
 	if err != nil {

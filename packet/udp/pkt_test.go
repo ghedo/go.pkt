@@ -36,7 +36,6 @@ import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
-import "github.com/ghedo/hype/packet/util"
 
 var test_simple = []byte{
 	0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x00, 0x00,
@@ -140,7 +139,7 @@ func TestPackWithIPv4(t *testing.T) {
 		Length: 18,
 	}
 
-	util.Compose(ip4, udp)
+	ip4.SetPayload(udp)
 
 	err := udp.Pack(&b)
 	if err != nil {
