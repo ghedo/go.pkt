@@ -85,11 +85,11 @@ func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 
 	raw_pkt.WriteI(p.Operation)
 
-	raw_pkt.Write(p.HWSrcAddr)
-	raw_pkt.Write(p.ProtoSrcAddr.To4())
+	raw_pkt.Write(p.HWSrcAddr[len(p.HWSrcAddr) - int(p.HWAddrLen):])
+	raw_pkt.Write(p.ProtoSrcAddr[len(p.ProtoSrcAddr) - int(p.ProtoAddrLen):])
 
-	raw_pkt.Write(p.HWDstAddr)
-	raw_pkt.Write(p.ProtoDstAddr.To4())
+	raw_pkt.Write(p.HWDstAddr[len(p.HWDstAddr) - int(p.HWAddrLen):])
+	raw_pkt.Write(p.ProtoDstAddr[len(p.ProtoDstAddr) - int(p.ProtoAddrLen):])
 
 	return nil
 }
