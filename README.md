@@ -163,10 +163,7 @@ package.
 
 The following example uses the `UnpackAll()` function to decode a whole chain of
 packets (e.g. ethernet -> ipv4 -> udp), and returns a slice containing the
-decoded packets. Note that it needs to know what the starting layer is, in this
-case we assume "Ethernet", but when using the packet capture interface seen
-above, you can pass the result of the `src.LinkType()` call (where "src" is a
-capture handle).
+decoded packets.
 
 ```go
 package main
