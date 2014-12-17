@@ -194,7 +194,7 @@ func main() {
 
 TODO
 
-For more examples have a look at the [examples][examples/] directory in the
+For more examples have a look at the [examples](examples/) directory in the
 source repository.
 
 ## DEPENDENCIES
