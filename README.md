@@ -38,7 +38,7 @@ a dump file.
 
 In the following example we create a "live" source (the `eth0` network
 interface), we activate it and then capture packets using the `Capture()`
-method. Note that error checking has been left out for brevity.
+method.
 
 ```go
 package main
