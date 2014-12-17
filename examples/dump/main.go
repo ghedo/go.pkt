@@ -38,6 +38,7 @@ import "github.com/docopt/docopt-go"
 import "github.com/ghedo/hype/capture"
 import "github.com/ghedo/hype/capture/live"
 import "github.com/ghedo/hype/capture/file"
+import "github.com/ghedo/hype/filter"
 import "github.com/ghedo/hype/packet/util"
 
 func main() {
@@ -98,7 +99,15 @@ Options:
 	}
 
 	if args["<expression>"] != nil {
-		err = src.ApplyFilter(args["<expression>"].(string))
+		expr := args["<expression>"].(string)
+
+		flt, err := filter.Compile(expr, src.LinkType())
+		if err != nil {
+			log.Fatalf("Error parsing filter: %s", err)
+		}
+		defer flt.Cleanup()
+
+		err = src.ApplyFilter(flt)
 		if err != nil {
 			log.Fatalf("Error appying filter: %s", err)
 		}

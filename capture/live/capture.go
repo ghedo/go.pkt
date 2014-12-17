@@ -10,6 +10,7 @@ import "C"
 import "fmt"
 import "unsafe"
 
+import "github.com/ghedo/hype/filter"
 import "github.com/ghedo/hype/packet"
 
 type Handle struct {
@@ -90,14 +91,10 @@ func (h *Handle) SetMonitorMode(monitor bool) error {
 	return nil
 }
 
-// Compile the given filter and apply it to the packet source. Only packets that
-// match this filter will be returned.
-func (h *Handle) ApplyFilter(filter string) error {
+// Apply the given filter it to the packet source. Only packets that match this
+// filter will be captured.
+func (h *Handle) ApplyFilter(filter *filter.Filter) error {
 	var net, mask C.bpf_u_int32
-	var bpf       C.struct_bpf_program
-
-	fil_str := C.CString(filter)
-	defer C.free(unsafe.Pointer(fil_str))
 
 	err_str := (*C.char)(C.calloc(256, 1))
 	defer C.free(unsafe.Pointer(err_str))
@@ -112,12 +109,7 @@ func (h *Handle) ApplyFilter(filter string) error {
 		)
 	}
 
-	err = C.pcap_compile(h.pcap, &bpf, fil_str, 0, net)
-	if err < 0 {
-		return fmt.Errorf("Could not compile filter: %s", h.get_error())
-	}
-
-	err = C.pcap_setfilter(h.pcap, &bpf)
+	err = C.pcap_setfilter(h.pcap, (*C.struct_bpf_program)(unsafe.Pointer(filter)))
 	if err < 0 {
 		return fmt.Errorf("Could not set filter: %s", h.get_error())
 	}

@@ -132,12 +132,11 @@ func (h *Handle) SetMonitorMode(monitor bool) error {
 	return fmt.Errorf("Unsupported")
 }
 
-// Compile the given filter and apply it to the packet source. Only packets that
-// match this filter will be captured.
-func (h *Handle) ApplyFilter(filter_str string) error {
-	var err error
-	h.filter, err = filter.Compile(filter_str, h.LinkType())
-	return err
+// Apply the given filter it to the packet source. Only packets that match this
+// filter will be captured.
+func (h *Handle) ApplyFilter(filter *filter.Filter) error {
+	h.filter = filter
+	return nil
 }
 
 // Activate the capture handle (this is not needed for the file capture handle,

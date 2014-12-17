@@ -2,6 +2,8 @@ package file
 
 import "testing"
 
+import "github.com/ghedo/hype/filter"
+
 func TestCapture(t *testing.T) {
 	src, err := Open("capture_test.pcap")
 	if err != nil {
@@ -33,7 +35,13 @@ func TestCaptureFilter(t *testing.T) {
 		t.Fatalf("Error opening: %s", err)
 	}
 
-	err = src.ApplyFilter("arp")
+	flt, err := filter.Compile("arp", src.LinkType())
+	if err != nil {
+		t.Fatalf("Error parsing filter: %s", err)
+	}
+	defer flt.Cleanup()
+
+	err = src.ApplyFilter(flt)
 	if err != nil {
 		t.Fatalf("Error applying filter: %s", err)
 	}
