@@ -36,8 +36,8 @@ decoding network packets.
 Packet capturing is done using a packet "source" such as a network interface or
 a dump file.
 
-In the following example we create a "live" source (the `eth0` network
-interface), we activate it and then capture packets using the `Capture()`
+In the following example we create a "live" capture handle using the `eth0`
+network interface, we activate it and then capture packets using the `Capture()`
 method.
 
 ```go
@@ -80,12 +80,11 @@ func main() {
 
 ### Injection
 
-Similarly to packet capturing, packet injection requires a network "source"
-(which in this case is more of a sink).
+Similarly to packet capturing, packet injection requires a capture handle.
 
-In the following example we create a source like before and then use the
-`Inject()` method to send some data (we'll see later how to encode "proper"
-network data).
+In the following example we create a capture handle like before and then use
+the `Inject()` method to send some data (we'll see later how to encode data in
+the propert formats).
 
 ```go
 package main
@@ -95,7 +94,7 @@ import "log"
 import "github.com/ghedo/hype/capture/live"
 
 func main() {
-	src, err := live.Open("eth0")
+	dst, err := live.Open("eth0")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,12 +102,12 @@ func main() {
 	// you may configure the source further, e.g. by activating
 	// promiscuous mode.
 
-	err = src.Activate()
+	err = dst.Activate()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = src.Inject([]byte("random data"))
+	err = dst.Inject([]byte("random data"))
 	if err != nil {
 		log.Fatal(err)
 	}
