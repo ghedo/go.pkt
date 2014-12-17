@@ -6,25 +6,26 @@ hype
 **hype** provides Go libraries for capturing, injecting, filtering, encoding and
 decoding network packets.
 
-* [hype/capture][http://godoc.org/github.com/ghedo/hype/capture]: provides
+* [hype/capture](http://godoc.org/github.com/ghedo/hype/capture): provides
   packet capture and injection functionality using different kind of packet
   sources (e.g. live network interfaces via libpcap, pcap dump files, ...). All
   capture sources implement a common interface to make switching between them
   easier. Note however that not all sources support all the available features
   (e.g. you can't put a dump file into promiscuous mode).
 
-* [hyper/filter][http://godoc.org/github.com/ghedo/hype/filter]: provides packet
+* [hyper/filter](http://godoc.org/github.com/ghedo/hype/filter): provides packet
   filtering capabilities by generating BPF filters based on input rules. Note
   that currently it uses the pcap filter compiler, but the plan is to also
   support compiling custom BPF programs in the future.
 
-* [hype/packet][http://godoc.org/github.com/ghedo/hype/packet]: provides packet
+* [hype/packet](http://godoc.org/github.com/ghedo/hype/packet): provides packet
   encoding and decoding capabilities. Every supported protocol provides its own
   submodule that implements the same common interface. Additionally the
-  [hype/packet/util][] module provides additional convenience functions for
-  manipulating packets (e.g. encoding or decoding chains of packages).
+  [hype/packet/util](http://godoc.org/github.com/ghedo/hype/packet/util) module
+  provides additional convenience functions for manipulating packets (e.g.
+  encoding or decoding chains of packages).
 
-* [hype/routing][http://godoc.org/github.com/ghedo/hype/packet]: provides
+* [hype/routing](http://godoc.org/github.com/ghedo/hype/packet): provides
   routing information on the host system. It can either return all available
   routes or select a specific route depending on the destination address.
 
