@@ -94,7 +94,9 @@ func (h *Handle) SetMonitorMode(monitor bool) error {
 // Apply the given filter it to the packet source. Only packets that match this
 // filter will be captured.
 func (h *Handle) ApplyFilter(filter *filter.Filter) error {
-	var net, mask C.bpf_u_int32
+	if !filter.Validate() {
+		return fmt.Errorf("Invalid filter")
+	}
 
 	err_str := (*C.char)(C.calloc(256, 1))
 	defer C.free(unsafe.Pointer(err_str))
@@ -102,14 +104,7 @@ func (h *Handle) ApplyFilter(filter *filter.Filter) error {
 	dev_str := C.CString(h.Device)
 	defer C.free(unsafe.Pointer(dev_str))
 
-	err := C.pcap_lookupnet(dev_str, &net, &mask, err_str)
-	if err < 0 {
-		return fmt.Errorf(
-			"Could not get device netmask: %s", C.GoString(err_str),
-		)
-	}
-
-	err = C.pcap_setfilter(h.pcap, (*C.struct_bpf_program)(unsafe.Pointer(filter)))
+	err := C.pcap_setfilter(h.pcap, (*C.struct_bpf_program)(unsafe.Pointer(filter)))
 	if err < 0 {
 		return fmt.Errorf("Could not set filter: %s", h.get_error())
 	}

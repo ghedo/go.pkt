@@ -135,6 +135,10 @@ func (h *Handle) SetMonitorMode(monitor bool) error {
 // Apply the given filter it to the packet source. Only packets that match this
 // filter will be captured.
 func (h *Handle) ApplyFilter(filter *filter.Filter) error {
+	if !filter.Validate() {
+		return fmt.Errorf("Invalid filter")
+	}
+
 	h.filter = filter
 	return nil
 }
