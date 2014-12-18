@@ -237,6 +237,13 @@ func (f *Filter) TXA() {
 	f.append_insn(code, 0, 0, 0)
 }
 
+// Return the number of instructions in the filter.
+func (f *Filter) Len() int {
+	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
+	flen := C.bpf_get_len(prog)
+	return int(flen)
+}
+
 func (f *Filter) String() string {
 	var insns []string
 
