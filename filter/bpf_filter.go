@@ -164,6 +164,8 @@ func (f *Filter) JSET(s Src, jt, jf uint8, cmp uint32) {
 	C.bpf_append_insn(prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(cmp))
 }
 
+/* TODO: support more instructions */
+
 // Append a RET (return) instruction to the filter.
 func (f *Filter) RET(s Src, bytes uint32) {
 	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
