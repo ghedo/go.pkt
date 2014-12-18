@@ -14,9 +14,9 @@ decoding network packets.
   (e.g. you can't put a dump file into promiscuous mode).
 
 * [hyper/filter](http://godoc.org/github.com/ghedo/hype/filter): provides packet
-  filtering capabilities by generating BPF filters based on input rules. Note
-  that currently it uses the pcap filter compiler, but the plan is to also
-  support compiling custom BPF programs in the future.
+  filtering capabilities by generating BPF filters based on input rules. It is
+  possible to either compile tcpdump-like expressions (by using the libpcap
+  compiler) or to generate filters from "raw" BPF instructions.
 
 * [hype/packet](http://godoc.org/github.com/ghedo/hype/packet): provides packet
   encoding and decoding capabilities. Every supported protocol provides its own

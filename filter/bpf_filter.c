@@ -394,3 +394,34 @@ bpf_validate(const struct bpf_insn *f, int len)
 	}
 	return (BPF_CLASS(f[len - 1].code) == BPF_RET);
 }
+
+int
+bpf_append_insn(struct bpf_program *p, unsigned short code,
+                unsigned char jt, unsigned char jf, unsigned int k)
+{
+	p->bf_insns = realloc(p->bf_insns, ++p->bf_len*sizeof(struct bpf_insn));
+	if (p->bf_insns == NULL)
+		return -1;
+
+	p->bf_insns[p->bf_len - 1].code = code;
+	p->bf_insns[p->bf_len - 1].jt   = jt;
+	p->bf_insns[p->bf_len - 1].jf   = jf;
+	p->bf_insns[p->bf_len - 1].k    = k;
+
+	return 0;
+}
+
+int
+bpf_get_len(struct bpf_program *p)
+{
+	return p->bf_len;
+}
+
+struct bpf_insn *
+bpf_get_insn(struct bpf_program *p, int i)
+{
+	if (i > p->bf_len)
+		return NULL;
+
+	return &p->bf_insns[i];
+}

@@ -123,3 +123,10 @@ unsigned int bpf_filter(const struct bpf_insn *pc, char *p,
                         unsigned int wirelen, unsigned int buflen);
 
 int bpf_validate(const struct bpf_insn *f, int len);
+
+int bpf_append_insn(struct bpf_program *p, unsigned short code,
+                unsigned char jt, unsigned char jf, unsigned int k);
+
+int bpf_get_len(struct bpf_program *p);
+
+struct bpf_insn *bpf_get_insn(struct bpf_program *p, int i);

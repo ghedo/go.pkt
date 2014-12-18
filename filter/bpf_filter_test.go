@@ -64,9 +64,15 @@ var test_eth_ipv4_tcp = []byte{
 }
 
 func TestMatch(t *testing.T) {
-	arp, err := Compile("arp", packet.Eth)
-	if err != nil {
-		t.Fatalf("Error compiling arp")
+	arp := &Filter{}
+
+	arp.LD(Half, ABS, 12)
+	arp.JEQ(Const, 0, 1, 0x806)
+	arp.RET(Const, 0x40000)
+	arp.RET(Const, 0x0)
+
+	if !arp.Validate() {
+		t.Fatalf("Invalid filter ARP\n%s", arp)
 	}
 
 	udp, err := Compile("udp", packet.Eth)
