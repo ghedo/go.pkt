@@ -53,12 +53,13 @@ const (
 	IPv6
 	ISIS      /* TODO */
 	L2TP      /* TODO */
-	LLC       /* TODO */
+	LLC
 	LLDP      /* TODO */
 	OSPF      /* TODO */
 	RadioTap  /* TODO */
 	Raw
 	SCTP      /* TODO */
+	SNAP
 	TCP
 	TRILL     /* TODO */
 	UDP

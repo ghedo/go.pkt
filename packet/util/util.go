@@ -39,6 +39,7 @@ import "github.com/ghedo/hype/packet/icmpv4"
 import "github.com/ghedo/hype/packet/icmpv6"
 import "github.com/ghedo/hype/packet/ipv4"
 import "github.com/ghedo/hype/packet/ipv6"
+import "github.com/ghedo/hype/packet/llc"
 import "github.com/ghedo/hype/packet/raw"
 import "github.com/ghedo/hype/packet/tcp"
 import "github.com/ghedo/hype/packet/udp"
@@ -145,6 +146,7 @@ func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 		case packet.ICMPv6: p = &icmpv6.Packet{}
 		case packet.IPv4:   p = &ipv4.Packet{}
 		case packet.IPv6:   p = &ipv6.Packet{}
+		case packet.LLC:    p = &llc.Packet{}
 		case packet.TCP:    p = &tcp.Packet{}
 		case packet.UDP:    p = &udp.Packet{}
 		case packet.VLAN:   p = &vlan.Packet{}
