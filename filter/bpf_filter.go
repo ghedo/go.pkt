@@ -43,6 +43,17 @@ type Filter C.struct_bpf_program
 
 type Code uint16
 
+const (
+	LD Code = 0x00
+	LDX     = 0x01
+	ST      = 0x02
+	STX     = 0x03
+	ALU     = 0x04
+	JMP     = 0x05
+	RET     = 0x06
+	MISC    = 0x07
+)
+
 type Size uint16
 
 const (
@@ -67,6 +78,7 @@ type Src uint16
 const (
 	Const Src = 0x00
 	Index     = 0x08
+	Acc       = 0x10
 )
 
 // Try to match the given buffer against the filter.
@@ -103,74 +115,126 @@ func (f *Filter) Cleanup() {
 
 // Append a LD (load) instruction to the filter.
 func (f *Filter) LD(s Size, m Mode, val uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(m) | uint16(0x00))
-	C.bpf_append_insn(prog, C.ushort(code), 0, 0, C.uint(val))
+	code := Code(uint16(s) | uint16(m)) | LD
+	f.append_insn(code, 0, 0, val)
 }
 
 // Append a LDX (load index) instruction to the filter.
 func (f *Filter) LDX(s Size, m Mode, val uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(m) | uint16(0x01))
-	C.bpf_append_insn(prog, C.ushort(code), 0, 0, C.uint(val))
+	code := Code(uint16(s) | uint16(m) | LDX)
+	f.append_insn(code, 0, 0, val)
 }
 
 // Append a ST (store) instruction to the filter.
 func (f *Filter) ST(val uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(0x02))
-	C.bpf_append_insn(prog, C.ushort(code), 0, 0, C.uint(val))
+	f.append_insn(ST, 0, 0, val)
 }
 
 // Append a STX (store to index) instruction to the filter.
 func (f *Filter) STX(val uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(0x03))
-	C.bpf_append_insn(prog, C.ushort(code), 0, 0, C.uint(val))
+	f.append_insn(STX, 0, 0, val)
+}
+
+// Append a ADD instruction to the filter.
+func (f *Filter) ADD(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x00) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a SUB instruction to the filter.
+func (f *Filter) SUB(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x10) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a MUL instruction to the filter.
+func (f *Filter) MUL(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x20) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a DIV instruction to the filter.
+func (f *Filter) DIV(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x30) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a AND instruction to the filter.
+func (f *Filter) AND(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x40) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a OR instruction to the filter.
+func (f *Filter) OR(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x50) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a LSH instruction to the filter.
+func (f *Filter) LSH(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x60) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a RSH instruction to the filter.
+func (f *Filter) RSH(s Src, val uint32) {
+	code := Code(uint16(s) | uint16(0x70) | ALU)
+	f.append_insn(code, 0, 0, val)
+}
+
+// Append a NEG instruction to the filter.
+func (f *Filter) NEG() {
+	code := Code(uint16(0x80) | ALU)
+	f.append_insn(code, 0, 0, 0)
 }
 
 // Append a JA (jump absolute) instruction to the filter.
-func (f *Filter) JA(s Src, addr uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(0x00) | uint16(0x05))
-	C.bpf_append_insn(prog, C.ushort(code), 0, 0, C.uint(addr))
+func (f *Filter) JA(addr uint8) {
+	code := Code(uint16(0x00) | JMP)
+	f.append_insn(code, 0, 0, uint32(addr))
 }
 
 // Append a JEQ (jump if equal) instruction to the filter.
 func (f *Filter) JEQ(s Src, jt, jf uint8, cmp uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(0x10) | uint16(0x05))
-	C.bpf_append_insn(prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(cmp))
+	code := Code(uint16(s) | uint16(0x10) | JMP)
+	f.append_insn(code, jt, jf, cmp)
 }
 
 // Append a JGT (jump if greater than) instruction to the filter.
 func (f *Filter) JGT(s Src, jt, jf uint8, cmp uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(0x10) | uint16(0x05))
-	C.bpf_append_insn(prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(cmp))
+	code := Code(uint16(s) | uint16(0x20) | JMP)
+	f.append_insn(code, jt, jf, cmp)
 }
 
 // Append a JGE (jump if greater or equal) instruction to the filter.
 func (f *Filter) JGE(s Src, jt, jf uint8, cmp uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(0x10) | uint16(0x05))
-	C.bpf_append_insn(prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(cmp))
+	code := Code(uint16(s) | uint16(0x30) | JMP)
+	f.append_insn(code, jt, jf, cmp)
 }
 
 // Append a JSET instruction to the filter.
 func (f *Filter) JSET(s Src, jt, jf uint8, cmp uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(0x10) | uint16(0x05))
-	C.bpf_append_insn(prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(cmp))
+	code := Code(uint16(s) | uint16(0x40) | JMP)
+	f.append_insn(code, jt, jf, cmp)
 }
-
-/* TODO: support more instructions */
 
 // Append a RET (return) instruction to the filter.
 func (f *Filter) RET(s Src, bytes uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
-	code := Code(uint16(s) | uint16(0x06))
-	C.bpf_append_insn(prog, C.ushort(code), 0, 0, C.uint(bytes))
+	code := Code(uint16(s) | RET)
+	f.append_insn(code, 0, 0, bytes)
+}
+
+// Append a TAX instruction to the filter.
+func (f *Filter) TAX() {
+	code := Code(uint16(0x00) | MISC)
+	f.append_insn(code, 0, 0, 0)
+}
+
+// Append a TXA instruction to the filter.
+func (f *Filter) TXA() {
+	code := Code(uint16(0x80) | MISC)
+	f.append_insn(code, 0, 0, 0)
 }
 
 func (f *Filter) String() string {
@@ -182,7 +246,6 @@ func (f *Filter) String() string {
 	for i := C.int(0); i < flen; i++ {
 		insn := C.bpf_get_insn(prog, i)
 
-
 		str := fmt.Sprintf(
 			"{ 0x%.2x, %3d, %3d, 0x%.8x },",
 			insn.code, insn.jt, insn.jf, insn.k,
@@ -192,4 +255,11 @@ func (f *Filter) String() string {
 	}
 
 	return strings.Join(insns, "\n")
+}
+
+func (f *Filter) append_insn(code Code, jt, jf uint8, k uint32) {
+	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
+	C.bpf_append_insn(
+		prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(k),
+	)
 }
