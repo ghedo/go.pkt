@@ -104,7 +104,7 @@ func (h *Handle) ApplyFilter(filter *filter.Filter) error {
 	dev_str := C.CString(h.Device)
 	defer C.free(unsafe.Pointer(dev_str))
 
-	err := C.pcap_setfilter(h.pcap, (*C.struct_bpf_program)(unsafe.Pointer(filter)))
+	err := C.pcap_setfilter(h.pcap, (*C.struct_bpf_program)(filter.Program()))
 	if err < 0 {
 		return fmt.Errorf("Could not set filter: %s", h.get_error())
 	}

@@ -39,7 +39,9 @@ import "fmt"
 import "strings"
 import "unsafe"
 
-type Filter C.struct_bpf_program
+type Filter struct {
+	program C.struct_bpf_program
+}
 
 type Code uint16
 
@@ -86,7 +88,7 @@ func (f *Filter) Match(raw_pkt []byte) bool {
 	buf  := (*C.char)(unsafe.Pointer(&raw_pkt[0]))
 	blen := C.uint(len(raw_pkt))
 
-	if C.bpf_filter(f.bf_insns, buf, blen, blen) > 0 {
+	if C.bpf_filter(f.program.bf_insns, buf, blen, blen) > 0 {
 		return true
 	}
 
@@ -96,7 +98,7 @@ func (f *Filter) Match(raw_pkt []byte) bool {
 // Validate the filter. The constraints are that each jump be forward and to a
 // valid code. The code must terminate with either an accept or reject.
 func (f *Filter) Validate() bool {
-	if C.bpf_validate(f.bf_insns, C.int(f.bf_len)) > 0 {
+	if C.bpf_validate(f.program.bf_insns, C.int(f.program.bf_len)) > 0 {
 		return true
 	}
 
@@ -105,11 +107,11 @@ func (f *Filter) Validate() bool {
 
 // Deallocate the filter.
 func (f *Filter) Cleanup() {
-	f.bf_len = 0
+	f.program.bf_len = 0
 
-	if f.bf_insns != nil {
-		C.free(unsafe.Pointer(f.bf_insns))
-		f.bf_insns = nil
+	if f.program.bf_insns != nil {
+		C.free(unsafe.Pointer(f.program.bf_insns))
+		f.program.bf_insns = nil
 	}
 }
 
@@ -239,15 +241,20 @@ func (f *Filter) TXA() {
 
 // Return the number of instructions in the filter.
 func (f *Filter) Len() int {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
+	prog := (*C.struct_bpf_program)(f.Program())
 	flen := C.bpf_get_len(prog)
 	return int(flen)
+}
+
+// Return the compiled BPF program.
+func (f *Filter) Program() unsafe.Pointer {
+	return unsafe.Pointer(&f.program)
 }
 
 func (f *Filter) String() string {
 	var insns []string
 
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
+	prog := (*C.struct_bpf_program)(f.Program())
 	flen := C.bpf_get_len(prog)
 
 	for i := C.int(0); i < flen; i++ {
@@ -265,7 +272,7 @@ func (f *Filter) String() string {
 }
 
 func (f *Filter) append_insn(code Code, jt, jf uint8, k uint32) {
-	prog := (*C.struct_bpf_program)(unsafe.Pointer(f))
+	prog := (*C.struct_bpf_program)(f.Program())
 	C.bpf_append_insn(
 		prog, C.ushort(code), C.uchar(jt), C.uchar(jf), C.uint(k),
 	)

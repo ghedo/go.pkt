@@ -54,7 +54,7 @@ func Compile(filter string, link_type packet.Type) (*Filter, error) {
 
 	err := C.pcap_compile_nopcap(
 		C.int(0x7fff), C.int(pcap_type),
-		(*C.struct_bpf_program)(f),
+		(*C.struct_bpf_program)(f.Program()),
 		fil_str, 0, 0xffffffff,
 	)
 	if err < 0 {
