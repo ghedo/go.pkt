@@ -102,20 +102,7 @@ import "github.com/docopt/docopt-go"
 
 import "github.com/ghedo/hype/filter"
 
-const (
-	JTL int = iota
-	JFL
-	JKL
-)
-
-var flt *filter.Filter
-
-var lbl map[string]uint8
-
-func jmpl(f *filter.Filter, l string) uint8 {
-	off := lbl[l]
-	return off - uint8(f.Len()) - 1
-}
+var bld *filter.Builder
 
 func main() {
 	log.SetFlags(0)
@@ -132,19 +119,12 @@ func main() {
 		log.Fatalf("Error opening file: %s", err)
 	}
 
-	lbl = make(map[string]uint8)
-	flt = &filter.Filter{}
+	bld = filter.NewBuilder()
 
-	// We do 2 passes, the first to initialize the labels map and the second
-	// to do the actual parsing. This is pretty stupid, but it's the easiest
-	// to resolve the label names.
 	lex := NewLexer(file)
 	yyParse(lex)
-	flt.Cleanup()
 
-	file.Seek(0, 0)
-	lex = NewLexer(file)
-	yyParse(lex)
+	flt := bld.Build()
 
 	if !flt.Validate() {
 		log.Fatalf("Invalid filter")

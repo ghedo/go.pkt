@@ -114,366 +114,366 @@ instr
 	;
 
 labelled
-	: label ':' { lbl[$1] = uint8(flt.Len())
+	: label ':' { bld.Label($1)
 	}
 	;
 
 ldb
 	: OP_LDB '[' 'x' '+' number ']' {
-		flt.LD(filter.Byte, filter.IND, $5)
+		bld.LD(filter.Byte, filter.IND, $5)
 	}
 	| OP_LDB '[' '%' 'x' '+' number ']' {
-		flt.LD(filter.Byte, filter.IND, $6)
+		bld.LD(filter.Byte, filter.IND, $6)
 	}
 	| OP_LDB '[' number ']' {
-		flt.LD(filter.Byte, filter.ABS, $3)
+		bld.LD(filter.Byte, filter.ABS, $3)
 	}
 	;
 
 ldh
 	: OP_LDH '[' 'x' '+' number ']' {
-		flt.LD(filter.Half, filter.IND, $5)
+		bld.LD(filter.Half, filter.IND, $5)
 	}
 	| OP_LDH '[' '%' 'x' '+' number ']' {
-		flt.LD(filter.Half, filter.IND, $6)
+		bld.LD(filter.Half, filter.IND, $6)
 	}
 	| OP_LDH '[' number ']' {
-		flt.LD(filter.Half, filter.ABS, $3)
+		bld.LD(filter.Half, filter.ABS, $3)
 	}
 	;
 
 ldi
 	: OP_LDI '#' number {
-		flt.LD(filter.Word, filter.IMM, $3)
+		bld.LD(filter.Word, filter.IMM, $3)
 	}
 	| OP_LDI number {
-		flt.LD(filter.Word, filter.IMM, $2)
+		bld.LD(filter.Word, filter.IMM, $2)
 	}
 	;
 
 ld
 	: OP_LD '#' number {
-		flt.LD(filter.Word, filter.IMM, $3)
+		bld.LD(filter.Word, filter.IMM, $3)
 	}
 	| OP_LD K_PKT_LEN {
-		flt.LD(filter.Word, filter.LEN, 0)
+		bld.LD(filter.Word, filter.LEN, 0)
 	}
 	| OP_LD 'M' '[' number ']' {
-		flt.LD(filter.Word, filter.MEM, $4)
+		bld.LD(filter.Word, filter.MEM, $4)
 	}
 	| OP_LD '[' 'x' '+' number ']' {
-		flt.LD(filter.Word, filter.IND, $5)
+		bld.LD(filter.Word, filter.IND, $5)
 	}
 	| OP_LD '[' '%' 'x' '+' number ']' {
-		flt.LD(filter.Word, filter.IND, $6)
+		bld.LD(filter.Word, filter.IND, $6)
 	}
 	| OP_LD '[' number ']' {
-		flt.LD(filter.Word, filter.ABS, $3)
+		bld.LD(filter.Word, filter.ABS, $3)
 	}
 	;
 
 ldxi
 	: OP_LDXI '#' number {
-		flt.LDX(filter.Word, filter.IMM, $3)
+		bld.LDX(filter.Word, filter.IMM, $3)
 	}
 	| OP_LDXI number {
-		flt.LDX(filter.Word, filter.IMM, $2)
+		bld.LDX(filter.Word, filter.IMM, $2)
 	}
 	;
 
 ldx
 	: OP_LDX '#' number {
-		flt.LDX(filter.Word, filter.IMM, $3)
+		bld.LDX(filter.Word, filter.IMM, $3)
 	}
 	| OP_LDX K_PKT_LEN {
-		flt.LDX(filter.Word, filter.LEN, 0)
+		bld.LDX(filter.Word, filter.LEN, 0)
 	}
 	| OP_LDX 'M' '[' number ']' {
-		flt.LDX(filter.Word, filter.MEM, $4)
+		bld.LDX(filter.Word, filter.MEM, $4)
 	}
 	| OP_LDXB number '*' '(' '[' number ']' '&' number ')' {
 		if ($2 != 4 || $9 != 0xf) {
 			yylex.Error("ldxb offset not supported!")
 		} else {
-			flt.LDX(filter.Byte, filter.MSH, $6)
+			bld.LDX(filter.Byte, filter.MSH, $6)
 		}
 	}
 	| OP_LDX number '*' '(' '[' number ']' '&' number ')' {
 		if ($2 != 4 || $9 != 0xf) {
 			yylex.Error("ldxb offset not supported!")
 		} else {
-			flt.LDX(filter.Byte, filter.MSH, $6)
+			bld.LDX(filter.Byte, filter.MSH, $6)
 		}
 	}
 	;
 
 st
 	: OP_ST 'M' '[' number ']' {
-		flt.ST($4)
+		bld.ST($4)
 	}
 	;
 
 stx
 	: OP_STX 'M' '[' number ']' {
-		flt.STX($4)
+		bld.STX($4)
 	}
 	;
 
 jmp
 	: OP_JMP label {
-		flt.JA(jmpl(flt, $2))
+		bld.JA($2)
 	}
 	;
 
 jeq
 	: OP_JEQ '#' number ',' label ',' label {
-		flt.JEQ(filter.Const, jmpl(flt, $5), jmpl(flt, $7), $3)
+		bld.JEQ(filter.Const, $5, $7, $3)
 	}
 	| OP_JEQ 'x' ',' label ',' label {
-		flt.JEQ(filter.Index, jmpl(flt, $4), jmpl(flt, $6), 0)
+		bld.JEQ(filter.Index, $4, $6, 0)
 	}
 	| OP_JEQ '%' 'x' ',' label ',' label {
-		flt.JEQ(filter.Index, jmpl(flt, $5), jmpl(flt, $7), 0)
+		bld.JEQ(filter.Index, $5, $7, 0)
 	}
 	| OP_JEQ '#' number ',' label {
-		flt.JEQ(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JEQ(filter.Const, "", $5, $3)
 	}
 	| OP_JEQ 'x' ',' label {
-		flt.JEQ(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JEQ(filter.Index, "", $4, 0)
 	}
 	| OP_JEQ '%' 'x' ',' label {
-		flt.JEQ(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JEQ(filter.Index, "", $5, 0)
 	}
 	;
 
 jneq
 	: OP_JNEQ '#' number ',' label {
-		flt.JEQ(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JEQ(filter.Const, "", $5, $3)
 	}
 	| OP_JNEQ 'x' ',' label {
-		flt.JEQ(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JEQ(filter.Index, "", $4, 0)
 	}
 	| OP_JNEQ '%' 'x' ',' label {
-		flt.JEQ(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JEQ(filter.Index, "", $5, 0)
 	}
 	;
 
 jlt
 	: OP_JLT '#' number ',' label {
-		flt.JGE(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JGE(filter.Const, "", $5, $3)
 	}
 	| OP_JLT 'x' ',' label {
-		flt.JGE(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JGE(filter.Index, "", $4, 0)
 	}
 	| OP_JLT '%' 'x' ',' label {
-		flt.JGE(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JGE(filter.Index, "", $5, 0)
 	}
 	;
 
 jle
 	: OP_JLE '#' number ',' label {
-		flt.JGT(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JGT(filter.Const, "", $5, $3)
 	}
 	| OP_JLE 'x' ',' label {
-		flt.JGT(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JGT(filter.Index, "", $4, 0)
 	}
 	| OP_JLE '%' 'x' ',' label {
-		flt.JGT(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JGT(filter.Index, "", $5, 0)
 	}
 	;
 
 jgt
 	: OP_JGT '#' number ',' label ',' label {
-		flt.JGT(filter.Const, jmpl(flt, $5), jmpl(flt, $7), $3)
+		bld.JGT(filter.Const, $5, $7, $3)
 	}
 	| OP_JGT 'x' ',' label ',' label {
-		flt.JGT(filter.Index, jmpl(flt, $4), jmpl(flt, $6), 0)
+		bld.JGT(filter.Index, $4, $6, 0)
 	}
 	| OP_JGT '%' 'x' ',' label ',' label {
-		flt.JGT(filter.Index, jmpl(flt, $5), jmpl(flt, $7), 0)
+		bld.JGT(filter.Index, $5, $7, 0)
 	}
 	| OP_JGT '#' number ',' label {
-		flt.JGT(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JGT(filter.Const, "", $5, $3)
 	}
 	| OP_JGT 'x' ',' label {
-		flt.JGT(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JGT(filter.Index, "", $4, 0)
 	}
 	| OP_JGT '%' 'x' ',' label {
-		flt.JGT(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JGT(filter.Index, "", $5, 0)
 	}
 	;
 
 jge
 	: OP_JGE '#' number ',' label ',' label {
-		flt.JGE(filter.Const, jmpl(flt, $5), jmpl(flt, $7), $3)
+		bld.JGE(filter.Const, $5, $7, $3)
 	}
 	| OP_JGE 'x' ',' label ',' label {
-		flt.JGE(filter.Index, jmpl(flt, $4), jmpl(flt, $6), 0)
+		bld.JGE(filter.Index, $4, $6, 0)
 	}
 	| OP_JGE '%' 'x' ',' label ',' label {
-		flt.JGE(filter.Index, jmpl(flt, $5), jmpl(flt, $7), 0)
+		bld.JGE(filter.Index, $5, $7, 0)
 	}
 	| OP_JGE '#' number ',' label {
-		flt.JGE(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JGE(filter.Const, "", $5, $3)
 	}
 	| OP_JGE 'x' ',' label {
-		flt.JGE(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JGE(filter.Index, "", $4, 0)
 	}
 	| OP_JGE '%' 'x' ',' label {
-		flt.JGE(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JGE(filter.Index, "", $5, 0)
 	}
 	;
 
 jset
 	: OP_JSET '#' number ',' label ',' label {
-		flt.JSET(filter.Const, jmpl(flt, $5), jmpl(flt, $7), $3)
+		bld.JSET(filter.Const, $5, $7, $3)
 	}
 	| OP_JSET 'x' ',' label ',' label {
-		flt.JSET(filter.Index, jmpl(flt, $4), jmpl(flt, $6), 0)
+		bld.JSET(filter.Index, $4, $6, 0)
 	}
 	| OP_JSET '%' 'x' ',' label ',' label {
-		flt.JSET(filter.Index, jmpl(flt, $5), jmpl(flt, $7), 0)
+		bld.JSET(filter.Index, $5, $7, 0)
 	}
 	| OP_JSET '#' number ',' label {
-		flt.JSET(filter.Const, 0, jmpl(flt, $5), $3)
+		bld.JSET(filter.Const, "", $5, $3)
 	}
 	| OP_JSET 'x' ',' label {
-		flt.JSET(filter.Index, 0, jmpl(flt, $4), 0)
+		bld.JSET(filter.Index, "", $4, 0)
 	}
 	| OP_JSET '%' 'x' ',' label {
-		flt.JSET(filter.Index, 0, jmpl(flt, $5), 0)
+		bld.JSET(filter.Index, "", $5, 0)
 	}
 	;
 
 add
 	: OP_ADD '#' number {
-		flt.ADD(filter.Const, $3)
+		bld.ADD(filter.Const, $3)
 	}
 	| OP_ADD 'x' {
-		flt.ADD(filter.Index, 0)
+		bld.ADD(filter.Index, 0)
 	}
 	| OP_ADD '%' 'x' {
-		flt.ADD(filter.Index, 0)
+		bld.ADD(filter.Index, 0)
 	}
 	;
 
 sub
 	: OP_SUB '#' number {
-		flt.SUB(filter.Const, $3)
+		bld.SUB(filter.Const, $3)
 	}
 	| OP_SUB 'x' {
-		flt.SUB(filter.Index, 0)
+		bld.SUB(filter.Index, 0)
 	}
 	| OP_SUB '%' 'x' {
-		flt.SUB(filter.Index, 0)
+		bld.SUB(filter.Index, 0)
 	}
 	;
 
 mul
 	: OP_MUL '#' number {
-		flt.MUL(filter.Const, $3)
+		bld.MUL(filter.Const, $3)
 	}
 	| OP_MUL 'x' {
-		flt.MUL(filter.Index, 0)
+		bld.MUL(filter.Index, 0)
 	}
 	| OP_MUL '%' 'x' {
-		flt.MUL(filter.Index, 0)
+		bld.MUL(filter.Index, 0)
 	}
 	;
 
 div
 	: OP_DIV '#' number {
-		flt.DIV(filter.Const, $3)
+		bld.DIV(filter.Const, $3)
 	}
 	| OP_DIV 'x' {
-		flt.DIV(filter.Index, 0)
+		bld.DIV(filter.Index, 0)
 	}
 	| OP_DIV '%' 'x' {
-		flt.DIV(filter.Index, 0)
+		bld.DIV(filter.Index, 0)
 	}
 	;
 
 neg
 	: OP_NEG {
-		flt.NEG()
+		bld.NEG()
 	}
 	;
 
 and
 	: OP_AND '#' number {
-		flt.AND(filter.Const, $3)
+		bld.AND(filter.Const, $3)
 	}
 	| OP_AND 'x' {
-		flt.AND(filter.Index, 0)
+		bld.AND(filter.Index, 0)
 	}
 	| OP_AND '%' 'x' {
-		flt.AND(filter.Index, 0)
+		bld.AND(filter.Index, 0)
 	}
 	;
 
 or
 	: OP_OR '#' number {
-		flt.OR(filter.Const, $3)
+		bld.OR(filter.Const, $3)
 	}
 	| OP_OR 'x' {
-		flt.OR(filter.Index, 0)
+		bld.OR(filter.Index, 0)
 	}
 	| OP_OR '%' 'x' {
-		flt.OR(filter.Index, 0)
+		bld.OR(filter.Index, 0)
 	}
 	;
 
 lsh
 	: OP_LSH '#' number {
-		flt.LSH(filter.Const, $3)
+		bld.LSH(filter.Const, $3)
 	}
 	| OP_LSH 'x' {
-		flt.LSH(filter.Index, 0)
+		bld.LSH(filter.Index, 0)
 	}
 	| OP_LSH '%' 'x' {
-		flt.LSH(filter.Index, 0)
+		bld.LSH(filter.Index, 0)
 	}
 	;
 
 rsh
 	: OP_RSH '#' number {
-		flt.RSH(filter.Const, $3)
+		bld.RSH(filter.Const, $3)
 	}
 	| OP_RSH 'x' {
-		flt.RSH(filter.Index, 0)
+		bld.RSH(filter.Index, 0)
 	}
 	| OP_RSH '%' 'x' {
-		flt.RSH(filter.Index, 0)
+		bld.RSH(filter.Index, 0)
 	}
 	;
 
 ret
 	: OP_RET 'a' {
-		flt.RET(filter.Acc, 0)
+		bld.RET(filter.Acc, 0)
 	}
 	| OP_RET '%' 'a' {
-		flt.RET(filter.Acc, 0)
+		bld.RET(filter.Acc, 0)
 	}
 	| OP_RET 'x' {
-		flt.RET(filter.Index, 0)
+		bld.RET(filter.Index, 0)
 	}
 	| OP_RET '%' 'x' {
-		flt.RET(filter.Index, 0)
+		bld.RET(filter.Index, 0)
 	}
 	| OP_RET '#' number {
-		flt.RET(filter.Const, $3)
+		bld.RET(filter.Const, $3)
 	}
 	;
 
 tax
 	: OP_TAX {
-		flt.TAX()
+		bld.TAX()
 	}
 	;
 
 txa
 	: OP_TXA {
-		flt.TXA()
+		bld.TXA()
 	}
 	;
 
