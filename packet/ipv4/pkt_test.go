@@ -53,7 +53,7 @@ func MakeTestSimple() *Packet {
 		Id: 15,
 		TTL: 100,
 		Flags: DontFragment,
-		Protocol: packet.TCP,
+		Protocol: TCP,
 		SrcAddr: net.ParseIP(ipsrc_str),
 		DstAddr: net.ParseIP(ipdst_str),
 	}

@@ -35,13 +35,14 @@ import "encoding/binary"
 import "net"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/ipv4"
 
 type Packet struct {
 	Version     uint8
 	Class       uint8
 	Label       uint32
 	Length      uint16        `name:"len"`
-	NextHdr     packet.Type   `name:"next"`
+	NextHdr     ipv4.Protocol `name:"next"`
 	HopLimit    uint8         `name:"hop"`
 	SrcAddr     net.IP        `name:"src"`
 	DstAddr     net.IP        `name:"dst"`
@@ -71,7 +72,7 @@ func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(uint16(p.Label))
 
 	raw_pkt.WriteI(p.Length)
-	raw_pkt.WriteI(p.NextHdr.ToIPProtocol())
+	raw_pkt.WriteI(p.NextHdr)
 	raw_pkt.WriteI(p.HopLimit)
 
 	raw_pkt.Write(p.SrcAddr.To16())
@@ -91,7 +92,7 @@ func (p *Packet) pseudo_checksum() uint32 {
 	}
 
 	csum += uint32(p.Length)
-	csum += uint32(p.NextHdr.ToIPProtocol())
+	csum += uint32(p.NextHdr)
 
 	return csum
 }
@@ -111,11 +112,7 @@ func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 	raw_pkt.Next(3)
 
 	raw_pkt.ReadI(&p.Length)
-
-	var proto uint8
-	raw_pkt.ReadI(&proto)
-	p.NextHdr = packet.IPProtocol(proto)
-
+	raw_pkt.ReadI(&p.NextHdr)
 	raw_pkt.ReadI(&p.HopLimit)
 
 	p.SrcAddr = net.IP(raw_pkt.Next(16))
@@ -131,12 +128,12 @@ func (p *Packet) Payload() packet.Packet {
 }
 
 func (p *Packet) PayloadType() packet.Type {
-	return p.NextHdr
+	return ipv4.ProtocolToType(p.NextHdr)
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.pkt_payload = pl
-	p.NextHdr     = pl.GetType()
+	p.NextHdr     = ipv4.TypeToProtocol(pl.GetType())
 	p.Length      = pl.GetLength()
 
 	pl.InitChecksum(p.pseudo_checksum())

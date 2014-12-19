@@ -87,49 +87,6 @@ type Packet interface {
 	String() string
 }
 
-var ipv4proto_to_type_map = [][2]uint16{
-	{ 0x01, uint16(ICMPv4)  },
-	{ 0x02, uint16(IGMP)    },
-	{ 0x06, uint16(TCP)     },
-	{ 0x11, uint16(UDP)     },
-	{ 0x29, uint16(IPv6)    },
-	{ 0x2B, uint16(IPv6)    }, /* IPv6-Route */
-	{ 0x2C, uint16(IPv6)    }, /* IPv6-Frag */
-	{ 0x2F, uint16(GRE)     },
-	{ 0x32, uint16(IPSec)   }, /* IPSec ESP */
-	{ 0x33, uint16(IPSec)   }, /* IPSec AH */
-	{ 0x3A, uint16(ICMPv6)  },
-	{ 0x3B, uint16(IPv6)    }, /* IPv6-NoNxt */
-	{ 0x3C, uint16(IPv6)    }, /* IPv6-Opts */
-	{ 0x59, uint16(OSPF)    },
-	{ 0x73, uint16(L2TP)    },
-	{ 0x7C, uint16(ISIS)    },
-	{ 0x84, uint16(SCTP)    },
-	{ 0x88, uint16(UDPLite) },
-}
-
-// Create a new Type from the given IP protocol ID.
-func IPProtocol(protocol uint8) Type {
-	for _, t := range ipv4proto_to_type_map {
-		if t[0] == uint16(protocol) {
-			return Type(t[1])
-		}
-	}
-
-	return Type(protocol)
-}
-
-// Convert the Type to the corresponding IP protocol ID.
-func (pkttype Type) ToIPProtocol() uint8 {
-	for _, t := range ipv4proto_to_type_map {
-		if t[1] == uint16(pkttype) {
-			return uint8(t[0])
-		}
-	}
-
-	return uint8(pkttype)
-}
-
 var pcap_link_type_to_type_map = [][2]uint32{
 	{ 0x01, uint32(Eth)  },
 }

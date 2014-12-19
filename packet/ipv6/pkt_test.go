@@ -35,6 +35,7 @@ import "net"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/ipv4"
 
 var test_simple = []byte{
 	0x63, 0x0d, 0x5b, 0x0a, 0x00, 0x08, 0x11, 0x40, 0xfe, 0x80, 0x00, 0x00,
@@ -52,7 +53,7 @@ func MakeTestSimple() *Packet {
 		Class: 48,
 		Label: 875274,
 		Length: 8,
-		NextHdr: packet.UDP,
+		NextHdr: ipv4.UDP,
 		HopLimit: 64,
 		SrcAddr: net.ParseIP(ipsrc_str),
 		DstAddr: net.ParseIP(ipdst_str),
