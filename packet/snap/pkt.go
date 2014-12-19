@@ -32,10 +32,11 @@
 package snap
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 type Packet struct {
 	OUI         [3]byte
-	Type        packet.Type
+	Type        eth.EtherType
 
 	pkt_payload packet.Packet `name:"skip"`
 }
@@ -59,18 +60,14 @@ func (p *Packet) GetLength() uint16 {
 
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(p.OUI)
-	raw_pkt.WriteI(p.Type.ToEtherType())
+	raw_pkt.WriteI(p.Type)
 
 	return nil
 }
 
 func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 	raw_pkt.ReadI(&p.OUI)
-
-	var etype uint16
-	raw_pkt.ReadI(&etype)
-
-	p.Type = packet.EtherType(etype)
+	raw_pkt.ReadI(&p.Type)
 
 	return nil
 }
@@ -81,7 +78,7 @@ func (p *Packet) Payload() packet.Packet {
 
 func (p *Packet) PayloadType() packet.Type {
 	if p.OUI[0] == 0x00 && p.OUI[1] == 0x00 && p.OUI[2] == 0x00 {
-		return p.Type
+		return eth.EtherTypeToType(p.Type)
 	} else {
 		return packet.Raw
 	}
@@ -89,7 +86,7 @@ func (p *Packet) PayloadType() packet.Type {
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.pkt_payload = pl
-	p.Type        = pl.GetType()
+	p.Type        = eth.TypeToEtherType(pl.GetType())
 
 	return nil
 }

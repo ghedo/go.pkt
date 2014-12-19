@@ -65,7 +65,7 @@ func MakeTestSimple() *Packet {
 	return &Packet{
 		SrcAddr: hwsrc,
 		DstAddr: hwdst,
-		Type: packet.IPv4,
+		Type:    IPv4,
 	}
 }
 

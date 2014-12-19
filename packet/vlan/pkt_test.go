@@ -34,6 +34,7 @@ import "bytes"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 var test_simple = []byte{
 	0x64, 0x00, 0x08, 0x00,
@@ -42,8 +43,8 @@ var test_simple = []byte{
 func MakeTestSimple() *Packet {
 	return &Packet{
 		Priority: 3,
-		VLAN: 1024,
-		Type: packet.IPv4,
+		VLAN:     1024,
+		Type:     eth.IPv4,
 	}
 }
 

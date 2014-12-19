@@ -34,17 +34,18 @@ package arp
 import "net"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 type Packet struct {
 	Operation     Operation        `name:"op"`
 
 	HWType        uint16
-	HWAddrLen     uint8
+	HWAddrLen     uint8            `name:"hwlen"`
 	HWSrcAddr     net.HardwareAddr `name:"hwsrc"`
 	HWDstAddr     net.HardwareAddr `name:"hwdst"`
 
-	ProtoType     packet.Type
-	ProtoAddrLen  uint8
+	ProtoType     eth.EtherType    `name:"ptype"`
+	ProtoAddrLen  uint8            `name:"plen"`
 	ProtoSrcAddr  net.IP           `name:"psrc"`
 	ProtoDstAddr  net.IP           `name:"pdst"`
 }
@@ -63,7 +64,7 @@ func Make() *Packet {
 		HWType: 1,
 		HWAddrLen: 6,
 
-		ProtoType: packet.IPv4,
+		ProtoType: eth.IPv4,
 		ProtoAddrLen: 4,
 	}
 }
@@ -78,7 +79,7 @@ func (p *Packet) GetLength() uint16 {
 
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(p.HWType)
-	raw_pkt.WriteI(p.ProtoType.ToEtherType())
+	raw_pkt.WriteI(p.ProtoType)
 
 	raw_pkt.WriteI(p.HWAddrLen)
 	raw_pkt.WriteI(p.ProtoAddrLen)
@@ -96,10 +97,7 @@ func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 
 func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 	raw_pkt.ReadI(&p.HWType)
-
-	var ethertype uint16
-	raw_pkt.ReadI(&ethertype)
-	p.ProtoType = packet.EtherType(ethertype)
+	raw_pkt.ReadI(&p.ProtoType)
 
 	raw_pkt.ReadI(&p.HWAddrLen)
 	raw_pkt.ReadI(&p.ProtoAddrLen)

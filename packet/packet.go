@@ -87,41 +87,6 @@ type Packet interface {
 	String() string
 }
 
-var ethertype_to_type_map = [][2]uint16{
-	{ 0x0000, uint16(None)  },
-	{ 0x0001, uint16(LLC)   },
-	{ 0x0800, uint16(IPv4)  },
-	{ 0x0806, uint16(ARP)   },
-	{ 0x0842, uint16(WoL)   },
-	{ 0x22F3, uint16(TRILL) },
-	{ 0x8100, uint16(VLAN)  },
-	{ 0x86DD, uint16(IPv6)  },
-	{ 0x88A8, uint16(VLAN)  }, /* QinQ */
-	{ 0x88CC, uint16(LLDP)  },
-}
-
-// Create a new Type from the given EtherType.
-func EtherType(ethertype uint16) Type {
-	for _, t := range ethertype_to_type_map {
-		if t[0] == ethertype {
-			return Type(t[1])
-		}
-	}
-
-	return Type(ethertype)
-}
-
-// Convert the Type to the corresponding EtherType.
-func (pkttype Type) ToEtherType() uint16 {
-	for _, t := range ethertype_to_type_map {
-		if t[1] == uint16(pkttype) {
-			return t[0]
-		}
-	}
-
-	return uint16(pkttype)
-}
-
 var ipv4proto_to_type_map = [][2]uint16{
 	{ 0x01, uint16(ICMPv4)  },
 	{ 0x02, uint16(IGMP)    },

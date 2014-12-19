@@ -34,6 +34,7 @@ import "bytes"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 var test_simple = []byte{
 	0x00, 0x00, 0x00, 0x08, 0x00,
@@ -51,7 +52,7 @@ func Compare(t *testing.T, a, b *Packet) {
 
 func MakeTestSimple() *Packet {
 	return &Packet{
-		Type: packet.IPv4,
+		Type: eth.IPv4,
 	}
 }
 

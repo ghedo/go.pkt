@@ -35,6 +35,7 @@ import "net"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 var test_simple = []byte{
 	0x00, 0x01, 0x08, 0x00, 0x06, 0x04, 0x00, 0x01, 0x4C, 0x72, 0xB9, 0x54,
@@ -61,7 +62,7 @@ func MakeTestSimple() *Packet {
 		HWSrcAddr: hwsrc,
 		HWDstAddr: hwdst,
 
-		ProtoType: packet.IPv4,
+		ProtoType:    eth.IPv4,
 		ProtoAddrLen: 4,
 		ProtoSrcAddr: ipsrc,
 		ProtoDstAddr: ipdst,

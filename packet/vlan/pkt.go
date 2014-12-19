@@ -32,12 +32,13 @@
 package vlan
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 type Packet struct {
 	Priority     uint8         `name:"prio"`
 	DropEligible bool          `name:"drop"`
 	VLAN         uint16
-	Type         packet.Type
+	Type         eth.EtherType
 	pkt_payload  packet.Packet `name:"skip"`
 }
 
@@ -64,7 +65,7 @@ func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	}
 
 	raw_pkt.WriteI(tci)
-	raw_pkt.WriteI(p.Type.ToEtherType())
+	raw_pkt.WriteI(p.Type)
 
 	return nil
 }
@@ -77,9 +78,7 @@ func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 	p.DropEligible = uint8(tci) & 0x10 != 0
 	p.VLAN         = tci & 0x0FFF
 
-	var ethertype uint16
-	raw_pkt.ReadI(&ethertype)
-	p.Type = packet.EtherType(ethertype)
+	raw_pkt.ReadI(&p.Type)
 
 	return nil
 }
@@ -89,12 +88,12 @@ func (p *Packet) Payload() packet.Packet {
 }
 
 func (p *Packet) PayloadType() packet.Type {
-	return p.Type
+	return eth.EtherTypeToType(p.Type)
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.pkt_payload = pl
-	p.Type        = pl.GetType()
+	p.Type        = eth.TypeToEtherType(pl.GetType())
 
 	return nil
 }
