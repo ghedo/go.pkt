@@ -31,6 +31,7 @@
 package main
 
 import "log"
+import "math/rand"
 import "net"
 
 import "github.com/docopt/docopt-go"
@@ -84,10 +85,12 @@ func main() {
 	ipv4_pkt.SrcAddr = route.PrefSrc
 	ipv4_pkt.DstAddr = addr_ip
 
+	id_rand := uint16(rand.Intn(65535))
+
 	icmp_pkt := icmpv4.Make()
 	icmp_pkt.Type = icmpv4.EchoRequest
 	icmp_pkt.Seq = 0
-	icmp_pkt.Id = 666
+	icmp_pkt.Id = id_rand
 
 	raw_pkt, _ := util.Pack(eth_pkt, ipv4_pkt, icmp_pkt)
 	err = c.Inject(raw_pkt)
@@ -123,7 +126,7 @@ func main() {
 		icmp_pkt := pkts[2].(*icmpv4.Packet)
 
 		if icmp_pkt.Type == icmpv4.EchoReply &&
-		   icmp_pkt.Id == 666 {
+		   icmp_pkt.Id == id_rand {
 			log.Println("ping")
 			break
 		}
