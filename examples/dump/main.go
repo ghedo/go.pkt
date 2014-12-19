@@ -39,7 +39,7 @@ import "github.com/ghedo/hype/capture"
 import "github.com/ghedo/hype/capture/live"
 import "github.com/ghedo/hype/capture/file"
 import "github.com/ghedo/hype/filter"
-import "github.com/ghedo/hype/packet/util"
+import "github.com/ghedo/hype/layers"
 
 func main() {
 	log.SetFlags(0)

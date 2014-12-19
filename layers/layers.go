@@ -28,7 +28,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Provides utility functions for manipulating packets.
+// Provides utility functions for encoding and decoding packets to/from binary
+// data. Differently from the basic "packet" interface, this can encode and
+// decode complete "stacks" of packets (e.g. ethernet -> ipv4 -> udp), instead
+// of manipulating single ones.
 package util
 
 import "github.com/ghedo/hype/packet"
@@ -66,8 +69,8 @@ func Compose(pkts ...packet.Packet) (packet.Packet, error) {
 	return pkts[0], nil
 }
 
-// Pack packets into their binary form. This will compose the packets before
-// encoding them (see Compose() method) and also calculate the checksums.
+// Pack packets into their binary form. This will stack the packets before
+// encoding them (see the Compose() method) and also calculate the checksums.
 func Pack(pkts ...packet.Packet) ([]byte, error) {
 	var buf packet.Buffer
 

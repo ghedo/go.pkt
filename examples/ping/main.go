@@ -41,7 +41,7 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/ipv4"
 import "github.com/ghedo/hype/packet/icmpv4"
-import "github.com/ghedo/hype/packet/util"
+import "github.com/ghedo/hype/layers"
 import "github.com/ghedo/hype/routing"
 
 func main() {

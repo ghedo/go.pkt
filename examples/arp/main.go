@@ -39,7 +39,7 @@ import "github.com/ghedo/hype/capture/live"
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/arp"
-import "github.com/ghedo/hype/packet/util"
+import "github.com/ghedo/hype/layers"
 import "github.com/ghedo/hype/routing"
 
 func main() {
