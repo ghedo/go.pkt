@@ -130,7 +130,8 @@ Encoding packets is done by using the functions provided by the `packet/util`
 package.
 
 In the following example we create an ARP packet on top of an Ethernet packet
-and we encode them to binary data by using the `Pack()` method.
+and we encode them to binary data by using the `Pack()` method. Note that you'll
+need to import the packages of the protocols used (`packet/eth` and `packet/arp`).
 
 ```go
 // Create an Ethernet packet
