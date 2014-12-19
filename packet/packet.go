@@ -59,6 +59,7 @@ const (
 	RadioTap  /* TODO */
 	Raw
 	SCTP      /* TODO */
+	SLL
 	SNAP
 	TCP
 	TRILL     /* TODO */
@@ -88,7 +89,8 @@ type Packet interface {
 }
 
 var pcap_link_type_to_type_map = [][2]uint32{
-	{ 0x01, uint32(Eth)  },
+	{   1, uint32(Eth)  },
+	{ 113, uint32(SLL)  },
 }
 
 // Create a new type from the given PCAP link type.
@@ -127,6 +129,8 @@ func (t Type) IsPayload() bool {
 	case LLC:       return false
 	case RadioTap:  return false
 	case SCTP:      return false
+	case SLL:       return false
+	case SNAP:      return false
 	case TCP:       return false
 	case UDP:       return false
 	case UDPLite:   return false
@@ -155,6 +159,8 @@ func (t Type) String() string {
 	case OSPF:      return "OSPF"
 	case RadioTap:  return "RadioTap"
 	case SCTP:      return "SCTP"
+	case SNAP:      return "SNAP"
+	case SLL:       return "SLL"
 	case TCP:       return "TCP"
 	case TRILL:     return "TRILL"
 	case UDPLite:   return "UDP Lite"
