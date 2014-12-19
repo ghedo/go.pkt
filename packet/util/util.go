@@ -126,7 +126,7 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 // Unpack the given byte slice into a list of arbitrary packet types. It will
 // extract packet type information from the binary data and use it to allocate
 // new packet accordingly. Note that given the memory allocations performed,
-// thsi may be slower the the Unpack() method.
+// thsi may be slower then the Unpack() method.
 func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 	var raw_pkt packet.Buffer
 	raw_pkt.Init(buf)
