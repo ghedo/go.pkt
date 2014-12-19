@@ -37,11 +37,12 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
 
 type Packet struct {
-	Type     Type
-	Code     Code
-	Checksum uint16 `name:"sum"`
-	Id       uint16
-	Seq      uint16
+	Type        Type
+	Code        Code
+	Checksum    uint16        `name:"sum"`
+	Id          uint16
+	Seq         uint16
+	pkt_payload packet.Packet `name:"skip"`
 }
 
 type Type uint8
@@ -107,14 +108,20 @@ func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return nil
+	return p.pkt_payload
 }
 
 func (p *Packet) PayloadType() packet.Type {
+	switch p.Type {
+	case DstUnreachable, SrcQuench, RedirectMsg, TimeExceeded, ParamProblem:
+		return packet.IPv4
+	}
+
 	return packet.None
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
+	p.pkt_payload = pl
 	return nil
 }
 
