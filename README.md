@@ -126,7 +126,7 @@ log.Println("MATCH!!!")
 
 ### Encoding
 
-Encoding packets is done by using the functions provided by the `packet/util`
+Encoding packets is done by using the functions provided by the `layers`
 package.
 
 In the following example we create an ARP packet on top of an Ethernet packet
@@ -157,8 +157,8 @@ log.Println(raw_pkt)
 
 ### Decoding
 
-Like encoding, decoding is done by using the functions provided by the
-`packet/util` package.
+Like encoding, decoding is done by using the functions provided by the `layers`
+package.
 
 The following example uses the `UnpackAll()` function to decode a whole chain of
 packets (e.g. ethernet -> ipv4 -> udp).
