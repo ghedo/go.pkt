@@ -44,6 +44,7 @@ type Builder struct {
 	jumps_jf map[int]string
 }
 
+// Allocate and initialize a new Builder.
 func NewBuilder() *Builder {
 	b := &Builder{}
 
@@ -56,6 +57,7 @@ func NewBuilder() *Builder {
 	return b
 }
 
+// Generate and return the Filter associated with the Builder.
 func (b *Builder) Build() *Filter {
 	prog := (*C.struct_bpf_program)(b.filter.Program())
 	flen := int(C.bpf_get_len(prog))
@@ -86,6 +88,8 @@ func (b *Builder) Build() *Filter {
 	return b.filter
 }
 
+// Define a new label at the next instruction position. Labels are used in jump
+// instructions to identify the jump target.
 func (b *Builder) Label(name string) *Builder {
 	b.labels[name] = b.filter.Len()
 	return b
