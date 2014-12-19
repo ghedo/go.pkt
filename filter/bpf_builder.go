@@ -28,7 +28,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Provides an API for compiling and manipulating BPF filters.
 package filter
 
 // #include "bpf_filter.h"
