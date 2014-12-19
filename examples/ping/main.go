@@ -113,6 +113,13 @@ func main() {
 			continue
 		}
 
+		ipv4_pkt := pkts[1].(*ipv4.Packet)
+
+		if !ipv4_pkt.SrcAddr.Equal(addr_ip) ||
+		   !ipv4_pkt.DstAddr.Equal(route.PrefSrc) {
+			continue
+		}
+
 		icmp_pkt := pkts[2].(*icmpv4.Packet)
 
 		if icmp_pkt.Type == icmpv4.EchoReply &&
