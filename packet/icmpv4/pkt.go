@@ -148,7 +148,7 @@ func (t Type) String() string {
 
 func (c Code) String() string {
 	if c != 0 {
-		return fmt.Sprintf("%x", c)
+		return fmt.Sprintf("%x", uint8(c))
 	}
 
 	return ""
