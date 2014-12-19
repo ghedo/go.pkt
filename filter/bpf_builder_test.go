@@ -30,9 +30,24 @@
 
 package filter
 
-import "fmt"
+import "testing"
 
-func ExampleARP() {
+func TestEmpty(t *testing.T) {
+	bld := NewBuilder()
+
+	flt := bld.Build()
+	if flt.Len() != 0 {
+		t.Fatalf("Len mismatch: %d", flt.Len())
+	}
+	flt.Cleanup()
+}
+
+var test_arp = `{ 0x28,   0,   0, 0x0000000c },
+{ 0x15,   0,   1, 0x00000806 },
+{ 0x06,   0,   0, 0x00040000 },
+{ 0x06,   0,   0, 0x00000000 },`
+
+func TestARP(t *testing.T) {
 	arp := NewBuilder().
 		LD(Half, ABS, 12).
 		JEQ(Const, "", "fail", 0x806).
@@ -41,16 +56,27 @@ func ExampleARP() {
 		RET(Const, 0x0).
 		Build()
 
-	fmt.Println(arp)
-
-	// Output:
-	// { 0x28,   0,   0, 0x0000000c },
-	// { 0x15,   0,   1, 0x00000806 },
-	// { 0x06,   0,   0, 0x00040000 },
-	// { 0x06,   0,   0, 0x00000000 },
+	if arp.String() != test_arp {
+		t.Fatalf("Program mismatch: %s", arp.String())
+	}
 }
 
-func ExampleDNS() {
+var test_dns = `{ 0x00,   0,   0, 0x00000014 },
+{ 0xb1,   0,   0, 0x00000000 },
+{ 0x0c,   0,   0, 0x00000000 },
+{ 0x07,   0,   0, 0x00000000 },
+{ 0x40,   0,   0, 0x00000000 },
+{ 0x15,   0,   7, 0x07657861 },
+{ 0x40,   0,   0, 0x00000004 },
+{ 0x15,   0,   5, 0x6d706c65 },
+{ 0x40,   0,   0, 0x00000008 },
+{ 0x15,   0,   3, 0x03636f6d },
+{ 0x50,   0,   0, 0x0000000c },
+{ 0x15,   0,   1, 0x00000000 },
+{ 0x06,   0,   0, 0x00000001 },
+{ 0x06,   0,   0, 0x00000000 },`
+
+func TestDNS(t *testing.T) {
 	dns := NewBuilder().
 		LD(Word, IMM, 20).
 		LDX(Byte, MSH, 0).
@@ -70,21 +96,8 @@ func ExampleDNS() {
 		RET(Const, 0).
 		Build()
 
-	fmt.Println(dns)
 
-	// Output:
-	// { 0x00,   0,   0, 0x00000014 },
-	// { 0xb1,   0,   0, 0x00000000 },
-	// { 0x0c,   0,   0, 0x00000000 },
-	// { 0x07,   0,   0, 0x00000000 },
-	// { 0x40,   0,   0, 0x00000000 },
-	// { 0x15,   0,   7, 0x07657861 },
-	// { 0x40,   0,   0, 0x00000004 },
-	// { 0x15,   0,   5, 0x6d706c65 },
-	// { 0x40,   0,   0, 0x00000008 },
-	// { 0x15,   0,   3, 0x03636f6d },
-	// { 0x50,   0,   0, 0x0000000c },
-	// { 0x15,   0,   1, 0x00000000 },
-	// { 0x06,   0,   0, 0x00000001 },
-	// { 0x06,   0,   0, 0x00000000 },
+	if dns.String() != test_dns {
+		t.Fatalf("Program mismatch: %s", dns.String())
+	}
 }
