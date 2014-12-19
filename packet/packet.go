@@ -117,30 +117,6 @@ func (pkttype Type) ToLinkType() uint32 {
 	return 0x00
 }
 
-// Return whether the packet type is the last of the chain.
-func (t Type) IsPayload() bool {
-	switch t {
-	case Bluetooth: return false
-	case WiFi:     return false
-	case Eth:       return false
-	case GRE:       return false
-	case IPSec:     return false
-	case IPv4:      return false
-	case IPv6:      return false
-	case L2TP:      return false
-	case LLC:       return false
-	case RadioTap:  return false
-	case SCTP:      return false
-	case SLL:       return false
-	case SNAP:      return false
-	case TCP:       return false
-	case UDP:       return false
-	case UDPLite:   return false
-	case VLAN:      return false
-	default:        return true
-	}
-}
-
 func (t Type) String() string {
 	switch t {
 	case ARP:       return "ARP"

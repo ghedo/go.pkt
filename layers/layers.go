@@ -115,7 +115,7 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 			prev_pkt.SetPayload(p)
 		}
 
-		if p.GetType().IsPayload() {
+		if p.PayloadType() == packet.None {
 			break
 		}
 
@@ -136,7 +136,7 @@ func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 	pkts     := []packet.Packet{}
 	prev_pkt := packet.Packet(nil)
 
-	for {
+	for link_type != packet.None {
 		var p packet.Packet
 
 		if raw_pkt.Len() <= 0 {
@@ -174,10 +174,6 @@ func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 
 		if prev_pkt != nil {
 			prev_pkt.SetPayload(p)
-		}
-
-		if p.GetType().IsPayload() {
-			break
 		}
 
 		prev_pkt  = p
