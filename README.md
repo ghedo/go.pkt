@@ -46,6 +46,33 @@ network interface, we activate it and then capture packets using the `Capture()`
 method.
 
 ```go
+src, err := live.Open("eth0")
+if err != nil {
+	log.Fatal(err)
+}
+
+// you may configure the source further, e.g. by activating
+// promiscuous mode.
+
+err = src.Activate()
+if err != nil {
+	log.Fatal(err)
+}
+
+for {
+	raw_pkt, err := src.Capture()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if raw_pkt == nil {
+		break
+	}
+
+	log.Println("PACKET!!!")
+
+	// do something with the packet
+}
 ```
 
 ### Injection
@@ -57,6 +84,23 @@ the `Inject()` method to send some data (we'll see later how to encode data in
 the propert formats).
 
 ```go
+dst, err := live.Open("eth0")
+if err != nil {
+	log.Fatal(err)
+}
+
+// you may configure the source further, e.g. by activating
+// promiscuous mode.
+
+err = dst.Activate()
+if err != nil {
+	log.Fatal(err)
+}
+
+err = dst.Inject([]byte("random data"))
+if err != nil {
+	log.Fatal(err)
+}
 ```
 
 ### Filtering
@@ -130,57 +174,6 @@ if err != nil {
 
 for _, p := range pkts {
 	log.Println(p)
-}
-```
-
-The following example shows how to use the capturing and decoding capabilities
-together. Note the `src.LinkType()` call when using the `UnpackAll()` method:
-this tells the decoder which packet type to expect at the start of the chain,
-and while before we assumed Ethernet, different packet sources may return
-packets in different formats (e.g. a wifi network interface in monitor mode
-returns "WiFi" packets).
-
-```go
-package main
-
-import "log"
-
-import "github.com/ghedo/hype/capture/live"
-import "github.com/ghedo/hype/packet/util"
-
-func main() {
-	src, err := live.Open("eth0")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// you may configure the source further, e.g. by activating
-	// promiscuous mode.
-
-	err = src.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for {
-		raw_pkt, err := src.Capture()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if raw_pkt == nil {
-			break
-		}
-
-		pkts, err := util.UnpackAll(raw_pkt, src.LinkType())
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for _, p := range pkts {
-			log.Println(p)
-		}
-	}
 }
 ```
 
