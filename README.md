@@ -144,7 +144,8 @@ func main() {
 
 ### Encoding
 
-Encoding packets is done by using the functions provided by the `util` package.
+Encoding packets is done by using the functions provided by the `packet/util`
+package.
 
 In the following example we create an ARP packet on top of an Ethernet packet
 and we encode them to binary data by using the `Pack()` method.
@@ -181,12 +182,11 @@ func main() {
 
 ### Decoding
 
-Like encoding, decoding is done by using the functions provided by the `util`
-package.
+Like encoding, decoding is done by using the functions provided by the
+`packet/util` package.
 
 The following example uses the `UnpackAll()` function to decode a whole chain of
-packets (e.g. ethernet -> ipv4 -> udp), and returns a slice containing the
-decoded packets.
+packets (e.g. ethernet -> ipv4 -> udp).
 
 ```go
 package main
