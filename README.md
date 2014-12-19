@@ -215,7 +215,7 @@ together. Note the `src.LinkType()` call when using the `UnpackAll()` method:
 this tells the decoder which packet type to expect at the start of the chain,
 and while before we assumed Ethernet, different packet sources may return
 packets in different formats (e.g. a wifi network interface in monitor mode
-returns "WiFi" packet).
+returns "WiFi" packets).
 
 ```go
 package main
