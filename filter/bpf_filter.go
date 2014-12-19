@@ -30,8 +30,8 @@
 
 // Provides an API for compiling and manipulating BPF filters. A filter can be
 // either compiled from tcpdump-like expressions, or created from basic BPF
-// instructions. Filters can then be either applied directly to packet sources
-// (see the capture package) or directly run against binary data.
+// instructions. Filters can then be either applied to packet sources (see the
+// capture package) or directly run against binary data.
 package filter
 
 // #include <stdlib.h>
