@@ -84,7 +84,7 @@ func main() {
 	arp_pkt.ProtoSrcAddr = route.PrefSrc
 	arp_pkt.ProtoDstAddr = addr_ip
 
-	raw_pkt, _ := util.Pack(eth_pkt, arp_pkt)
+	raw_pkt, _ := layers.Pack(eth_pkt, arp_pkt)
 
 	err = c.Inject(raw_pkt)
 	if err != nil {
@@ -98,7 +98,7 @@ func main() {
 			break
 		}
 
-		pkts, err := util.UnpackAll(raw_pkt, c.LinkType())
+		pkts, err := layers.UnpackAll(raw_pkt, c.LinkType())
 		if err != nil {
 			log.Printf("Error: %s\n", err)
 		}

@@ -92,7 +92,7 @@ func main() {
 	icmp_pkt.Seq = 0
 	icmp_pkt.Id = id_rand
 
-	raw_pkt, _ := util.Pack(eth_pkt, ipv4_pkt, icmp_pkt)
+	raw_pkt, _ := layers.Pack(eth_pkt, ipv4_pkt, icmp_pkt)
 	err = c.Inject(raw_pkt)
 	if err != nil {
 		log.Fatalf("Error: %s", err)
@@ -105,7 +105,7 @@ func main() {
 			break
 		}
 
-		pkts, err := util.UnpackAll(raw_pkt, c.LinkType())
+		pkts, err := layers.UnpackAll(raw_pkt, c.LinkType())
 		if err != nil {
 			log.Printf("Error: %s\n", err)
 		}

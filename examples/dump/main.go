@@ -129,7 +129,7 @@ Options:
 		i++
 
 		if dst == nil {
-			pkts, err := util.UnpackAll(raw_pkt, src.LinkType())
+			pkts, err := layers.UnpackAll(raw_pkt, src.LinkType())
 			if err != nil {
 				log.Printf("Error: %s\n", err)
 			}

@@ -30,9 +30,8 @@
 
 // Provides utility functions for encoding and decoding packets to/from binary
 // data. Differently from the basic "packet" interface, this can encode and
-// decode complete "stacks" of packets (e.g. ethernet -> ipv4 -> udp), instead
-// of manipulating single ones.
-package util
+// decode complete "stacks" of packets, instead of manipulating single ones.
+package layers
 
 import "github.com/ghedo/hype/packet"
 
