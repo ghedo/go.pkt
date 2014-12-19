@@ -30,6 +30,7 @@
 
 package filter
 
+import "log"
 import "testing"
 
 func TestEmpty(t *testing.T) {
@@ -99,5 +100,20 @@ func TestDNS(t *testing.T) {
 
 	if dns.String() != test_dns {
 		t.Fatalf("Program mismatch: %s", dns.String())
+	}
+}
+
+func ExampleBuilder() {
+	// Build a filter to match ARP packets on top of Ethernet
+	flt := NewBuilder().
+		LD(Half, ABS, 12).
+		JEQ(Const, "", "fail", 0x806).
+		RET(Const, 0x40000).
+		Label("fail").
+		RET(Const, 0x0).
+		Build()
+
+	if flt.Match([]byte("random data")) {
+		log.Println("MATCH!!!")
 	}
 }

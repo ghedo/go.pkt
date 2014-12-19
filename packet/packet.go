@@ -28,7 +28,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Provides the basic interfaces for implementing packet encoders and decoders.
+// Provides the interfaces for implementing packet encoders and decoders. Every
+// supported protocol implements the Packet interface as a submodule of this
+// package (e.g. packet/ipv4, packet/tcp, ...).
 package packet
 
 import "fmt"

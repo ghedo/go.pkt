@@ -31,6 +31,7 @@
 package util
 
 import "bytes"
+import "log"
 import "net"
 import "testing"
 
@@ -277,5 +278,42 @@ func TestUnpackAllEthIPv4TCP(t *testing.T) {
 
 	if pkts[2].GetType() != packet.TCP {
 		t.Fatalf("Packet type mismatch, %s", pkts[2].GetType())
+	}
+}
+
+func ExamplePack() {
+	// Create an Ethernet packet
+	eth_pkt := eth.Make()
+	eth_pkt.SrcAddr, _ = net.ParseMAC("4c:72:b9:54:e5:3d")
+	eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
+
+	// Create an ARP packet
+	arp_pkt := arp.Make()
+	arp_pkt.HWSrcAddr, _ = net.ParseMAC("4c:72:b9:54:e5:3d")
+	arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
+	arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
+	arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
+
+	raw_pkt, err := Pack(eth_pkt, arp_pkt)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// do something with the packet
+	log.Println(raw_pkt)
+}
+
+func ExampleUnpack() {
+	// Create the raw_pkt data
+	raw_pkt := []byte("random data")
+
+	// Assume Ethernet as datalink layer
+	pkts, err := UnpackAll(raw_pkt, packet.Eth)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, p := range pkts {
+		log.Println(p)
 	}
 }

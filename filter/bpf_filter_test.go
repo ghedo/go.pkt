@@ -30,9 +30,10 @@
 
 package filter
 
-import "github.com/ghedo/hype/packet"
-
+import "log"
 import "testing"
+
+import "github.com/ghedo/hype/packet"
 
 var test_eth_arp = []byte{
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x4c, 0x72, 0xb9, 0x54, 0xe5, 0x3d,
@@ -109,5 +110,17 @@ func TestMatch(t *testing.T) {
 
 	if port.Match(test_eth_vlan_arp) {
 		t.Fatalf("Port matched (but it shouldn't have)")
+	}
+}
+
+func ExampleFilter() {
+	// Match UDP or TCP packets on top of Ethernet
+	flt, err := Compile("udp or tcp", packet.Eth)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if flt.Match([]byte("random data")) {
+		log.Println("MATCH!!!")
 	}
 }
