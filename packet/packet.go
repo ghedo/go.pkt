@@ -115,62 +115,63 @@ func (pkttype Type) ToLinkType() uint32 {
 	return 0x00
 }
 
+type type_map struct {
+	name    Type
+	sname   string
+	payload bool
+}
+
+var types_map = []type_map{
+	{ None,      "None",      true  },
+	{ ARP,       "ARP",       true  },
+	{ Bluetooth, "Bluetooth", false },
+	{ Eth,       "Eth",       false },
+	{ GRE,       "GRE",       false },
+	{ ICMPv4,    "ICMPv4",    true  },
+	{ ICMPv6,    "ICMPv6",    true  },
+	{ IGMP,      "IGMP",      true  },
+	{ IPSec,     "IPSec",     false },
+	{ IPv4,      "IPv4",      false },
+	{ IPv6,      "IPv6",      false },
+	{ ISIS,      "ISIS",      true  },
+	{ L2TP,      "L2TP",      false },
+	{ LLC,       "LLC",       false },
+	{ LLDP,      "LLDP",      true  },
+	{ OSPF,      "OSPF",      true  },
+	{ RadioTap,  "RadioTap",  false },
+	{ Raw,       "Data",      true  },
+	{ SCTP,      "SCTP",      false },
+	{ SLL,       "SLL",       false },
+	{ SNAP,      "SNAP",      false },
+	{ TCP,       "TCP",       false },
+	{ TRILL,     "TRILL",     true  },
+	{ UDP,       "UDP",       false },
+	{ UDPLite,   "UDPLite",   false },
+	{ VLAN,      "VLAN",      false },
+	{ WiFi,      "WiFi",      false },
+	{ WoL,       "WoL",       true  },
+}
+
 // Return whether the packet type is the last of the chain.
 func (t Type) IsPayload() bool {
-	switch t {
-	case Bluetooth: return false
-	case WiFi:     return false
-	case Eth:       return false
-	case GRE:       return false
-	case IPSec:     return false
-	case IPv4:      return false
-	case IPv6:      return false
-	case L2TP:      return false
-	case LLC:       return false
-	case RadioTap:  return false
-	case SCTP:      return false
-	case SLL:       return false
-	case SNAP:      return false
-	case TCP:       return false
-	case UDP:       return false
-	case UDPLite:   return false
-	case VLAN:      return false
-	default:        return true
+	for _, entry := range types_map {
+		if entry.name == t {
+			return entry.payload
+		}
 	}
+
+	return true
 }
 
 func (t Type) String() string {
-	switch t {
-	case ARP:       return "ARP"
-	case Bluetooth: return "Bluetooth"
-	case Eth:       return "Ethernet"
-	case GRE:       return "GRE"
-	case ICMPv4:    return "ICMPv4"
-	case ICMPv6:    return "ICMPv6"
-	case IGMP:      return "IGMP"
-	case IPSec:     return "IPSec"
-	case IPv4:      return "IPv4"
-	case IPv6:      return "IPv6"
-	case ISIS:      return "IS-IS"
-	case L2TP:      return "L2TP"
-	case LLC:       return "LLC"
-	case LLDP:      return "LLDP"
-	case None:      return "None"
-	case OSPF:      return "OSPF"
-	case RadioTap:  return "RadioTap"
-	case SCTP:      return "SCTP"
-	case SNAP:      return "SNAP"
-	case SLL:       return "SLL"
-	case TCP:       return "TCP"
-	case TRILL:     return "TRILL"
-	case UDPLite:   return "UDP Lite"
-	case UDP:       return "UDP"
-	case VLAN:      return "VLAN"
-	case WiFi:      return "WiFi"
-	case WoL:       return "WoL"
-	/* case Raw: */
-	default:        return "Data"
+	for _, entry := range types_map {
+		if entry.name == t {
+			return entry.sname
+		}
 	}
+
+	return "Data"
+
 }
 
 func Stringify(p Packet) string {
