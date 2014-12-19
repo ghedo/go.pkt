@@ -37,8 +37,8 @@ import "io"
 // It's based on the bytes.Buffer code provided by the standard library, but
 // implements additional convenience methods.
 //
-// This used internally to provide packet encoding and decoding, and should not
-// be used directly.
+// This is used internally to provide packet encoding and decoding, and should
+// not be used directly.
 type Buffer struct {
 	buf       []byte
 	off       int
