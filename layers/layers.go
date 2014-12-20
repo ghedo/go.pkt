@@ -120,7 +120,7 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 			prev_pkt.SetPayload(p)
 		}
 
-		if p.PayloadType() == packet.None {
+		if p.GuessPayloadType() == packet.None {
 			break
 		}
 
@@ -187,7 +187,7 @@ func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 		}
 
 		prev_pkt  = p
-		link_type = p.PayloadType()
+		link_type = p.GuessPayloadType()
 	}
 
 	return pkts, nil

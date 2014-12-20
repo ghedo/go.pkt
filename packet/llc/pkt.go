@@ -99,7 +99,7 @@ func (p *Packet) Payload() packet.Packet {
 	return p.pkt_payload
 }
 
-func (p *Packet) PayloadType() packet.Type {
+func (p *Packet) GuessPayloadType() packet.Type {
 	if p.DSAP == 0xaa && p.SSAP == 0xaa {
 		return packet.SNAP
 	}

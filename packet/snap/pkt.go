@@ -84,7 +84,7 @@ func (p *Packet) Payload() packet.Packet {
 	return p.pkt_payload
 }
 
-func (p *Packet) PayloadType() packet.Type {
+func (p *Packet) GuessPayloadType() packet.Type {
 	if p.OUI[0] == 0x00 && p.OUI[1] == 0x00 && p.OUI[2] == 0x00 {
 		return eth.EtherTypeToType(p.Type)
 	} else {

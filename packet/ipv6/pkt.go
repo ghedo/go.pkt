@@ -150,7 +150,7 @@ func (p *Packet) Payload() packet.Packet {
 	return p.pkt_payload
 }
 
-func (p *Packet) PayloadType() packet.Type {
+func (p *Packet) GuessPayloadType() packet.Type {
 	return ipv4.ProtocolToType(p.NextHdr)
 }
 

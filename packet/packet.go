@@ -96,11 +96,11 @@ type Packet interface {
 	/* Return the payload of the packet or nil */
 	Payload() Packet
 
-	/* Return the type of the payload or None */
-	PayloadType() Type
-
 	/* Initialize the payload of the packet */
 	SetPayload(payload Packet) error
+
+	/* Try to guess the type of the payload */
+	GuessPayloadType() Type
 
 	/* Initialize the checksum of the packet with the given seed */
 	InitChecksum(seed uint32)

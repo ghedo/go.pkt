@@ -134,7 +134,7 @@ func (p *Packet) Payload() packet.Packet {
 	return nil
 }
 
-func (p *Packet) PayloadType() packet.Type {
+func (p *Packet) GuessPayloadType() packet.Type {
 	return packet.None
 }
 

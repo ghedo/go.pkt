@@ -102,7 +102,7 @@ func (p *Packet) Payload() packet.Packet {
 	return p.pkt_payload
 }
 
-func (p *Packet) PayloadType() packet.Type {
+func (p *Packet) GuessPayloadType() packet.Type {
 	if p.pkt_payload != nil {
 		return p.pkt_payload.GetType()
 	}
