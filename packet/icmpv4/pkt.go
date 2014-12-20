@@ -141,7 +141,11 @@ func (p *Packet) GuessPayloadType() packet.Type {
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
+	switch p.Type {
+	case DstUnreachable, SrcQuench, RedirectMsg, TimeExceeded, ParamProblem:
+		p.pkt_payload = pl
+	}
+
 	return nil
 }
 
