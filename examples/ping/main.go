@@ -109,11 +109,7 @@ func main() {
 			log.Printf("Error: %s\n", err)
 		}
 
-		if len(pkts) < 3 {
-			continue
-		}
-
-		if pkts[1].Answers(ipv4_pkt) {
+		if pkts[0].Answers(eth_pkt) {
 			log.Println("ping")
 			break
 		}

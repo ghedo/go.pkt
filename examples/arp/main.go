@@ -102,11 +102,7 @@ func main() {
 			log.Printf("Error: %s\n", err)
 		}
 
-		if len(pkts) < 2 {
-			continue
-		}
-
-		if pkts[1].Answers(arp_pkt) {
+		if pkts[0].Answers(eth_pkt) {
 			log.Println(pkts[1].(*arp.Packet).HWSrcAddr)
 			break
 		}
