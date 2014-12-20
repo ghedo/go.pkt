@@ -93,6 +93,11 @@ func Pack(pkts ...packet.Packet) ([]byte, error) {
 // Unpack the given byte slice into the packet list supplied. Note that this
 // will not check whether the packet types provided match the raw data. If the
 // packet types to be decoded are unknown, UnpackAll() should be used instead.
+//
+// Note that unpacking is done without copying the input slice, which means that
+// if the slice is modifed, it may affect the packets that where unpacked from
+// it. If you can't guarantee that the data slice won't change, you'll need to
+// copy it and pass the copy to Unpack().
 func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 	var raw_pkt packet.Buffer
 	raw_pkt.Init(buf)
@@ -129,6 +134,11 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 // extract packet type information from the binary data and use it to allocate
 // new packet accordingly. Note that given the memory allocations performed,
 // thsi may be slower then the Unpack() method.
+//
+// Note that unpacking is done without copying the input slice, which means that
+// if the slice is modifed, it may affect the packets that where unpacked from
+// it. If you can't guarantee that the data slice won't change, you'll need to
+// copy it and pass the copy to UnpackAll().
 func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 	var raw_pkt packet.Buffer
 	raw_pkt.Init(buf)
