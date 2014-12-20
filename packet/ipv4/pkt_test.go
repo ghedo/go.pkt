@@ -28,13 +28,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ipv4
+package ipv4_test
 
 import "bytes"
 import "net"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/ipv4"
 
 var test_simple = []byte{
 	0x45, 0x03, 0x00, 0x14, 0x00, 0x0f, 0x40, 0x00, 0x64, 0x06, 0x48, 0x97,
@@ -44,22 +45,22 @@ var test_simple = []byte{
 var ipsrc_str = "192.168.1.135"
 var ipdst_str = "8.8.4.4"
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *ipv4.Packet {
+	return &ipv4.Packet{
 		Version: 4,
 		IHL: 5,
 		Length: 20,
 		TOS: 3,
 		Id: 15,
 		TTL: 100,
-		Flags: DontFragment,
-		Protocol: TCP,
+		Flags: ipv4.DontFragment,
+		Protocol: ipv4.TCP,
 		SrcAddr: net.ParseIP(ipsrc_str),
 		DstAddr: net.ParseIP(ipdst_str),
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *ipv4.Packet) {
 	if a.Version != b.Version {
 		t.Fatalf("Version mismatch: %d", b.Version)
 	}
@@ -131,7 +132,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p ipv4.Packet
 
 	cmp := MakeTestSimple()
 	cmp.Checksum = 0x4897
@@ -148,7 +149,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p ipv4.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package udp
+package udp_test
 
 import "bytes"
 import "net"
@@ -36,20 +36,21 @@ import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
+import "github.com/ghedo/hype/packet/udp"
 
 var test_simple = []byte{
 	0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x00, 0x00,
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *udp.Packet {
+	return &udp.Packet{
 		SrcPort: 52134,
 		DstPort: 80,
 		Length: 18,
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *udp.Packet) {
 	if a.SrcPort != b.SrcPort {
 		t.Fatalf("SrcPort mismatch: %d", b.SrcPort)
 	}
@@ -93,7 +94,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p udp.Packet
 
 	cmp := MakeTestSimple()
 
@@ -109,7 +110,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p udp.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)
@@ -133,7 +134,7 @@ func TestPackWithIPv4(t *testing.T) {
 	ip4.SrcAddr = net.ParseIP(ipsrc_str)
 	ip4.DstAddr = net.ParseIP(ipdst_str)
 
-	udp := &Packet{
+	udp := &udp.Packet{
 		SrcPort: 52134,
 		DstPort: 80,
 		Length: 18,
@@ -152,7 +153,7 @@ func TestPackWithIPv4(t *testing.T) {
 }
 
 func TestUnpackWithIPv4(t *testing.T) {
-	var p Packet
+	var p udp.Packet
 
 	cmp := MakeTestSimple()
 	cmp.Checksum = 0x6194

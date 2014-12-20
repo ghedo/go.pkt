@@ -28,10 +28,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package live
+package live_test
+
+import "github.com/ghedo/hype/capture/live"
 
 func ExampleCapture() {
-	src, err := Open("eth0")
+	src, err := live.Open("eth0")
 	if err != nil {
 		log.Fatal(err)
 	}

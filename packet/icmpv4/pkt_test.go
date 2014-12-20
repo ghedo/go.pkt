@@ -28,27 +28,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package icmpv4
+package icmpv4_test
 
 import "bytes"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/icmpv4"
 
 var test_simple = []byte{
 	0x08, 0x00, 0xf7, 0xd2, 0x00, 0x0f, 0x00, 0x1e,
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
-		Type: EchoRequest,
+func MakeTestSimple() *icmpv4.Packet {
+	return &icmpv4.Packet{
+		Type: icmpv4.EchoRequest,
 		Code: 0,
 		Id: 15,
 		Seq: 30,
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *icmpv4.Packet) {
 	if a.Type != b.Type {
 		t.Fatalf("Type mismatch: %s", b.Type)
 	}
@@ -96,7 +97,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p icmpv4.Packet
 
 	cmp := MakeTestSimple()
 	cmp.Checksum = 0xf7d2
@@ -113,7 +114,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p icmpv4.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

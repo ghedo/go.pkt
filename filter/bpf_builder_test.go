@@ -28,13 +28,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package filter
+package filter_test
 
 import "log"
 import "testing"
 
+import "github.com/ghedo/hype/filter"
+
 func TestEmpty(t *testing.T) {
-	bld := NewBuilder()
+	bld := filter.NewBuilder()
 
 	flt := bld.Build()
 	if flt.Len() != 0 {
@@ -49,12 +51,12 @@ var test_arp = `{ 0x28,   0,   0, 0x0000000c },
 { 0x06,   0,   0, 0x00000000 },`
 
 func TestARP(t *testing.T) {
-	arp := NewBuilder().
-		LD(Half, ABS, 12).
-		JEQ(Const, "", "fail", 0x806).
-		RET(Const, 0x40000).
+	arp := filter.NewBuilder().
+		LD(filter.Half, filter.ABS, 12).
+		JEQ(filter.Const, "", "fail", 0x806).
+		RET(filter.Const, 0x40000).
 		Label("fail").
-		RET(Const, 0x0).
+		RET(filter.Const, 0x0).
 		Build()
 
 	if arp.String() != test_arp {
@@ -78,23 +80,23 @@ var test_dns = `{ 0x00,   0,   0, 0x00000014 },
 { 0x06,   0,   0, 0x00000000 },`
 
 func TestDNS(t *testing.T) {
-	dns := NewBuilder().
-		LD(Word, IMM, 20).
-		LDX(Byte, MSH, 0).
-		ADD(Index, 0).
+	dns := filter.NewBuilder().
+		LD(filter.Word, filter.IMM, 20).
+		LDX(filter.Byte, filter.MSH, 0).
+		ADD(filter.Index, 0).
 		TAX().
 		Label("lb_0").
-		LD(Word, IND, 0).
-		JEQ(Const, "", "lb_1", 0x07657861).
-		LD(Word, IND, 4).
-		JEQ(Const, "", "lb_1", 0x6d706c65).
-		LD(Word, IND, 8).
-		JEQ(Const, "", "lb_1", 0x03636f6d).
-		LD(Byte, IND, 12).
-		JEQ(Const, "", "lb_1", 0x00).
-		RET(Const, 1).
+		LD(filter.Word, filter.IND, 0).
+		JEQ(filter.Const, "", "lb_1", 0x07657861).
+		LD(filter.Word, filter.IND, 4).
+		JEQ(filter.Const, "", "lb_1", 0x6d706c65).
+		LD(filter.Word, filter.IND, 8).
+		JEQ(filter.Const, "", "lb_1", 0x03636f6d).
+		LD(filter.Byte, filter.IND, 12).
+		JEQ(filter.Const, "", "lb_1", 0x00).
+		RET(filter.Const, 1).
 		Label("lb_1").
-		RET(Const, 0).
+		RET(filter.Const, 0).
 		Build()
 
 
@@ -105,12 +107,12 @@ func TestDNS(t *testing.T) {
 
 func ExampleBuilder() {
 	// Build a filter to match ARP packets on top of Ethernet
-	flt := NewBuilder().
-		LD(Half, ABS, 12).
-		JEQ(Const, "", "fail", 0x806).
-		RET(Const, 0x40000).
+	flt := filter.NewBuilder().
+		LD(filter.Half, filter.ABS, 12).
+		JEQ(filter.Const, "", "fail", 0x806).
+		RET(filter.Const, 0x40000).
 		Label("fail").
-		RET(Const, 0x0).
+		RET(filter.Const, 0x0).
 		Build()
 
 	if flt.Match([]byte("random data")) {

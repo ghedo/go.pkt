@@ -28,13 +28,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package arp
+package arp_test
 
 import "bytes"
 import "net"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/arp"
 import "github.com/ghedo/hype/packet/eth"
 
 var test_simple = []byte{
@@ -48,14 +49,14 @@ var hwdst_str = "1f:92:2b:56:ed:77"
 var ipsrc_str = "192.168.1.135"
 var ipdst_str = "28.60.9.191"
 
-func MakeTestSimple() *Packet {
+func MakeTestSimple() *arp.Packet {
 	hwsrc, _ := net.ParseMAC(hwsrc_str)
 	hwdst, _ := net.ParseMAC(hwdst_str)
 	ipsrc := net.ParseIP(ipsrc_str)
 	ipdst := net.ParseIP(ipdst_str)
 
-	return &Packet{
-		Operation: Request,
+	return &arp.Packet{
+		Operation: arp.Request,
 
 		HWType: 1,
 		HWAddrLen: 6,
@@ -69,7 +70,7 @@ func MakeTestSimple() *Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *arp.Packet) {
 	if a.Operation != b.Operation {
 		t.Fatalf("Operation mismatch: %d", b.Operation)
 	}
@@ -141,7 +142,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p arp.Packet
 
 	cmp := MakeTestSimple()
 
@@ -157,7 +158,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p arp.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

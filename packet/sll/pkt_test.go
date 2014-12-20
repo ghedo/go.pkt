@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package sll
+package sll_test
 
 import "bytes"
 import "net"
@@ -36,6 +36,7 @@ import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
+import "github.com/ghedo/hype/packet/sll"
 
 var hwsrc_str = "4c:72:b9:54:e5:3d"
 
@@ -44,11 +45,11 @@ var test_simple = []byte{
 	0x00, 0x00, 0x08, 0x00,
 }
 
-func MakeTestSimple() *Packet {
+func MakeTestSimple() *sll.Packet {
 	hwsrc, _ := net.ParseMAC(hwsrc_str)
 
-	return &Packet{
-		Type: Outgoing,
+	return &sll.Packet{
+		Type: sll.Outgoing,
 		AddrType: 1,
 		AddrLen: 6,
 		SrcAddr: hwsrc,
@@ -56,7 +57,7 @@ func MakeTestSimple() *Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *sll.Packet) {
 	if a.Type != b.Type {
 		t.Fatalf("Type mismatch: %d", b.Type)
 	}
@@ -104,7 +105,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p sll.Packet
 
 	cmp := MakeTestSimple()
 
@@ -120,7 +121,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p sll.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

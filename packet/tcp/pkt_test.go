@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package tcp
+package tcp_test
 
 import "bytes"
 import "net"
@@ -36,26 +36,27 @@ import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
+import "github.com/ghedo/hype/packet/tcp"
 
 var test_simple = []byte{
 	0x00, 0x14, 0x00, 0x50, 0x00, 0x00, 0x15, 0x18, 0x00, 0x00, 0x01, 0xb0,
 	0x50, 0x02, 0x20, 0x00, 0x00, 0x00, 0x00, 0x28,
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *tcp.Packet {
+	return &tcp.Packet{
 		SrcPort: 20,
 		DstPort: 80,
 		Seq: 5400,
 		Ack: 432,
 		DataOff: 5,
-		Flags: Syn,
+		Flags: tcp.Syn,
 		WindowSize: 8192,
 		Urgent: 40,
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *tcp.Packet) {
 	if a.SrcPort != b.SrcPort {
 		t.Fatalf("SrcPort mismatch: %d", b.SrcPort)
 	}
@@ -119,7 +120,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p tcp.Packet
 
 	cmp := MakeTestSimple()
 
@@ -135,7 +136,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p tcp.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)
@@ -175,7 +176,7 @@ func TestPackWithIPv4(t *testing.T) {
 }
 
 func TestUnpackWithIPv4(t *testing.T) {
-	var p Packet
+	var p tcp.Packet
 
 	cmp := MakeTestSimple()
 	cmp.Checksum = 0xa64f

@@ -28,13 +28,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package eth
+package eth_test
 
 import "bytes"
 import "net"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/eth"
 
 var hwsrc_str = "4c:72:b9:54:e5:3d"
 var hwdst_str = "1f:92:2b:56:ed:77"
@@ -44,7 +45,7 @@ var test_simple = []byte{
 	0x08, 0x00,
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *eth.Packet) {
 	if !bytes.Equal(a.SrcAddr, b.SrcAddr) {
 		t.Fatalf("SrcAddr mismatch: %s",b.SrcAddr)
 	}
@@ -58,14 +59,14 @@ func Compare(t *testing.T, a, b *Packet) {
 	}
 }
 
-func MakeTestSimple() *Packet {
+func MakeTestSimple() *eth.Packet {
 	hwsrc, _ := net.ParseMAC(hwsrc_str)
 	hwdst, _ := net.ParseMAC(hwdst_str)
 
-	return &Packet{
+	return &eth.Packet{
 		SrcAddr: hwsrc,
 		DstAddr: hwdst,
-		Type:    IPv4,
+		Type:    eth.IPv4,
 	}
 }
 
@@ -95,7 +96,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p eth.Packet
 
 	cmp := MakeTestSimple()
 
@@ -111,7 +112,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p eth.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

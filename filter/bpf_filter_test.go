@@ -28,11 +28,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package filter
+package filter_test
 
 import "log"
 import "testing"
 
+import "github.com/ghedo/hype/filter"
 import "github.com/ghedo/hype/packet"
 
 var test_eth_arp = []byte{
@@ -65,7 +66,7 @@ var test_eth_ipv4_tcp = []byte{
 }
 
 func TestMatch(t *testing.T) {
-	arp, err := Compile("arp", packet.Eth)
+	arp, err := filter.Compile("arp", packet.Eth)
 	if err != nil {
 		t.Fatalf("Error compiling arp")
 	}
@@ -74,12 +75,12 @@ func TestMatch(t *testing.T) {
 		t.Fatalf("Invalid filter ARP\n%s", arp)
 	}
 
-	udp, err := Compile("udp", packet.Eth)
+	udp, err := filter.Compile("udp", packet.Eth)
 	if err != nil {
 		t.Fatalf("Error compiling udp")
 	}
 
-	port, err := Compile("port 8338", packet.Eth)
+	port, err := filter.Compile("port 8338", packet.Eth)
 	if err != nil {
 		t.Fatalf("Error compiling port")
 	}
@@ -115,7 +116,7 @@ func TestMatch(t *testing.T) {
 
 func ExampleFilter() {
 	// Match UDP or TCP packets on top of Ethernet
-	flt, err := Compile("udp or tcp", packet.Eth)
+	flt, err := filter.Compile("udp or tcp", packet.Eth)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -120,7 +120,7 @@ if err != nil {
 }
 
 if flt.Match([]byte("random data")) {
-log.Println("MATCH!!!")
+	log.Println("MATCH!!!")
 }
 ```
 
@@ -146,7 +146,7 @@ arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
 arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
 arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
 
-raw_pkt, err := Pack(eth_pkt, arp_pkt)
+raw_pkt, err := layers.Pack(eth_pkt, arp_pkt)
 if err != nil {
 	log.Fatal(err)
 }
@@ -168,7 +168,7 @@ packets (e.g. ethernet -> ipv4 -> udp).
 raw_pkt := []byte("random data")
 
 // Assume Ethernet as datalink layer
-pkts, err := UnpackAll(raw_pkt, packet.Eth)
+pkts, err := layers.UnpackAll(raw_pkt, packet.Eth)
 if err != nil {
 	log.Fatal(err)
 }

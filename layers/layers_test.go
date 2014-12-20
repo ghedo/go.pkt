@@ -28,13 +28,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package layers
+package layers_test
 
 import "bytes"
 import "log"
 import "net"
 import "testing"
 
+import "github.com/ghedo/hype/layers"
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/arp"
 import "github.com/ghedo/hype/packet/eth"
@@ -68,7 +69,7 @@ func TestPackEthArp(t *testing.T) {
 	arp_pkt.ProtoSrcAddr = net.ParseIP(ipsrc_str)
 	arp_pkt.ProtoDstAddr = net.ParseIP(ipdst_str)
 
-	raw_pkt, err := Pack(eth_pkt, arp_pkt)
+	raw_pkt, err := layers.Pack(eth_pkt, arp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
@@ -79,14 +80,14 @@ func TestPackEthArp(t *testing.T) {
 }
 
 func TestUnpackEthArp(t *testing.T) {
-	_, err := Unpack(test_eth_arp, &eth.Packet{}, &arp.Packet{})
+	_, err := layers.Unpack(test_eth_arp, &eth.Packet{}, &arp.Packet{})
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 }
 
 func TestUnpackAllEthArp(t *testing.T) {
-	pkts, err := UnpackAll(test_eth_arp, packet.Eth)
+	pkts, err := layers.UnpackAll(test_eth_arp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
@@ -122,7 +123,7 @@ func TestPackEthVLANArp(t *testing.T) {
 	arp_pkt.ProtoSrcAddr = net.ParseIP(ipsrc_str)
 	arp_pkt.ProtoDstAddr = net.ParseIP(ipdst_str)
 
-	raw_pkt, err := Pack(eth_pkt, vlan_pkt, arp_pkt)
+	raw_pkt, err := layers.Pack(eth_pkt, vlan_pkt, arp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
@@ -133,14 +134,14 @@ func TestPackEthVLANArp(t *testing.T) {
 }
 
 func TestUnpackEthVLANArp(t *testing.T) {
-	_, err := Unpack(test_eth_arp, &eth.Packet{}, &vlan.Packet{}, &arp.Packet{})
+	_, err := layers.Unpack(test_eth_arp, &eth.Packet{}, &vlan.Packet{}, &arp.Packet{})
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 }
 
 func TestUnpackAllEthVLANArp(t *testing.T) {
-	pkts, err := UnpackAll(test_eth_vlan_arp, packet.Eth)
+	pkts, err := layers.UnpackAll(test_eth_vlan_arp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
@@ -178,7 +179,7 @@ func TestPackEthIPv4UDP(t *testing.T) {
 	udp_pkt.SrcPort = 41562
 	udp_pkt.DstPort = 8338
 
-	raw_pkt, err := Pack(eth_pkt, ip4_pkt, udp_pkt)
+	raw_pkt, err := layers.Pack(eth_pkt, ip4_pkt, udp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
@@ -193,14 +194,14 @@ func TestUnpackEthUPv4UDP(t *testing.T) {
 	var ip4_pkt ipv4.Packet
 	var udp_pkt udp.Packet
 
-	_, err := Unpack(test_eth_ipv4_udp, &eth_pkt, &ip4_pkt, &udp_pkt)
+	_, err := layers.Unpack(test_eth_ipv4_udp, &eth_pkt, &ip4_pkt, &udp_pkt)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 }
 
 func TestUnpackAllEthIPv4UDP(t *testing.T) {
-	pkts, err := UnpackAll(test_eth_ipv4_udp, packet.Eth)
+	pkts, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
@@ -241,7 +242,7 @@ func TestPackEthIPv4TCP(t *testing.T) {
 	tcp_pkt.Flags   = tcp.Syn
 	tcp_pkt.WindowSize = 8192
 
-	raw_pkt, err := Pack(eth_pkt, ip4_pkt, tcp_pkt)
+	raw_pkt, err := layers.Pack(eth_pkt, ip4_pkt, tcp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
@@ -256,14 +257,14 @@ func TestUnpackEthUPv4TCP(t *testing.T) {
 	var ip4_pkt ipv4.Packet
 	var tcp_pkt tcp.Packet
 
-	_, err := Unpack(test_eth_ipv4_tcp, &eth_pkt, &ip4_pkt, &tcp_pkt)
+	_, err := layers.Unpack(test_eth_ipv4_tcp, &eth_pkt, &ip4_pkt, &tcp_pkt)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 }
 
 func TestUnpackAllEthIPv4TCP(t *testing.T) {
-	pkts, err := UnpackAll(test_eth_ipv4_tcp, packet.Eth)
+	pkts, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
@@ -294,7 +295,7 @@ func ExamplePack() {
 	arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
 	arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
 
-	raw_pkt, err := Pack(eth_pkt, arp_pkt)
+	raw_pkt, err := layers.Pack(eth_pkt, arp_pkt)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -308,7 +309,7 @@ func ExampleUnpack() {
 	raw_pkt := []byte("random data")
 
 	// Assume Ethernet as datalink layer
-	pkts, err := UnpackAll(raw_pkt, packet.Eth)
+	pkts, err := layers.UnpackAll(raw_pkt, packet.Eth)
 	if err != nil {
 		log.Fatal(err)
 	}

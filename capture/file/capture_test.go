@@ -28,15 +28,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package file
+package file_test
 
 import "log"
 import "testing"
 
+import "github.com/ghedo/hype/capture/file"
 import "github.com/ghedo/hype/filter"
 
 func TestCapture(t *testing.T) {
-	src, err := Open("capture_test.pcap")
+	src, err := file.Open("capture_test.pcap")
 	if err != nil {
 		t.Fatalf("Error opening: %s", err)
 	}
@@ -61,7 +62,7 @@ func TestCapture(t *testing.T) {
 }
 
 func TestCaptureFilter(t *testing.T) {
-	src, err := Open("capture_test.pcap")
+	src, err := file.Open("capture_test.pcap")
 	if err != nil {
 		t.Fatalf("Error opening: %s", err)
 	}
@@ -97,7 +98,7 @@ func TestCaptureFilter(t *testing.T) {
 }
 
 func ExampleCapture() {
-	src, err := Open("/path/to/file/dump.pcap")
+	src, err := file.Open("/path/to/file/dump.pcap")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,7 +128,7 @@ func ExampleCapture() {
 }
 
 func ExampleInject() {
-	dst, err := Open("/path/to/file/dump.pcap")
+	dst, err := file.Open("/path/to/file/dump.pcap")
 	if err != nil {
 		log.Fatal(err)
 	}

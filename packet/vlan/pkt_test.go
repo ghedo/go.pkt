@@ -28,27 +28,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package vlan
+package vlan_test
 
 import "bytes"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
+import "github.com/ghedo/hype/packet/vlan"
 
 var test_simple = []byte{
 	0x64, 0x00, 0x08, 0x00,
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *vlan.Packet {
+	return &vlan.Packet{
 		Priority: 3,
 		VLAN:     1024,
 		Type:     eth.IPv4,
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *vlan.Packet) {
 	if a.Priority != b.Priority {
 		t.Fatalf("Priority mismatch: %d", b.Priority)
 	}
@@ -88,7 +89,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p vlan.Packet
 
 	cmp := MakeTestSimple()
 
@@ -104,7 +105,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p vlan.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

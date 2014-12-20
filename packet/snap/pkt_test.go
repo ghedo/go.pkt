@@ -28,19 +28,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package snap
+package snap_test
 
 import "bytes"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
+import "github.com/ghedo/hype/packet/snap"
 
 var test_simple = []byte{
 	0x00, 0x00, 0x00, 0x08, 0x00,
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *snap.Packet) {
 	if !bytes.Equal(a.OUI[:], b.OUI[:]) {
 		t.Fatalf("OUI mismatch: %x", b.OUI)
 	}
@@ -50,8 +51,8 @@ func Compare(t *testing.T, a, b *Packet) {
 	}
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *snap.Packet {
+	return &snap.Packet{
 		Type: eth.IPv4,
 	}
 }
@@ -82,7 +83,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p snap.Packet
 
 	cmp := MakeTestSimple()
 
@@ -98,7 +99,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p snap.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

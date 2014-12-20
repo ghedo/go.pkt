@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ipv6
+package ipv6_test
 
 import "bytes"
 import "net"
@@ -36,6 +36,7 @@ import "testing"
 
 import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
+import "github.com/ghedo/hype/packet/ipv6"
 
 var test_simple = []byte{
 	0x63, 0x0d, 0x5b, 0x0a, 0x00, 0x08, 0x11, 0x40, 0xfe, 0x80, 0x00, 0x00,
@@ -47,8 +48,8 @@ var test_simple = []byte{
 var ipsrc_str = "fe80::4e72:b9ff:fe54:e53d"
 var ipdst_str = "79a:19b9:1115:ed67:99f5:f07a:6687:5b0f"
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *ipv6.Packet {
+	return &ipv6.Packet{
 		Version: 6,
 		Class: 48,
 		Label: 875274,
@@ -60,7 +61,7 @@ func MakeTestSimple() *Packet {
 	}
 }
 
-func Compate(t *testing.T, a, b *Packet) {
+func Compate(t *testing.T, a, b *ipv6.Packet) {
 	if a.Version != b.Version {
 		t.Fatalf("Version mismatch: %d", b.Version)
 	}
@@ -120,7 +121,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p ipv6.Packet
 
 	cmp := MakeTestSimple()
 
@@ -136,7 +137,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p ipv6.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

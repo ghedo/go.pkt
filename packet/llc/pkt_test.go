@@ -28,18 +28,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package llc
+package llc_test
 
 import "bytes"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/llc"
 
 var test_simple = []byte{
 	0x4e, 0x5e, 0x0b,
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *llc.Packet) {
 	if a.DSAP != b.DSAP {
 		t.Fatalf("DSAP mismatch: %x", b.DSAP)
 	}
@@ -53,8 +54,8 @@ func Compare(t *testing.T, a, b *Packet) {
 	}
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *llc.Packet {
+	return &llc.Packet{
 		DSAP: 0x4e,
 		SSAP: 0x5e,
 		Control: 0xa | 0x1,
@@ -87,7 +88,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p llc.Packet
 
 	cmp := MakeTestSimple()
 
@@ -103,7 +104,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p llc.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)

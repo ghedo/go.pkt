@@ -35,19 +35,20 @@ import "net"
 import "testing"
 
 import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/hype/packet/icmpv6"
 import "github.com/ghedo/hype/packet/ipv6"
 
 var test_simple = []byte{
 	0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 }
 
-func MakeTestSimple() *Packet {
-	return &Packet{
+func MakeTestSimple() *icmpv6.Packet {
+	return &icmpv6.Packet{
 		Type: EchoRequest,
 	}
 }
 
-func Compare(t *testing.T, a, b *Packet) {
+func Compare(t *testing.T, a, b *icmpv6.Packet) {
 	if a.Type != b.Type {
 		t.Fatalf("Type mismatch: %s", b.Type)
 	}
@@ -91,7 +92,7 @@ func BenchmarkPack(bn *testing.B) {
 }
 
 func TestUnpack(t *testing.T) {
-	var p Packet
+	var p icmpv6.Packet
 
 	cmp := MakeTestSimple()
 
@@ -107,7 +108,7 @@ func TestUnpack(t *testing.T) {
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p Packet
+	var p icmpv6.Packet
 
 	var b packet.Buffer
 	b.Init(test_simple)
@@ -148,7 +149,7 @@ func TestPackWithIPv6(t *testing.T) {
 }
 
 func TestUnpackWithIPv6(t *testing.T) {
-	var p Packet
+	var p icmpv6.Packet
 
 	cmp := MakeTestSimple()
 	cmp.Checksum = 0x5bed
