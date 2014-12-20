@@ -75,20 +75,35 @@ const (
 // Packet is the interface used internally to implement packet encoding and
 // decoding independently of the packet wire format.
 type Packet interface {
+	/* Return the type of the packet */
 	GetType() Type
+
+	/* Return the length of the packet including the payload if present */
 	GetLength() uint16
 
+	/* Check if the packet matches another packet */
 	Equals(other Packet) bool
+
+	/* Check if the packet in an answer to another packet */
 	Answers(other Packet) bool
 
-	Pack(*Buffer) error
-	Unpack(raw_pkt *Buffer) error
+	/* Encode the packet and write it to the given buffer */
+	Pack(out *Buffer) error
 
+	/* Decode the packet from the given buffer */
+	Unpack(in *Buffer) error
+
+	/* Return the payload of the packet or nil */
 	Payload() Packet
-	PayloadType() Type
-	SetPayload(p Packet) error
 
-	InitChecksum(csum uint32)
+	/* Return the type of the payload or None */
+	PayloadType() Type
+
+	/* Initialize the payload of the packet */
+	SetPayload(payload Packet) error
+
+	/* Initialize the checksum of the packet with the given seed */
+	InitChecksum(seed uint32)
 
 	String() string
 }
