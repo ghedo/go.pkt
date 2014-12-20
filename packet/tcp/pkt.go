@@ -226,11 +226,7 @@ func (p *Packet) Payload() packet.Packet {
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetType()
-	}
-
-	return packet.None
+	return packet.Raw
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
