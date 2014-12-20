@@ -97,13 +97,13 @@ func main() {
 			break
 		}
 
-		pkts, err := layers.UnpackAll(raw_pkt, c.LinkType())
+		rsp_pkt, err := layers.UnpackAll(raw_pkt, c.LinkType())
 		if err != nil {
 			log.Printf("Error: %s\n", err)
 		}
 
-		if pkts[0].Answers(eth_pkt) {
-			log.Println(pkts[1].(*arp.Packet).HWSrcAddr)
+		if rsp_pkt.Answers(eth_pkt) {
+			log.Println(rsp_pkt.(*arp.Packet).HWSrcAddr)
 			break
 		}
 	}

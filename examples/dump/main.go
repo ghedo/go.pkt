@@ -129,12 +129,12 @@ Options:
 		i++
 
 		if dst == nil {
-			pkts, err := layers.UnpackAll(raw_pkt, src.LinkType())
+			rcv_pkt, err := layers.UnpackAll(raw_pkt, src.LinkType())
 			if err != nil {
 				log.Printf("Error: %s\n", err)
 			}
 
-			log.Println(pkts[0])
+			log.Println(rcv_pkt)
 		} else {
 			dst.Inject(raw_pkt)
 		}

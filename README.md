@@ -168,14 +168,12 @@ packets (e.g. ethernet -> ipv4 -> udp).
 raw_pkt := []byte("random data")
 
 // Assume Ethernet as datalink layer
-pkts, err := layers.UnpackAll(raw_pkt, packet.Eth)
+pkt, err := layers.UnpackAll(raw_pkt, packet.Eth)
 if err != nil {
 	log.Fatal(err)
 }
 
-for _, p := range pkts {
-	log.Println(p)
-}
+log.Println(pkt)
 ```
 
 ### Routing

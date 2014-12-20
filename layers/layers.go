@@ -130,21 +130,21 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 	return pkts[0], nil
 }
 
-// Unpack the given byte slice into a list of arbitrary packet types. It will
-// extract packet type information from the binary data and use it to allocate
-// new packet accordingly. Note that given the memory allocations performed,
-// thsi may be slower then the Unpack() method.
+
+// Recursively unpack the given byte slice into a packet. The link_type argument
+// must specify the type of the first layer in the input data, successive layers
+// will be detected automatically.
 //
 // Note that unpacking is done without copying the input slice, which means that
 // if the slice is modifed, it may affect the packets that where unpacked from
 // it. If you can't guarantee that the data slice won't change, you'll need to
 // copy it and pass the copy to UnpackAll().
-func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
+func UnpackAll(buf []byte, link_type packet.Type) (packet.Packet, error) {
 	var raw_pkt packet.Buffer
 	raw_pkt.Init(buf)
 
-	pkts     := []packet.Packet{}
-	prev_pkt := packet.Packet(nil)
+	first_pkt := packet.Packet(nil)
+	prev_pkt  := packet.Packet(nil)
 
 	for link_type != packet.None {
 		var p packet.Packet
@@ -180,17 +180,17 @@ func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 			return nil, err
 		}
 
-		pkts = append(pkts, p)
-
 		if prev_pkt != nil {
 			prev_pkt.SetPayload(p)
+		} else {
+			first_pkt = p
 		}
 
 		prev_pkt  = p
 		link_type = p.GuessPayloadType()
 	}
 
-	return pkts, nil
+	return first_pkt, nil
 }
 
 // Return the first layer of the given type in the packet. If no suitable layer

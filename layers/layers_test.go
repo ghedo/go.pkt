@@ -87,17 +87,17 @@ func TestUnpackEthArp(t *testing.T) {
 }
 
 func TestUnpackAllEthArp(t *testing.T) {
-	pkts, err := layers.UnpackAll(test_eth_arp, packet.Eth)
+	pkt, err := layers.UnpackAll(test_eth_arp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	if pkts[0].GetType() != packet.Eth {
-		t.Fatalf("Packet type mismatch, %s", pkts[0].GetType())
+	if pkt.GetType() != packet.Eth {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[1].GetType() != packet.ARP {
-		t.Fatalf("Packet type mismatch, %s", pkts[1].GetType())
+	if pkt.Payload().GetType() != packet.ARP {
+		t.Fatalf("Packet type mismatch, %s", pkt.Payload().GetType())
 	}
 }
 
@@ -141,21 +141,23 @@ func TestUnpackEthVLANArp(t *testing.T) {
 }
 
 func TestUnpackAllEthVLANArp(t *testing.T) {
-	pkts, err := layers.UnpackAll(test_eth_vlan_arp, packet.Eth)
+	pkt, err := layers.UnpackAll(test_eth_vlan_arp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	if pkts[0].GetType() != packet.Eth {
-		t.Fatalf("Packet type mismatch, %s", pkts[0].GetType())
+	if pkt.GetType() != packet.Eth {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[1].GetType() != packet.VLAN {
-		t.Fatalf("Packet type mismatch, %s", pkts[1].GetType())
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.VLAN {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[2].GetType() != packet.ARP {
-		t.Fatalf("Packet type mismatch, %s", pkts[2].GetType())
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.ARP {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 }
 
@@ -201,21 +203,23 @@ func TestUnpackEthUPv4UDP(t *testing.T) {
 }
 
 func TestUnpackAllEthIPv4UDP(t *testing.T) {
-	pkts, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
+	pkt, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	if pkts[0].GetType() != packet.Eth {
-		t.Fatalf("Packet type mismatch, %s", pkts[0].GetType())
+	if pkt.GetType() != packet.Eth {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[1].GetType() != packet.IPv4 {
-		t.Fatalf("Packet type mismatch, %s", pkts[1].GetType())
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.IPv4 {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[2].GetType() != packet.UDP {
-		t.Fatalf("Packet type mismatch, %s", pkts[2].GetType())
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.UDP {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 }
 
@@ -264,41 +268,43 @@ func TestUnpackEthUPv4TCP(t *testing.T) {
 }
 
 func TestUnpackAllEthIPv4TCP(t *testing.T) {
-	pkts, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
+	pkt, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	if pkts[0].GetType() != packet.Eth {
-		t.Fatalf("Packet type mismatch, %s", pkts[0].GetType())
+	if pkt.GetType() != packet.Eth {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[1].GetType() != packet.IPv4 {
-		t.Fatalf("Packet type mismatch, %s", pkts[1].GetType())
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.IPv4 {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 
-	if pkts[2].GetType() != packet.TCP {
-		t.Fatalf("Packet type mismatch, %s", pkts[2].GetType())
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.TCP {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 }
 
 func TestFindLayer(t *testing.T) {
-	pkts, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
+	pkt, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	ipv4_pkt := layers.FindLayer(pkts[0], packet.IPv4)
+	ipv4_pkt := layers.FindLayer(pkt, packet.IPv4)
 	if ipv4_pkt == nil || ipv4_pkt.GetType() != packet.IPv4 {
 		t.Fatalf("Not IPv4: %s", ipv4_pkt)
 	}
 
-	tcp_pkt := layers.FindLayer(pkts[0], packet.TCP)
+	tcp_pkt := layers.FindLayer(pkt, packet.TCP)
 	if tcp_pkt == nil || tcp_pkt.GetType() != packet.TCP {
 		t.Fatalf("Not TCP: %s", tcp_pkt)
 	}
 
-	udp_pkt := layers.FindLayer(pkts[0], packet.UDP)
+	udp_pkt := layers.FindLayer(pkt, packet.UDP)
 	if udp_pkt != nil {
 		t.Fatalf("Not nil: %s", udp_pkt)
 	}
@@ -331,12 +337,10 @@ func ExampleUnpack() {
 	raw_pkt := []byte("random data")
 
 	// Assume Ethernet as datalink layer
-	pkts, err := layers.UnpackAll(raw_pkt, packet.Eth)
+	pkt, err := layers.UnpackAll(raw_pkt, packet.Eth)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, p := range pkts {
-		log.Println(p)
-	}
+	log.Println(pkt)
 }
