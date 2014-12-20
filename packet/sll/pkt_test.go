@@ -57,28 +57,6 @@ func MakeTestSimple() *sll.Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *sll.Packet) {
-	if a.Type != b.Type {
-		t.Fatalf("Type mismatch: %d", b.Type)
-	}
-
-	if a.AddrType != b.AddrType {
-		t.Fatalf("AddrType mismatch: %d", b.AddrType)
-	}
-
-	if a.AddrLen != b.AddrLen {
-		t.Fatalf("AddrLen mismatch: %d", b.AddrLen)
-	}
-
-	if !bytes.Equal(a.SrcAddr, b.SrcAddr) {
-		t.Fatalf("SrcAddr mismatch: %s", b.SrcAddr)
-	}
-
-	if a.EtherType != b.EtherType {
-		t.Fatalf("EtherType mismatch: %d", b.EtherType)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -117,7 +95,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

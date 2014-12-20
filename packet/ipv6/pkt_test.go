@@ -61,40 +61,6 @@ func MakeTestSimple() *ipv6.Packet {
 	}
 }
 
-func Compate(t *testing.T, a, b *ipv6.Packet) {
-	if a.Version != b.Version {
-		t.Fatalf("Version mismatch: %d", b.Version)
-	}
-
-	if a.Class != b.Class {
-		t.Fatalf("Class mismatch: %d", b.Class)
-	}
-
-	if a.Label != b.Label {
-		t.Fatalf("Label mismatch: %d", b.Label)
-	}
-
-	if a.Length != b.Length {
-		t.Fatalf("Length mismatch: %d", b.Length)
-	}
-
-	if a.NextHdr != b.NextHdr {
-		t.Fatalf("NextHdr mismatch: %d", b.NextHdr)
-	}
-
-	if a.HopLimit != b.HopLimit {
-		t.Fatalf("HopLimit mismatch: %d", b.HopLimit)
-	}
-
-	if !a.SrcAddr.Equal(b.SrcAddr) {
-		t.Fatalf("ProtoSrcAddr mismatch: %s", b.SrcAddr)
-	}
-
-	if !a.DstAddr.Equal(b.DstAddr) {
-		t.Fatalf("ProtoDstAddr mismatch: %s", b.DstAddr)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -133,7 +99,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compate(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

@@ -70,52 +70,6 @@ func MakeTestSimple() *arp.Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *arp.Packet) {
-	if a.Operation != b.Operation {
-		t.Fatalf("Operation mismatch: %d", b.Operation)
-	}
-
-	if a.HWType != b.HWType {
-		t.Fatalf("HWType mismatch: %x", b.HWType)
-	}
-
-	if a.ProtoType != b.ProtoType {
-		t.Fatalf("ProtoType mismatch: %x", b.ProtoType)
-	}
-
-	if a.HWAddrLen != 6 {
-		t.Fatalf("HWAddrLen mismatch: %d", b.HWAddrLen)
-	}
-
-	if a.ProtoAddrLen != 4 {
-		t.Fatalf("ProtoAddrLen mismatch: %d", b.ProtoAddrLen)
-	}
-
-	if a.HWAddrLen != b.HWAddrLen {
-		t.Fatalf("HWAddrLen mismatch: %s", b.HWAddrLen)
-	}
-
-	if !bytes.Equal(a.HWSrcAddr, b.HWSrcAddr) {
-		t.Fatalf("HWSrcAddr mismatch: %s", b.HWSrcAddr)
-	}
-
-	if !bytes.Equal(a.HWDstAddr, b.HWDstAddr) {
-		t.Fatalf("HWDstAddr mismatch: %s", b.HWDstAddr)
-	}
-
-	if a.ProtoAddrLen != b.ProtoAddrLen {
-		t.Fatalf("ProtoAddrLen mismatch: %s", b.ProtoAddrLen)
-	}
-
-	if !a.ProtoSrcAddr.Equal(b.ProtoSrcAddr) {
-		t.Fatalf("ProtoSrcAddr mismatch: %s", b.ProtoSrcAddr)
-	}
-
-	if !a.ProtoDstAddr.Equal(b.ProtoDstAddr) {
-		t.Fatalf("ProtoDstAddr mismatch: %s", b.ProtoDstAddr)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -154,7 +108,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

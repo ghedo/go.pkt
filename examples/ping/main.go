@@ -37,7 +37,6 @@ import "net"
 import "github.com/docopt/docopt-go"
 
 import "github.com/ghedo/hype/capture/live"
-import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/ipv4"
 import "github.com/ghedo/hype/packet/icmpv4"
@@ -110,23 +109,11 @@ func main() {
 			log.Printf("Error: %s\n", err)
 		}
 
-		if len(pkts) < 3 ||
-		   pkts[1].GetType() != packet.IPv4 ||
-		   pkts[2].GetType() != packet.ICMPv4 {
+		if len(pkts) < 3 {
 			continue
 		}
 
-		ipv4_pkt := pkts[1].(*ipv4.Packet)
-
-		if !ipv4_pkt.SrcAddr.Equal(addr_ip) ||
-		   !ipv4_pkt.DstAddr.Equal(route.PrefSrc) {
-			continue
-		}
-
-		icmp_pkt := pkts[2].(*icmpv4.Packet)
-
-		if icmp_pkt.Type == icmpv4.EchoReply &&
-		   icmp_pkt.Id == id_rand {
+		if pkts[1].Answers(ipv4_pkt) {
 			log.Println("ping")
 			break
 		}

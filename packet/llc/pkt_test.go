@@ -40,20 +40,6 @@ var test_simple = []byte{
 	0x4e, 0x5e, 0x0b,
 }
 
-func Compare(t *testing.T, a, b *llc.Packet) {
-	if a.DSAP != b.DSAP {
-		t.Fatalf("DSAP mismatch: %x", b.DSAP)
-	}
-
-	if a.SSAP != b.SSAP {
-		t.Fatalf("SSAP mismatch: %x", b.SSAP)
-	}
-
-	if a.Control != b.Control {
-		t.Fatalf("Control mismatch: %x", b.Control)
-	}
-}
-
 func MakeTestSimple() *llc.Packet {
 	return &llc.Packet{
 		DSAP: 0x4e,
@@ -100,7 +86,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

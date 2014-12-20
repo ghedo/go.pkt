@@ -45,20 +45,6 @@ var test_simple = []byte{
 	0x08, 0x00,
 }
 
-func Compare(t *testing.T, a, b *eth.Packet) {
-	if !bytes.Equal(a.SrcAddr, b.SrcAddr) {
-		t.Fatalf("SrcAddr mismatch: %s",b.SrcAddr)
-	}
-
-	if !bytes.Equal(a.DstAddr, b.DstAddr) {
-		t.Fatalf("DstAddr mismatch: %s", b.DstAddr)
-	}
-
-	if a.Type != b.Type {
-		t.Fatalf("Type mismatch: %s", b.Type)
-	}
-}
-
 func MakeTestSimple() *eth.Packet {
 	hwsrc, _ := net.ParseMAC(hwsrc_str)
 	hwdst, _ := net.ParseMAC(hwdst_str)
@@ -108,7 +94,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

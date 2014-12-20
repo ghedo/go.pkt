@@ -75,6 +75,14 @@ func (p *Packet) GetLength() uint16 {
 	return p.AddrLen + 16
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	return false
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(p.Type)
 	raw_pkt.WriteI(p.AddrType)

@@ -49,20 +49,6 @@ func MakeTestSimple() *vlan.Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *vlan.Packet) {
-	if a.Priority != b.Priority {
-		t.Fatalf("Priority mismatch: %d", b.Priority)
-	}
-
-	if a.VLAN != b.VLAN {
-		t.Fatalf("VLAN mismatch: %d", b.VLAN)
-	}
-
-	if a.Type != b.Type {
-		t.Fatalf("Type mismatch: %d", b.Type)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -101,7 +87,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

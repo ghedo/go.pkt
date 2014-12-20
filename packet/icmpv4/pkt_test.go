@@ -49,28 +49,6 @@ func MakeTestSimple() *icmpv4.Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *icmpv4.Packet) {
-	if a.Type != b.Type {
-		t.Fatalf("Type mismatch: %s", b.Type)
-	}
-
-	if a.Code != b.Code {
-		t.Fatalf("Code mismatch: %x", b.Code)
-	}
-
-	if a.Id != b.Id {
-		t.Fatalf("Id mismatch: %x", b.Id)
-	}
-
-	if a.Seq != b.Seq {
-		t.Fatalf("Seq mismatch: %x", b.Seq)
-	}
-
-	if a.Checksum != b.Checksum {
-		t.Fatalf("Checksum mismatch: %x", b.Checksum)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -110,7 +88,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

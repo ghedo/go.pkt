@@ -60,52 +60,6 @@ func MakeTestSimple() *ipv4.Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *ipv4.Packet) {
-	if a.Version != b.Version {
-		t.Fatalf("Version mismatch: %d", b.Version)
-	}
-
-	if a.IHL != b.IHL {
-		t.Fatalf("IHL mismatch: %d", b.IHL)
-	}
-
-	if a.TOS != b.TOS {
-		t.Fatalf("TOS mismatch: %d", b.TOS)
-	}
-
-	if a.Length != b.Length {
-		t.Fatalf("Length mismatch: %d", b.Length)
-	}
-
-	if a.Id != b.Id {
-		t.Fatalf("Id mismatch: %d", b.Id)
-	}
-
-	if a.Flags != b.Flags {
-		t.Fatalf("Flags mismatch: %d", b.Flags)
-	}
-
-	if a.TTL != b.TTL {
-		t.Fatalf("TTL mismatch: %d", b.TTL)
-	}
-
-	if a.Protocol != b.Protocol {
-		t.Fatalf("Protocol mismatch: %d", b.Protocol)
-	}
-
-	if a.Checksum != b.Checksum {
-		t.Fatalf("Checksum mismatch: %d", b.Checksum)
-	}
-
-	if !a.SrcAddr.Equal(b.SrcAddr) {
-		t.Fatalf("ProtoSrcAddr mismatch: %s", b.SrcAddr)
-	}
-
-	if !a.DstAddr.Equal(b.DstAddr) {
-		t.Fatalf("ProtoDstAddr mismatch: %s", b.DstAddr)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -145,7 +99,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

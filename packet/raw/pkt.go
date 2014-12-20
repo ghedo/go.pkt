@@ -50,6 +50,14 @@ func (p *Packet) GetLength() uint16 {
 	return uint16(len(p.Data))
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	return false
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.Write(p.Data)
 

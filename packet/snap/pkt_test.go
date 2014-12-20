@@ -41,16 +41,6 @@ var test_simple = []byte{
 	0x00, 0x00, 0x00, 0x08, 0x00,
 }
 
-func Compare(t *testing.T, a, b *snap.Packet) {
-	if !bytes.Equal(a.OUI[:], b.OUI[:]) {
-		t.Fatalf("OUI mismatch: %x", b.OUI)
-	}
-
-	if a.Type != b.Type {
-		t.Fatalf("Type mismatch: %s", b.Type)
-	}
-}
-
 func MakeTestSimple() *snap.Packet {
 	return &snap.Packet{
 		Type: eth.IPv4,
@@ -95,7 +85,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {

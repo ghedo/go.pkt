@@ -66,6 +66,29 @@ func (p *Packet) GetLength() uint16 {
 	return 40 + p.Length
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	if other == nil || other.GetType() != packet.IPv6 {
+		return false
+	}
+
+	/* TODO: check link-local broadcast addresses */
+	if !p.DstAddr.Equal(other.(*Packet).SrcAddr) {
+		return false
+	}
+
+	/* TODO: check ICMPv6 errors */
+
+	if p.Payload() != nil {
+		return p.Payload().Answers(other.Payload())
+	}
+
+	return true
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(uint8(p.Version << 4 | (p.Class >> 4)))
 	raw_pkt.WriteI(p.Class << 4 | uint8(p.Label >> 16))

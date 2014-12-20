@@ -58,6 +58,27 @@ func (p *Packet) GetLength() uint16 {
 	return 2
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	if other == nil {
+		return false
+	}
+
+	if  other.GetType() == packet.VLAN &&
+	    p.VLAN != other.(*Packet).VLAN {
+		return false
+	}
+
+	if p.Payload() != nil {
+		return p.Payload().Answers(other.Payload())
+	}
+
+	return true
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	tci := uint16(p.Priority) << 13 | p.VLAN
 	if p.DropEligible {

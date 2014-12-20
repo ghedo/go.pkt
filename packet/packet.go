@@ -78,6 +78,9 @@ type Packet interface {
 	GetType() Type
 	GetLength() uint16
 
+	Equals(other Packet) bool
+	Answers(other Packet) bool
+
 	Pack(*Buffer) error
 	Unpack(raw_pkt *Buffer) error
 
@@ -151,6 +154,83 @@ func (t Type) String() string {
 	}
 }
 
+func Compare(a, b Packet) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+
+	if a.GetType() != b.GetType() {
+		return false
+	}
+
+	aval := reflect.ValueOf(a).Elem()
+	bval := reflect.ValueOf(b).Elem()
+
+	for i := 0; i < aval.NumField(); i++ {
+		if !compare_value(aval.Field(i), bval.Field(i)) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func compare_value(a, b reflect.Value) bool {
+	if a.Type() != b.Type() {
+		return false
+	}
+
+	m := a.MethodByName("Equal")
+	if m.IsValid() {
+		res := m.Call([]reflect.Value{b})
+		return res[0].Bool()
+	}
+
+	switch a.Kind() {
+	case reflect.Bool:
+		return a.Bool() == b.Bool()
+
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32:
+		return a.Uint() == b.Uint()
+
+	case reflect.Array:
+		for i := 0; i < a.Len(); i++ {
+			if !compare_value(a.Index(i), b.Index(i)) {
+				return false
+			}
+		}
+
+		return true
+
+	case reflect.Slice:
+		if a.IsNil() != b.IsNil() {
+			return false
+		}
+
+		if a.Len() != b.Len() {
+			return false
+		}
+
+		if a.Pointer() == b.Pointer() {
+			return true
+		}
+
+		for i := 0; i < a.Len(); i++ {
+			if !compare_value(a.Index(i), b.Index(i)) {
+				return false
+			}
+		}
+
+		return true
+
+	case reflect.Interface:
+		return true
+
+	default:
+		return false
+	}
+}
+
 func Stringify(p Packet) string {
 	value := reflect.ValueOf(p).Elem()
 	name  := strings.ToLower(p.GetType().String())
@@ -194,7 +274,7 @@ func stringify_value(key string, val reflect.Value) string {
 	}
 
 	switch val.Kind() {
-	case reflect.Uint8, reflect.Uint16:
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32:
 		if val.Uint() > 0 {
 			if key == "sum" || key == "type" {
 				s = "0x" + strconv.FormatUint(val.Uint(), 16)

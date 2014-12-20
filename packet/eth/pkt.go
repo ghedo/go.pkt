@@ -68,6 +68,26 @@ func Make() *Packet {
 	}
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	if other == nil || other.GetType() != packet.Eth {
+		return false
+	}
+
+	if p.Type != other.(*Packet).Type {
+		return false
+	}
+
+	if p.Payload() != nil {
+		return p.Payload().Answers(other.Payload())
+	}
+
+	return true
+}
+
 func (p *Packet) GetType() packet.Type {
 	return packet.Eth
 }

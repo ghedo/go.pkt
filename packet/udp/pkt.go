@@ -57,6 +57,23 @@ func (p *Packet) GetLength() uint16 {
 	return p.Length
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	if other == nil || other.GetType() != packet.TCP {
+		return false
+	}
+
+	if p.SrcPort != other.(*Packet).DstPort ||
+	   p.DstPort != other.(*Packet).SrcPort {
+		return false
+	}
+
+	return true
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(p.SrcPort)
 	raw_pkt.WriteI(p.DstPort)

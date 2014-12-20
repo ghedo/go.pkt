@@ -74,6 +74,22 @@ func (p *Packet) GetLength() uint16 {
 	return 8
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	if other == nil || other.GetType() != packet.ICMPv6 {
+		return false
+	}
+
+	if other.(*Packet).Type == EchoRequest && p.Type == EchoReply {
+		return true
+	}
+
+	return false
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(byte(p.Type))
 	raw_pkt.WriteI(byte(p.Code))

@@ -77,6 +77,23 @@ func (p *Packet) GetLength() uint16 {
 	return 8 + uint16(p.HWAddrLen) * 2 + uint16(p.ProtoAddrLen) * 2
 }
 
+func (p *Packet) Equals(other packet.Packet) bool {
+	return packet.Compare(p, other)
+}
+
+func (p *Packet) Answers(other packet.Packet) bool {
+	if other == nil || other.GetType() != packet.ARP {
+		return false
+	}
+
+	if p.Operation == Reply && other.(*Packet).Operation == Request &&
+	   p.ProtoSrcAddr.Equal(other.(*Packet).ProtoDstAddr) {
+		return true
+	}
+
+	return false
+}
+
 func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 	raw_pkt.WriteI(p.HWType)
 	raw_pkt.WriteI(p.ProtoType)

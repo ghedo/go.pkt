@@ -36,7 +36,6 @@ import "net"
 import "github.com/docopt/docopt-go"
 
 import "github.com/ghedo/hype/capture/live"
-import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/arp"
 import "github.com/ghedo/hype/layers"
@@ -103,13 +102,11 @@ func main() {
 			log.Printf("Error: %s\n", err)
 		}
 
-		if len(pkts) < 2 || pkts[1].GetType() != packet.ARP {
+		if len(pkts) < 2 {
 			continue
 		}
 
-		arp_pkt := pkts[1].(*arp.Packet)
-
-		if arp_pkt.ProtoSrcAddr.Equal(addr_ip) {
+		if pkts[1].Answers(arp_pkt) {
 			log.Println(arp_pkt.HWSrcAddr)
 			break
 		}

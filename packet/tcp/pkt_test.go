@@ -56,44 +56,6 @@ func MakeTestSimple() *tcp.Packet {
 	}
 }
 
-func Compare(t *testing.T, a, b *tcp.Packet) {
-	if a.SrcPort != b.SrcPort {
-		t.Fatalf("SrcPort mismatch: %d", b.SrcPort)
-	}
-
-	if a.DstPort != b.DstPort {
-		t.Fatalf("DstPort mismatch: %d", b.DstPort)
-	}
-
-	if a.Seq != b.Seq {
-		t.Fatalf("Seq mismatch: %d", b.Seq)
-	}
-
-	if a.Ack != b.Ack {
-		t.Fatalf("Ack mismatch: %d", b.Ack)
-	}
-
-	if a.DataOff != b.DataOff {
-		t.Fatalf("DataOff mismatch: %d", b.DataOff)
-	}
-
-	if a.Flags != b.Flags {
-		t.Fatalf("Flags mismatch: %s", b.Flags)
-	}
-
-	if a.WindowSize != b.WindowSize {
-		t.Fatalf("WindowSize mismatch: %d", b.WindowSize)
-	}
-
-	if a.Urgent != b.Urgent {
-		t.Fatalf("Urgent mismatch: %d", b.Urgent)
-	}
-
-	if a.Checksum != b.Checksum {
-		t.Fatalf("Checksum mismatch: %x", b.Checksum)
-	}
-}
-
 func TestPack(t *testing.T) {
 	var b packet.Buffer
 
@@ -132,7 +94,9 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
 
 func BenchmarkUnpack(bn *testing.B) {
@@ -189,5 +153,7 @@ func TestUnpackWithIPv4(t *testing.T) {
 		t.Fatalf("Error unpacking: %s", err)
 	}
 
-	Compare(t, cmp, &p)
+	if !p.Equals(cmp) {
+		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+	}
 }
