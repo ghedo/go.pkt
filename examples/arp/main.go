@@ -107,7 +107,7 @@ func main() {
 		}
 
 		if pkts[1].Answers(arp_pkt) {
-			log.Println(arp_pkt.HWSrcAddr)
+			log.Println(pkts[1].(*arp.Packet).HWSrcAddr)
 			break
 		}
 	}
