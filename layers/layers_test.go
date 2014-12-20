@@ -282,6 +282,28 @@ func TestUnpackAllEthIPv4TCP(t *testing.T) {
 	}
 }
 
+func TestFindLayer(t *testing.T) {
+	pkts, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
+	if err != nil {
+		t.Fatalf("Error unpacking: %s", err)
+	}
+
+	ipv4_pkt := layers.FindLayer(pkts[0], packet.IPv4)
+	if ipv4_pkt == nil || ipv4_pkt.GetType() != packet.IPv4 {
+		t.Fatalf("Not IPv4: %s", ipv4_pkt)
+	}
+
+	tcp_pkt := layers.FindLayer(pkts[0], packet.TCP)
+	if tcp_pkt == nil || tcp_pkt.GetType() != packet.TCP {
+		t.Fatalf("Not TCP: %s", tcp_pkt)
+	}
+
+	udp_pkt := layers.FindLayer(pkts[0], packet.UDP)
+	if udp_pkt != nil {
+		t.Fatalf("Not nil: %s", udp_pkt)
+	}
+}
+
 func ExamplePack() {
 	// Create an Ethernet packet
 	eth_pkt := eth.Make()

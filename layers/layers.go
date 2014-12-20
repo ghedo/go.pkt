@@ -192,3 +192,18 @@ func UnpackAll(buf []byte, link_type packet.Type) ([]packet.Packet, error) {
 
 	return pkts, nil
 }
+
+// Return the first layer of the given type in the packet. If no suitable layer
+// is found, return nil.
+func FindLayer(p packet.Packet, layer packet.Type) packet.Packet {
+	switch {
+	case p == nil:
+		return nil
+
+	case p.GetType() == layer:
+		return p
+
+	default:
+		return FindLayer(p.Payload(), layer)
+	}
+}
