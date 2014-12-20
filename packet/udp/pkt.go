@@ -35,12 +35,12 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
 
 type Packet struct {
-	SrcPort     uint16        `name:"sport"`
-	DstPort     uint16        `name:"dport"`
-	Length      uint16        `name:"len"`
-	Checksum    uint16        `name:"sum"`
-	csum_seed   uint32        `name:"skip"`
-	pkt_payload packet.Packet `name:"skip"`
+	SrcPort     uint16        `string:"sport"`
+	DstPort     uint16        `string:"dport"`
+	Length      uint16        `string:"len"`
+	Checksum    uint16        `string:"sum"`
+	csum_seed   uint32        `string:"skip"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 func Make() *Packet {

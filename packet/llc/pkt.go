@@ -36,9 +36,9 @@ import "github.com/ghedo/hype/packet"
 type Packet struct {
 	DSAP        uint8
 	SSAP        uint8
-	Control     uint16        `name:"ctrl"`
+	Control     uint16        `string:"ctrl"`
 
-	pkt_payload packet.Packet `name:"skip"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 func Make() *Packet {

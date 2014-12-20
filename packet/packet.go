@@ -257,8 +257,8 @@ func Stringify(p Packet) string {
 
 		key := strings.ToLower(ftype.Name)
 
-		if ftype.Tag.Get("name") != "" {
-			key = ftype.Tag.Get("name")
+		if ftype.Tag.Get("string") != "" {
+			key = ftype.Tag.Get("string")
 		}
 
 		if key == "skip" {

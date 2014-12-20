@@ -38,11 +38,11 @@ import "net"
 import "github.com/ghedo/hype/packet"
 
 type Packet struct {
-	DstAddr     net.HardwareAddr `name:"dst"`
-	SrcAddr     net.HardwareAddr `name:"src"`
+	DstAddr     net.HardwareAddr `string:"dst"`
+	SrcAddr     net.HardwareAddr `string:"src"`
 	Type        EtherType
 	Length      uint16
-	pkt_payload packet.Packet    `name:"skip"`
+	pkt_payload packet.Packet    `string:"skip"`
 }
 
 type EtherType uint16

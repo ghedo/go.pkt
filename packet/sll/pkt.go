@@ -38,11 +38,11 @@ import "github.com/ghedo/hype/packet/eth"
 
 type Packet struct {
 	Type        Type
-	AddrType    uint16           `name:"atype"`
-	AddrLen     uint16           `name:"alen"`
-	SrcAddr     net.HardwareAddr `name:"src"`
+	AddrType    uint16           `string:"atype"`
+	AddrLen     uint16           `string:"alen"`
+	SrcAddr     net.HardwareAddr `string:"src"`
 	EtherType   eth.EtherType
-	pkt_payload packet.Packet    `name:"skip"`
+	pkt_payload packet.Packet    `string:"skip"`
 }
 
 type Type uint16

@@ -46,11 +46,11 @@ type Packet struct {
 	Flags       Flags
 	FragOff     uint16
 	TTL         uint8
-	Protocol    Protocol      `name:"proto"`
-	Checksum    uint16        `name:"sum"`
-	SrcAddr     net.IP        `name:"src"`
-	DstAddr     net.IP        `name:"dst"`
-	pkt_payload packet.Packet `name:"skip"`
+	Protocol    Protocol      `string:"proto"`
+	Checksum    uint16        `string:"sum"`
+	SrcAddr     net.IP        `string:"src"`
+	DstAddr     net.IP        `string:"dst"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 type Flags uint8

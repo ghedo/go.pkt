@@ -38,7 +38,7 @@ type Packet struct {
 	OUI         [3]byte
 	Type        eth.EtherType
 
-	pkt_payload packet.Packet `name:"skip"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 func Make() *Packet {

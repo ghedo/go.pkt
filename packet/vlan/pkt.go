@@ -35,11 +35,11 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
 
 type Packet struct {
-	Priority     uint8         `name:"prio"`
-	DropEligible bool          `name:"drop"`
+	Priority     uint8         `string:"prio"`
+	DropEligible bool          `string:"drop"`
 	VLAN         uint16
 	Type         eth.EtherType
-	pkt_payload  packet.Packet `name:"skip"`
+	pkt_payload  packet.Packet `string:"skip"`
 }
 
 func Make() *Packet {

@@ -37,18 +37,18 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/ipv4"
 
 type Packet struct {
-	SrcPort     uint16        `name:"sport"`
-	DstPort     uint16        `name:"dport"`
+	SrcPort     uint16        `string:"sport"`
+	DstPort     uint16        `string:"dport"`
 	Seq         uint32
 	Ack         uint32
-	DataOff     uint8         `name:"off"`
+	DataOff     uint8         `string:"off"`
 	NS          bool
 	Flags       Flags
-	WindowSize  uint16        `name:"win"`
-	Checksum    uint16        `name:"sum"`
-	Urgent      uint16        `name:"urg"`
-	csum_seed   uint32        `name:"skip"`
-	pkt_payload packet.Packet `name:"skip"`
+	WindowSize  uint16        `string:"win"`
+	Checksum    uint16        `string:"sum"`
+	Urgent      uint16        `string:"urg"`
+	csum_seed   uint32        `string:"skip"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 type Flags uint16

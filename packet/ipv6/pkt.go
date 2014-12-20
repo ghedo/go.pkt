@@ -41,12 +41,12 @@ type Packet struct {
 	Version     uint8
 	Class       uint8
 	Label       uint32
-	Length      uint16        `name:"len"`
-	NextHdr     ipv4.Protocol `name:"next"`
-	HopLimit    uint8         `name:"hop"`
-	SrcAddr     net.IP        `name:"src"`
-	DstAddr     net.IP        `name:"dst"`
-	pkt_payload packet.Packet `name:"skip"`
+	Length      uint16        `string:"len"`
+	NextHdr     ipv4.Protocol `string:"next"`
+	HopLimit    uint8         `string:"hop"`
+	SrcAddr     net.IP        `string:"src"`
+	DstAddr     net.IP        `string:"dst"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 type Flags uint8

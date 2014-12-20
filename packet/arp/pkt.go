@@ -37,17 +37,17 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/eth"
 
 type Packet struct {
-	Operation     Operation        `name:"op"`
+	Operation     Operation        `string:"op"`
 
 	HWType        uint16
-	HWAddrLen     uint8            `name:"hwlen"`
-	HWSrcAddr     net.HardwareAddr `name:"hwsrc"`
-	HWDstAddr     net.HardwareAddr `name:"hwdst"`
+	HWAddrLen     uint8            `string:"hwlen"`
+	HWSrcAddr     net.HardwareAddr `string:"hwsrc"`
+	HWDstAddr     net.HardwareAddr `string:"hwdst"`
 
-	ProtoType     eth.EtherType    `name:"ptype"`
-	ProtoAddrLen  uint8            `name:"plen"`
-	ProtoSrcAddr  net.IP           `name:"psrc"`
-	ProtoDstAddr  net.IP           `name:"pdst"`
+	ProtoType     eth.EtherType    `string:"ptype"`
+	ProtoAddrLen  uint8            `string:"plen"`
+	ProtoSrcAddr  net.IP           `string:"psrc"`
+	ProtoDstAddr  net.IP           `string:"pdst"`
 }
 
 type Operation uint16

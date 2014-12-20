@@ -39,9 +39,9 @@ import "github.com/ghedo/hype/packet/ipv4"
 type Packet struct {
 	Type      Type
 	Code      Code
-	Checksum  uint16 `name:"sum"`
-	csum_seed uint32 `name:"skip"`
-	Body      uint32 `name:"skip"`
+	Checksum  uint16 `string:"sum"`
+	csum_seed uint32 `string:"skip"`
+	Body      uint32 `string:"skip"`
 }
 
 type Type uint8

@@ -39,10 +39,10 @@ import "github.com/ghedo/hype/packet/ipv4"
 type Packet struct {
 	Type        Type
 	Code        Code
-	Checksum    uint16        `name:"sum"`
+	Checksum    uint16        `string:"sum"`
 	Id          uint16
 	Seq         uint16
-	pkt_payload packet.Packet `name:"skip"`
+	pkt_payload packet.Packet `string:"skip"`
 }
 
 type Type uint8

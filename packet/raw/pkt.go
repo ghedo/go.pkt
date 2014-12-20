@@ -34,8 +34,8 @@ package raw
 import "github.com/ghedo/hype/packet"
 
 type Packet struct {
-	Length uint16 `name:"len"`
-	Data   []byte `name:"skip"`
+	Length uint16 `string:"len"`
+	Data   []byte `string:"skip"`
 }
 
 func Make() *Packet {
