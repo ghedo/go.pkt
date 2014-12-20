@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package icmpv6
+package icmpv6_test
 
 import "bytes"
 import "net"
@@ -44,7 +44,7 @@ var test_simple = []byte{
 
 func MakeTestSimple() *icmpv6.Packet {
 	return &icmpv6.Packet{
-		Type: EchoRequest,
+		Type: icmpv6.EchoRequest,
 	}
 }
 
@@ -132,9 +132,7 @@ func TestPackWithIPv6(t *testing.T) {
 	ip6.SrcAddr = net.ParseIP(ipsrc_str)
 	ip6.DstAddr = net.ParseIP(ipdst_str)
 
-	icmp6 := &Packet{
-		Type: EchoRequest,
-	}
+	icmp6 := MakeTestSimple()
 
 	ip6.SetPayload(icmp6)
 
