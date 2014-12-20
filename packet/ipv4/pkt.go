@@ -56,7 +56,7 @@ type Packet struct {
 type Flags uint8
 
 const (
-	Reserved Flags = 1 << 2
+	Evil     Flags = 1 << 2 /* RFC3514 */
 	DontFragment   = 1 << 1
 	MoreFragments  = 1 << 0
 )
@@ -226,8 +226,8 @@ func (p *Packet) String() string {
 func (f Flags) String() string {
 	var flags []string
 
-	if f & Reserved != 0  {
-		flags = append(flags, "reserved")
+	if f & Evil != 0  {
+		flags = append(flags, "evil")
 	}
 
 	if f & DontFragment != 0 {
