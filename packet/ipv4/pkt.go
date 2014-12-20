@@ -108,8 +108,9 @@ func (p *Packet) Answers(other packet.Packet) bool {
 		return false
 	}
 
-	if p.Payload().GetType() == packet.ICMPv4 &&
-	   p.Payload().PayloadType() == packet.IPv4 {
+	if p.Payload() != nil &&
+	   p.Payload().GetType() == packet.ICMPv4 &&
+	   p.Payload().Payload() != nil {
 		return p.Payload().Payload().Equals(other)
 	}
 
