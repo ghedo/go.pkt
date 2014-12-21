@@ -67,15 +67,15 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(p.OUI)
-	buf.WriteI(p.Type)
+	buf.WriteN(p.OUI)
+	buf.WriteN(p.Type)
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.OUI)
-	buf.ReadI(&p.Type)
+	buf.ReadN(&p.OUI)
+	buf.ReadN(&p.Type)
 
 	return nil
 }

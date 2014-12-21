@@ -87,7 +87,7 @@ func Pack(pkts ...packet.Packet) ([]byte, error) {
 		cur_len := int(cur_pkt.GetLength())
 
 		buf.SetOffset(tot_len - cur_len)
-		buf.Checkpoint()
+		buf.NewLayer()
 
 		err := cur_pkt.Pack(&buf)
 		if err != nil {
@@ -119,7 +119,7 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 			break
 		}
 
-		b.Checkpoint()
+		b.NewLayer()
 
 		err := p.Unpack(&b)
 		if err != nil {
@@ -183,7 +183,7 @@ func UnpackAll(buf []byte, link_type packet.Type) (packet.Packet, error) {
 			break
 		}
 
-		b.Checkpoint()
+		b.NewLayer()
 
 		err := p.Unpack(&b)
 		if err != nil {

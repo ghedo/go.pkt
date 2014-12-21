@@ -105,9 +105,9 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 	buf.Write(p.SrcAddr)
 
 	if p.Type != LLC {
-		buf.WriteI(p.Type)
+		buf.WriteN(p.Type)
 	} else {
-		buf.WriteI(p.Length)
+		buf.WriteN(p.Length)
 	}
 
 	return nil
@@ -117,7 +117,7 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 	p.DstAddr = net.HardwareAddr(buf.Next(6))
 	p.SrcAddr = net.HardwareAddr(buf.Next(6))
 
-	buf.ReadI(&p.Type)
+	buf.ReadN(&p.Type)
 
 	if p.Type < 0x0600 {
 		p.Length = uint16(p.Type)

@@ -84,29 +84,29 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(p.Type)
-	buf.WriteI(p.AddrType)
-	buf.WriteI(p.AddrLen)
-	buf.WriteI(p.SrcAddr)
+	buf.WriteN(p.Type)
+	buf.WriteN(p.AddrType)
+	buf.WriteN(p.AddrLen)
+	buf.WriteN(p.SrcAddr)
 
 	for i := 0; i < 8 - int(p.AddrLen); i++ {
-		buf.WriteI(uint8(0x00))
+		buf.WriteN(uint8(0x00))
 	}
 
-	buf.WriteI(p.EtherType)
+	buf.WriteN(p.EtherType)
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.Type)
-	buf.ReadI(&p.AddrType)
-	buf.ReadI(&p.AddrLen)
+	buf.ReadN(&p.Type)
+	buf.ReadN(&p.AddrType)
+	buf.ReadN(&p.AddrLen)
 
 	p.SrcAddr = net.HardwareAddr(buf.Next(int(p.AddrLen)))
 	buf.Next(8 - int(p.AddrLen))
 
-	buf.ReadI(&p.EtherType)
+	buf.ReadN(&p.EtherType)
 
 	return nil
 }

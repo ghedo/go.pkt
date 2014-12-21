@@ -79,25 +79,25 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(p.SrcPort)
-	buf.WriteI(p.DstPort)
-	buf.WriteI(p.Length)
+	buf.WriteN(p.SrcPort)
+	buf.WriteN(p.DstPort)
+	buf.WriteN(p.Length)
 
 	if p.csum_seed != 0 {
 		p.Checksum =
-		  ipv4.CalculateChecksum(buf.BytesChk(), p.csum_seed)
+		  ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
 	}
 
-	buf.WriteI(p.Checksum)
+	buf.WriteN(p.Checksum)
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.SrcPort)
-	buf.ReadI(&p.DstPort)
-	buf.ReadI(&p.Length)
-	buf.ReadI(&p.Checksum)
+	buf.ReadN(&p.SrcPort)
+	buf.ReadN(&p.DstPort)
+	buf.ReadN(&p.Length)
+	buf.ReadN(&p.Checksum)
 
 	return nil
 }

@@ -103,24 +103,24 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(byte(p.Type))
-	buf.WriteI(byte(p.Code))
-	buf.WriteI(uint16(0x0000))
-	buf.WriteI(p.Id)
-	buf.WriteI(p.Seq)
+	buf.WriteN(byte(p.Type))
+	buf.WriteN(byte(p.Code))
+	buf.WriteN(uint16(0x0000))
+	buf.WriteN(p.Id)
+	buf.WriteN(p.Seq)
 
-	p.Checksum = ipv4.CalculateChecksum(buf.BytesChk(), 0)
-	buf.PutUint16Off(2, p.Checksum)
+	p.Checksum = ipv4.CalculateChecksum(buf.LayerBytes(), 0)
+	buf.PutUint16N(2, p.Checksum)
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.Type)
-	buf.ReadI(&p.Code)
-	buf.ReadI(&p.Checksum)
-	buf.ReadI(&p.Id)
-	buf.ReadI(&p.Seq)
+	buf.ReadN(&p.Type)
+	buf.ReadN(&p.Code)
+	buf.ReadN(&p.Checksum)
+	buf.ReadN(&p.Id)
+	buf.ReadN(&p.Seq)
 
 	/* TODO: data */
 

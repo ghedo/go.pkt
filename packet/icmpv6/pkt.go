@@ -91,26 +91,26 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(byte(p.Type))
-	buf.WriteI(byte(p.Code))
-	buf.WriteI(uint16(0x00))
-	buf.WriteI(p.Body)
+	buf.WriteN(byte(p.Type))
+	buf.WriteN(byte(p.Code))
+	buf.WriteN(uint16(0x00))
+	buf.WriteN(p.Body)
 
 	if p.csum_seed != 0 {
-		p.Checksum = ipv4.CalculateChecksum(buf.BytesChk(), p.csum_seed)
-		buf.PutUint16Off(2, p.Checksum)
+		p.Checksum = ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
+		buf.PutUint16N(2, p.Checksum)
 	}
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.Type)
-	buf.ReadI(&p.Code)
-	buf.ReadI(&p.Checksum)
+	buf.ReadN(&p.Type)
+	buf.ReadN(&p.Code)
+	buf.ReadN(&p.Checksum)
 
 	/* TODO: data */
-	buf.ReadI(&p.Body)
+	buf.ReadN(&p.Body)
 
 	return nil
 }

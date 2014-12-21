@@ -101,10 +101,10 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(p.SrcPort)
-	buf.WriteI(p.DstPort)
-	buf.WriteI(p.Seq)
-	buf.WriteI(p.Ack)
+	buf.WriteN(p.SrcPort)
+	buf.WriteN(p.DstPort)
+	buf.WriteN(p.Seq)
+	buf.WriteN(p.Ack)
 
 	flags := uint16(p.DataOff) << 12
 
@@ -144,30 +144,30 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 		flags |= 0x0100
 	}
 
-	buf.WriteI(flags)
+	buf.WriteN(flags)
 
-	buf.WriteI(p.WindowSize)
-	buf.WriteI(uint16(0x0000))
-	buf.WriteI(p.Urgent)
+	buf.WriteN(p.WindowSize)
+	buf.WriteN(uint16(0x0000))
+	buf.WriteN(p.Urgent)
 
 	if p.csum_seed != 0 {
 		p.Checksum =
-		  ipv4.CalculateChecksum(buf.BytesChk(), p.csum_seed)
+		  ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
 	}
 
-	buf.PutUint16Off(16, p.Checksum)
+	buf.PutUint16N(16, p.Checksum)
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.SrcPort)
-	buf.ReadI(&p.DstPort)
-	buf.ReadI(&p.Seq)
-	buf.ReadI(&p.Ack)
+	buf.ReadN(&p.SrcPort)
+	buf.ReadN(&p.DstPort)
+	buf.ReadN(&p.Seq)
+	buf.ReadN(&p.Ack)
 
 	var offns uint8
-	buf.ReadI(&offns)
+	buf.ReadN(&offns)
 
 	p.DataOff = offns >> 4
 
@@ -176,7 +176,7 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 	}
 
 	var flags uint8
-	buf.ReadI(&flags)
+	buf.ReadN(&flags)
 
 	if flags & 0x01 != 0 {
 		p.Flags |= Fin
@@ -210,11 +210,11 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 		p.Flags |= Cwr
 	}
 
-	buf.ReadI(&p.WindowSize)
-	buf.ReadI(&p.Checksum)
-	buf.ReadI(&p.Urgent)
+	buf.ReadN(&p.WindowSize)
+	buf.ReadN(&p.Checksum)
+	buf.ReadN(&p.Urgent)
 
-	if int(p.DataOff * 4) > buf.LenChk() {
+	if int(p.DataOff * 4) > buf.LayerLen() {
 		/* TODO: Options */
 	}
 

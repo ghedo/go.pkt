@@ -95,13 +95,13 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(p.HWType)
-	buf.WriteI(p.ProtoType)
+	buf.WriteN(p.HWType)
+	buf.WriteN(p.ProtoType)
 
-	buf.WriteI(p.HWAddrLen)
-	buf.WriteI(p.ProtoAddrLen)
+	buf.WriteN(p.HWAddrLen)
+	buf.WriteN(p.ProtoAddrLen)
 
-	buf.WriteI(p.Operation)
+	buf.WriteN(p.Operation)
 
 	buf.Write(p.HWSrcAddr[len(p.HWSrcAddr) - int(p.HWAddrLen):])
 	buf.Write(p.ProtoSrcAddr[len(p.ProtoSrcAddr) - int(p.ProtoAddrLen):])
@@ -113,13 +113,13 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.HWType)
-	buf.ReadI(&p.ProtoType)
+	buf.ReadN(&p.HWType)
+	buf.ReadN(&p.ProtoType)
 
-	buf.ReadI(&p.HWAddrLen)
-	buf.ReadI(&p.ProtoAddrLen)
+	buf.ReadN(&p.HWAddrLen)
+	buf.ReadN(&p.ProtoAddrLen)
 
-	buf.ReadI(&p.Operation)
+	buf.ReadN(&p.Operation)
 
 	p.HWSrcAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
 	p.ProtoSrcAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))

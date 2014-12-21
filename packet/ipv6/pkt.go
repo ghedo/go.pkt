@@ -90,13 +90,13 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(uint8(p.Version << 4 | (p.Class >> 4)))
-	buf.WriteI(p.Class << 4 | uint8(p.Label >> 16))
-	buf.WriteI(uint16(p.Label))
+	buf.WriteN(uint8(p.Version << 4 | (p.Class >> 4)))
+	buf.WriteN(p.Class << 4 | uint8(p.Label >> 16))
+	buf.WriteN(uint16(p.Label))
 
-	buf.WriteI(p.Length)
-	buf.WriteI(p.NextHdr)
-	buf.WriteI(p.HopLimit)
+	buf.WriteN(p.Length)
+	buf.WriteN(p.NextHdr)
+	buf.WriteN(p.HopLimit)
 
 	buf.Write(p.SrcAddr.To16())
 	buf.Write(p.DstAddr.To16())
@@ -122,21 +122,21 @@ func (p *Packet) pseudo_checksum() uint32 {
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
 	var versclass uint8
-	buf.ReadI(&versclass)
+	buf.ReadN(&versclass)
 
 	p.Version = versclass >> 4
 
 	p.Class =
-	 uint8((binary.BigEndian.Uint16(buf.BytesChk()[0:2]) >> 4) & 0x00FF)
+	 uint8((binary.BigEndian.Uint16(buf.LayerBytes()[0:2]) >> 4) & 0x00FF)
 
 	p.Label =
-	 binary.BigEndian.Uint32(buf.BytesChk()[0:4]) & 0x000FFFFF
+	 binary.BigEndian.Uint32(buf.LayerBytes()[0:4]) & 0x000FFFFF
 
 	buf.Next(3)
 
-	buf.ReadI(&p.Length)
-	buf.ReadI(&p.NextHdr)
-	buf.ReadI(&p.HopLimit)
+	buf.ReadN(&p.Length)
+	buf.ReadN(&p.NextHdr)
+	buf.ReadN(&p.HopLimit)
 
 	p.SrcAddr = net.IP(buf.Next(16))
 	p.DstAddr = net.IP(buf.Next(16))

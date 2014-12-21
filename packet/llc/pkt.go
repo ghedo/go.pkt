@@ -67,28 +67,28 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI(p.DSAP)
-	buf.WriteI(p.SSAP)
+	buf.WriteN(p.DSAP)
+	buf.WriteN(p.SSAP)
 
 	if p.Control & 0x1 == 0 || p.Control & 0x3 == 0x1 {
-		buf.WriteI(p.Control)
+		buf.WriteN(p.Control)
 	} else {
-		buf.WriteI(uint8(p.Control))
+		buf.WriteN(uint8(p.Control))
 	}
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadI(&p.DSAP)
-	buf.ReadI(&p.SSAP)
+	buf.ReadN(&p.DSAP)
+	buf.ReadN(&p.SSAP)
 
 	if buf.Bytes()[:1][0] & 0x1 == 0 ||
 	   buf.Bytes()[:1][0] & 0x3 == 0x1 {
-		buf.ReadI(&p.Control)
+		buf.ReadN(&p.Control)
 	} else {
 		var ctrl uint8
-		buf.ReadI(&ctrl)
+		buf.ReadN(&ctrl)
 		p.Control = uint16(ctrl)
 	}
 

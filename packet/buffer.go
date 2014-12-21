@@ -41,7 +41,7 @@ import "encoding/binary"
 type Buffer struct {
 	buf       []byte
 	off       int
-	chkoff    int
+	layer_off int
 }
 
 // Initialize the buffer with the given slice.
@@ -69,19 +69,19 @@ func (b *Buffer) SetOffset(off int) {
 	b.off = off
 }
 
-// Set the checkpoint to the current buffer offset.
-func (b *Buffer) Checkpoint() {
-	b.chkoff = len(b.buf) - b.Len()
+// Point the layer starting offset to the current buffer offset.
+func (b *Buffer) NewLayer() {
+	b.layer_off = len(b.buf) - b.Len()
 }
 
-// Return the buffer starting from the last checkpoint, as slice.
-func (b *Buffer) BytesChk() []byte {
-	return b.buf[b.chkoff:]
+// Return the buffer of the current layer as slice.
+func (b *Buffer) LayerBytes() []byte {
+	return b.buf[b.layer_off:]
 }
 
-// Return the number of bytes of the buffer since the last checkpoint.
-func (b *Buffer) LenChk() int {
-	return len(b.buf) - b.chkoff
+// Return the length of the current layer..
+func (b *Buffer) LayerLen() int {
+	return len(b.buf) - b.layer_off
 }
 
 // Append the contents of p to the buffer.
@@ -91,14 +91,15 @@ func (b *Buffer) Write(p []byte) (n int, err error) {
 	return
 }
 
-// Append the binary representation of data in big endian order to the buffer.
-func (b *Buffer) WriteI(data interface{}) error {
+// Append the value of data to the buffer in network byter order.
+func (b *Buffer) WriteN(data interface{}) error {
 	return binary.Write(b, binary.BigEndian, data)
 }
 
-// Write data in big endian order to specified offset since the last checkpoint.
-func (b *Buffer) PutUint16Off(off int, data uint16) {
-	binary.BigEndian.PutUint16(b.buf[b.chkoff + off:], data)
+// Write data in network byte order to the specified offset relative to the
+// start of the current layer.
+func (b *Buffer) PutUint16N(off int, data uint16) {
+	binary.BigEndian.PutUint16(b.buf[b.layer_off + off:], data)
 }
 
 // Read the next len(p) bytes from the buffer or until the buffer is drained.
@@ -108,8 +109,8 @@ func (b *Buffer) Read(p []byte) (n int, err error) {
 	return
 }
 
-// Read structured big endian binary data from r into data.
-func (p *Buffer) ReadI(data interface{}) error {
+// Read structured data from the buffer in network byte order.
+func (p *Buffer) ReadN(data interface{}) error {
 	return binary.Read(p, binary.BigEndian, data)
 }
 

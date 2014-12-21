@@ -131,19 +131,19 @@ func (p *Packet) Answers(other packet.Packet) bool {
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteI((p.Version << 4) | p.IHL)
-	buf.WriteI(p.TOS)
-	buf.WriteI(p.Length)
-	buf.WriteI(p.Id)
-	buf.WriteI((uint16(p.Flags) << 13) | p.FragOff)
-	buf.WriteI(p.TTL)
-	buf.WriteI(p.Protocol)
-	buf.WriteI(uint16(0x00))
+	buf.WriteN((p.Version << 4) | p.IHL)
+	buf.WriteN(p.TOS)
+	buf.WriteN(p.Length)
+	buf.WriteN(p.Id)
+	buf.WriteN((uint16(p.Flags) << 13) | p.FragOff)
+	buf.WriteN(p.TTL)
+	buf.WriteN(p.Protocol)
+	buf.WriteN(uint16(0x00))
 	buf.Write(p.SrcAddr.To4())
 	buf.Write(p.DstAddr.To4())
 
-	p.checksum(buf.BytesChk()[:20])
-	buf.PutUint16Off(10, p.Checksum)
+	p.checksum(buf.LayerBytes()[:20])
+	buf.PutUint16N(10, p.Checksum)
 
 	return nil
 }
@@ -174,25 +174,25 @@ func (p *Packet) pseudo_checksum() uint32 {
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
 	var versihl uint8
-	buf.ReadI(&versihl)
+	buf.ReadN(&versihl)
 
 	p.Version  = versihl >> 4
 	p.IHL      = versihl & 0x0F
 
-	buf.ReadI(&p.TOS)
-	buf.ReadI(&p.Length)
-	buf.ReadI(&p.Id)
+	buf.ReadN(&p.TOS)
+	buf.ReadN(&p.Length)
+	buf.ReadN(&p.Id)
 
 	var flagsfrag uint16
-	buf.ReadI(&flagsfrag)
+	buf.ReadN(&flagsfrag)
 	p.Flags   = Flags(flagsfrag >> 13)
 	p.FragOff = flagsfrag & 0x1FFF
 
-	buf.ReadI(&p.TTL)
+	buf.ReadN(&p.TTL)
 
-	buf.ReadI(&p.Protocol)
+	buf.ReadN(&p.Protocol)
 
-	buf.ReadI(&p.Checksum)
+	buf.ReadN(&p.Checksum)
 
 	p.SrcAddr = net.IP(buf.Next(4))
 	p.DstAddr = net.IP(buf.Next(4))

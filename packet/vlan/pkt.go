@@ -85,21 +85,21 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 		tci |= 0x10
 	}
 
-	buf.WriteI(tci)
-	buf.WriteI(p.Type)
+	buf.WriteN(tci)
+	buf.WriteN(p.Type)
 
 	return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
 	var tci uint16
-	buf.ReadI(&tci)
+	buf.ReadN(&tci)
 
 	p.Priority     = (uint8(tci >> 8) & 0xE0) >> 5
 	p.DropEligible = uint8(tci) & 0x10 != 0
 	p.VLAN         = tci & 0x0FFF
 
-	buf.ReadI(&p.Type)
+	buf.ReadN(&p.Type)
 
 	return nil
 }
