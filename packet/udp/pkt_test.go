@@ -105,7 +105,7 @@ func BenchmarkUnpack(bn *testing.B) {
 }
 
 var test_with_ipv4 = []byte{
-	0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x61, 0x94,
+	0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x61, 0x9e,
 }
 
 var ipsrc_str = "192.168.1.135"
@@ -140,7 +140,7 @@ func TestUnpackWithIPv4(t *testing.T) {
 	var p udp.Packet
 
 	cmp := MakeTestSimple()
-	cmp.Checksum = 0x6194
+	cmp.Checksum = 0x619e
 
 	var b packet.Buffer
 	b.Init(test_with_ipv4)
