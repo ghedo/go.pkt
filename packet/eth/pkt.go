@@ -93,10 +93,6 @@ func (p *Packet) GetType() packet.Type {
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.Length > 0 && p.Type == LLC {
-		return p.Length
-	}
-
 	if p.pkt_payload != nil {
 		return p.pkt_payload.GetLength() + 14
 	}

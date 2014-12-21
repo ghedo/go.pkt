@@ -52,10 +52,10 @@ func (p *Packet) GetType() packet.Type {
 
 func (p *Packet) GetLength() uint16 {
 	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 2
+		return p.pkt_payload.GetLength() + 4
 	}
 
-	return 2
+	return 4
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
