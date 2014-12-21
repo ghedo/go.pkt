@@ -142,7 +142,10 @@ func (p *Packet) GuessPayloadType() packet.Type {
 func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.pkt_payload = pl
 	p.Type        = TypeToEtherType(pl.GetType())
-	p.Length     += pl.GetLength()
+
+	if p.Type < 0x0600 {
+		p.Length += pl.GetLength()
+	}
 
 	return nil
 }
