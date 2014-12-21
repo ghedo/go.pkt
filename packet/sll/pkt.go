@@ -83,30 +83,30 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(p.Type)
-	raw_pkt.WriteI(p.AddrType)
-	raw_pkt.WriteI(p.AddrLen)
-	raw_pkt.WriteI(p.SrcAddr)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(p.Type)
+	buf.WriteI(p.AddrType)
+	buf.WriteI(p.AddrLen)
+	buf.WriteI(p.SrcAddr)
 
 	for i := 0; i < 8 - int(p.AddrLen); i++ {
-		raw_pkt.WriteI(uint8(0x00))
+		buf.WriteI(uint8(0x00))
 	}
 
-	raw_pkt.WriteI(p.EtherType)
+	buf.WriteI(p.EtherType)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.Type)
-	raw_pkt.ReadI(&p.AddrType)
-	raw_pkt.ReadI(&p.AddrLen)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.Type)
+	buf.ReadI(&p.AddrType)
+	buf.ReadI(&p.AddrLen)
 
-	p.SrcAddr = net.HardwareAddr(raw_pkt.Next(int(p.AddrLen)))
-	raw_pkt.Next(8 - int(p.AddrLen))
+	p.SrcAddr = net.HardwareAddr(buf.Next(int(p.AddrLen)))
+	buf.Next(8 - int(p.AddrLen))
 
-	raw_pkt.ReadI(&p.EtherType)
+	buf.ReadI(&p.EtherType)
 
 	return nil
 }

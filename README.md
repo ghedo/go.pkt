@@ -60,12 +60,12 @@ if err != nil {
 }
 
 for {
-	raw_pkt, err := src.Capture()
+	buf, err := src.Capture()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if raw_pkt == nil {
+	if buf == nil {
 		break
 	}
 
@@ -146,13 +146,13 @@ arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
 arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
 arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
 
-raw_pkt, err := layers.Pack(eth_pkt, arp_pkt)
+buf, err := layers.Pack(eth_pkt, arp_pkt)
 if err != nil {
 	log.Fatal(err)
 }
 
 // do something with the packet
-log.Println(raw_pkt)
+log.Println(buf)
 ```
 
 ### Decoding
@@ -164,11 +164,11 @@ The following example uses the `UnpackAll()` function to decode a whole chain of
 packets (e.g. ethernet -> ipv4 -> udp).
 
 ```go
-// Create the raw_pkt data
-raw_pkt := []byte("random data")
+// Create the buf data
+buf := []byte("random data")
 
 // Assume Ethernet as datalink layer
-pkt, err := layers.UnpackAll(raw_pkt, packet.Eth)
+pkt, err := layers.UnpackAll(buf, packet.Eth)
 if err != nil {
 	log.Fatal(err)
 }

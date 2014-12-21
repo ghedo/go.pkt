@@ -157,11 +157,11 @@ func (h *Handle) Activate() error {
 // Capture a single packet from the packet source. This will block until a acket
 // is received.
 func (h *Handle) Capture() ([]byte, error) {
-	var raw_pkt *C.u_char
+	var buf *C.u_char
 	var pkt_hdr *C.struct_pcap_pkthdr
 
 	for {
-		err := C.pcap_next_ex(h.pcap, &pkt_hdr, &raw_pkt)
+		err := C.pcap_next_ex(h.pcap, &pkt_hdr, &buf)
 		switch err {
 		case -2:
 			return nil, nil
@@ -175,7 +175,7 @@ func (h *Handle) Capture() ([]byte, error) {
 			continue
 
 		case 1:
-			return C.GoBytes(unsafe.Pointer(raw_pkt),
+			return C.GoBytes(unsafe.Pointer(buf),
 			                 C.int(pkt_hdr.len)), nil
 		}
 	}
@@ -184,11 +184,11 @@ func (h *Handle) Capture() ([]byte, error) {
 }
 
 // Inject a packet in the packet source.
-func (h *Handle) Inject(raw_pkt []byte) error {
-	buf     := (*C.u_char)(&raw_pkt[0])
-	buf_len := C.int(len(raw_pkt))
+func (h *Handle) Inject(buf []byte) error {
+	cbuf := (*C.u_char)(&buf[0])
+	blen := C.int(len(buf))
 
-	err := C.pcap_sendpacket(h.pcap, buf, buf_len)
+	err := C.pcap_sendpacket(h.pcap, cbuf, blen)
 	if err < 0 {
 		return fmt.Errorf("Could not inject packet: %s", h.get_error())
 	}

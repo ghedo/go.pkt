@@ -87,11 +87,11 @@ const (
 )
 
 // Try to match the given buffer against the filter.
-func (f *Filter) Match(raw_pkt []byte) bool {
-	buf  := (*C.char)(unsafe.Pointer(&raw_pkt[0]))
-	blen := C.uint(len(raw_pkt))
+func (f *Filter) Match(buf []byte) bool {
+	cbuf := (*C.char)(unsafe.Pointer(&buf[0]))
+	blen := C.uint(len(buf))
 
-	if C.bpf_filter(f.program.bf_insns, buf, blen, blen) > 0 {
+	if C.bpf_filter(f.program.bf_insns, cbuf, blen, blen) > 0 {
 		return true
 	}
 

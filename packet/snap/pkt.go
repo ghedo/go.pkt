@@ -66,16 +66,16 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(p.OUI)
-	raw_pkt.WriteI(p.Type)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(p.OUI)
+	buf.WriteI(p.Type)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.OUI)
-	raw_pkt.ReadI(&p.Type)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.OUI)
+	buf.ReadI(&p.Type)
 
 	return nil
 }

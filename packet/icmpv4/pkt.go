@@ -102,25 +102,25 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(byte(p.Type))
-	raw_pkt.WriteI(byte(p.Code))
-	raw_pkt.WriteI(uint16(0x0000))
-	raw_pkt.WriteI(p.Id)
-	raw_pkt.WriteI(p.Seq)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(byte(p.Type))
+	buf.WriteI(byte(p.Code))
+	buf.WriteI(uint16(0x0000))
+	buf.WriteI(p.Id)
+	buf.WriteI(p.Seq)
 
-	p.Checksum = ipv4.CalculateChecksum(raw_pkt.BytesOff(), 0)
-	raw_pkt.PutUint16Off(2, p.Checksum)
+	p.Checksum = ipv4.CalculateChecksum(buf.BytesOff(), 0)
+	buf.PutUint16Off(2, p.Checksum)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.Type)
-	raw_pkt.ReadI(&p.Code)
-	raw_pkt.ReadI(&p.Checksum)
-	raw_pkt.ReadI(&p.Id)
-	raw_pkt.ReadI(&p.Seq)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.Type)
+	buf.ReadI(&p.Code)
+	buf.ReadI(&p.Checksum)
+	buf.ReadI(&p.Id)
+	buf.ReadI(&p.Seq)
 
 	/* TODO: data */
 

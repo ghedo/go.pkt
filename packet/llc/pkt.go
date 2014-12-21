@@ -66,29 +66,29 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(p.DSAP)
-	raw_pkt.WriteI(p.SSAP)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(p.DSAP)
+	buf.WriteI(p.SSAP)
 
 	if p.Control & 0x1 == 0 || p.Control & 0x3 == 0x1 {
-		raw_pkt.WriteI(p.Control)
+		buf.WriteI(p.Control)
 	} else {
-		raw_pkt.WriteI(uint8(p.Control))
+		buf.WriteI(uint8(p.Control))
 	}
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.DSAP)
-	raw_pkt.ReadI(&p.SSAP)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.DSAP)
+	buf.ReadI(&p.SSAP)
 
-	if raw_pkt.Bytes()[:1][0] & 0x1 == 0 ||
-	   raw_pkt.Bytes()[:1][0] & 0x3 == 0x1 {
-		raw_pkt.ReadI(&p.Control)
+	if buf.Bytes()[:1][0] & 0x1 == 0 ||
+	   buf.Bytes()[:1][0] & 0x3 == 0x1 {
+		buf.ReadI(&p.Control)
 	} else {
 		var ctrl uint8
-		raw_pkt.ReadI(&ctrl)
+		buf.ReadI(&ctrl)
 		p.Control = uint16(ctrl)
 	}
 

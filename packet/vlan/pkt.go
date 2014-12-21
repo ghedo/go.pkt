@@ -79,27 +79,27 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return true
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
+func (p *Packet) Pack(buf *packet.Buffer) error {
 	tci := uint16(p.Priority) << 13 | p.VLAN
 	if p.DropEligible {
 		tci |= 0x10
 	}
 
-	raw_pkt.WriteI(tci)
-	raw_pkt.WriteI(p.Type)
+	buf.WriteI(tci)
+	buf.WriteI(p.Type)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
+func (p *Packet) Unpack(buf *packet.Buffer) error {
 	var tci uint16
-	raw_pkt.ReadI(&tci)
+	buf.ReadI(&tci)
 
 	p.Priority     = (uint8(tci >> 8) & 0xE0) >> 5
 	p.DropEligible = uint8(tci) & 0x10 != 0
 	p.VLAN         = tci & 0x0FFF
 
-	raw_pkt.ReadI(&p.Type)
+	buf.ReadI(&p.Type)
 
 	return nil
 }

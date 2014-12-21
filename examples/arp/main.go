@@ -83,21 +83,21 @@ func main() {
 	arp_pkt.ProtoSrcAddr = route.PrefSrc
 	arp_pkt.ProtoDstAddr = addr_ip
 
-	raw_pkt, _ := layers.Pack(eth_pkt, arp_pkt)
+	buf, _ := layers.Pack(eth_pkt, arp_pkt)
 
-	err = c.Inject(raw_pkt)
+	err = c.Inject(buf)
 	if err != nil {
 		log.Fatalf("Error injecting packet: %s", err)
 	}
 
 	for {
-		raw_pkt, err := c.Capture()
+		buf, err := c.Capture()
 		if err != nil {
 			log.Fatalf("Error capturing packet: %s", err)
 			break
 		}
 
-		rsp_pkt, err := layers.UnpackAll(raw_pkt, c.LinkType())
+		rsp_pkt, err := layers.UnpackAll(buf, c.LinkType())
 		if err != nil {
 			log.Printf("Error: %s\n", err)
 		}

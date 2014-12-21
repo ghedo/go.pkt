@@ -100,24 +100,24 @@ func (p *Packet) GetLength() uint16 {
 	return 14
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.Write(p.DstAddr)
-	raw_pkt.Write(p.SrcAddr)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.Write(p.DstAddr)
+	buf.Write(p.SrcAddr)
 
 	if p.Type != LLC {
-		raw_pkt.WriteI(p.Type)
+		buf.WriteI(p.Type)
 	} else {
-		raw_pkt.WriteI(p.Length)
+		buf.WriteI(p.Length)
 	}
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	p.DstAddr = net.HardwareAddr(raw_pkt.Next(6))
-	p.SrcAddr = net.HardwareAddr(raw_pkt.Next(6))
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	p.DstAddr = net.HardwareAddr(buf.Next(6))
+	p.SrcAddr = net.HardwareAddr(buf.Next(6))
 
-	raw_pkt.ReadI(&p.Type)
+	buf.ReadI(&p.Type)
 
 	if p.Type < 0x0600 {
 		p.Length = uint16(p.Type)

@@ -78,26 +78,26 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return true
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(p.SrcPort)
-	raw_pkt.WriteI(p.DstPort)
-	raw_pkt.WriteI(p.Length)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(p.SrcPort)
+	buf.WriteI(p.DstPort)
+	buf.WriteI(p.Length)
 
 	if p.csum_seed != 0 {
 		p.Checksum =
-		  ipv4.CalculateChecksum(raw_pkt.BytesOff(), p.csum_seed)
+		  ipv4.CalculateChecksum(buf.BytesOff(), p.csum_seed)
 	}
 
-	raw_pkt.WriteI(p.Checksum)
+	buf.WriteI(p.Checksum)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.SrcPort)
-	raw_pkt.ReadI(&p.DstPort)
-	raw_pkt.ReadI(&p.Length)
-	raw_pkt.ReadI(&p.Checksum)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.SrcPort)
+	buf.ReadI(&p.DstPort)
+	buf.ReadI(&p.Length)
+	buf.ReadI(&p.Checksum)
 
 	return nil
 }

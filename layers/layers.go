@@ -109,19 +109,19 @@ func Pack(pkts ...packet.Packet) ([]byte, error) {
 // it. If you can't guarantee that the data slice won't change, you'll need to
 // copy it and pass the copy to Unpack().
 func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
-	var raw_pkt packet.Buffer
-	raw_pkt.Init(buf)
+	var b packet.Buffer
+	b.Init(buf)
 
 	prev_pkt := packet.Packet(nil)
 
 	for _, p := range pkts {
-		if raw_pkt.Len() <= 0 {
+		if b.Len() <= 0 {
 			break
 		}
 
-		raw_pkt.Checkpoint()
+		b.Checkpoint()
 
-		err := p.Unpack(&raw_pkt)
+		err := p.Unpack(&b)
 		if err != nil {
 			return nil, err
 		}
@@ -150,8 +150,8 @@ func Unpack(buf []byte, pkts ...packet.Packet) (packet.Packet, error) {
 // it. If you can't guarantee that the data slice won't change, you'll need to
 // copy it and pass the copy to UnpackAll().
 func UnpackAll(buf []byte, link_type packet.Type) (packet.Packet, error) {
-	var raw_pkt packet.Buffer
-	raw_pkt.Init(buf)
+	var b packet.Buffer
+	b.Init(buf)
 
 	first_pkt := packet.Packet(nil)
 	prev_pkt  := packet.Packet(nil)
@@ -159,7 +159,7 @@ func UnpackAll(buf []byte, link_type packet.Type) (packet.Packet, error) {
 	for link_type != packet.None {
 		var p packet.Packet
 
-		if raw_pkt.Len() <= 0 {
+		if b.Len() <= 0 {
 			break
 		}
 
@@ -183,9 +183,9 @@ func UnpackAll(buf []byte, link_type packet.Type) (packet.Packet, error) {
 			break
 		}
 
-		raw_pkt.Checkpoint()
+		b.Checkpoint()
 
-		err := p.Unpack(&raw_pkt)
+		err := p.Unpack(&b)
 		if err != nil {
 			return nil, err
 		}

@@ -44,12 +44,12 @@ func TestCapture(t *testing.T) {
 
 	var count uint64
 	for {
-		raw_pkt, err := src.Capture()
+		buf, err := src.Capture()
 		if err != nil {
 			t.Fatalf("Error reading: %s", err)
 		}
 
-		if raw_pkt == nil {
+		if buf == nil {
 			break
 		}
 
@@ -80,12 +80,12 @@ func TestCaptureFilter(t *testing.T) {
 
 	var count uint64
 	for {
-		raw_pkt, err := src.Capture()
+		buf, err := src.Capture()
 		if err != nil {
 			t.Fatalf("Error reading: %s %d", err, count)
 		}
 
-		if raw_pkt == nil {
+		if buf == nil {
 			break
 		}
 
@@ -112,12 +112,12 @@ func ExampleCapture() {
 	}
 
 	for {
-		raw_pkt, err := src.Capture()
+		buf, err := src.Capture()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if raw_pkt == nil {
+		if buf == nil {
 			break
 		}
 

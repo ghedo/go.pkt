@@ -130,20 +130,20 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return true
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI((p.Version << 4) | p.IHL)
-	raw_pkt.WriteI(p.TOS)
-	raw_pkt.WriteI(p.Length)
-	raw_pkt.WriteI(p.Id)
-	raw_pkt.WriteI((uint16(p.Flags) << 13) | p.FragOff)
-	raw_pkt.WriteI(p.TTL)
-	raw_pkt.WriteI(p.Protocol)
-	raw_pkt.WriteI(uint16(0x00))
-	raw_pkt.Write(p.SrcAddr.To4())
-	raw_pkt.Write(p.DstAddr.To4())
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI((p.Version << 4) | p.IHL)
+	buf.WriteI(p.TOS)
+	buf.WriteI(p.Length)
+	buf.WriteI(p.Id)
+	buf.WriteI((uint16(p.Flags) << 13) | p.FragOff)
+	buf.WriteI(p.TTL)
+	buf.WriteI(p.Protocol)
+	buf.WriteI(uint16(0x00))
+	buf.Write(p.SrcAddr.To4())
+	buf.Write(p.DstAddr.To4())
 
-	p.checksum(raw_pkt.BytesOff()[:20])
-	raw_pkt.PutUint16Off(10, p.Checksum)
+	p.checksum(buf.BytesOff()[:20])
+	buf.PutUint16Off(10, p.Checksum)
 
 	return nil
 }
@@ -172,30 +172,30 @@ func (p *Packet) pseudo_checksum() uint32 {
 	return csum
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
+func (p *Packet) Unpack(buf *packet.Buffer) error {
 	var versihl uint8
-	raw_pkt.ReadI(&versihl)
+	buf.ReadI(&versihl)
 
 	p.Version  = versihl >> 4
 	p.IHL      = versihl & 0x0F
 
-	raw_pkt.ReadI(&p.TOS)
-	raw_pkt.ReadI(&p.Length)
-	raw_pkt.ReadI(&p.Id)
+	buf.ReadI(&p.TOS)
+	buf.ReadI(&p.Length)
+	buf.ReadI(&p.Id)
 
 	var flagsfrag uint16
-	raw_pkt.ReadI(&flagsfrag)
+	buf.ReadI(&flagsfrag)
 	p.Flags   = Flags(flagsfrag >> 13)
 	p.FragOff = flagsfrag & 0x1FFF
 
-	raw_pkt.ReadI(&p.TTL)
+	buf.ReadI(&p.TTL)
 
-	raw_pkt.ReadI(&p.Protocol)
+	buf.ReadI(&p.Protocol)
 
-	raw_pkt.ReadI(&p.Checksum)
+	buf.ReadI(&p.Checksum)
 
-	p.SrcAddr = net.IP(raw_pkt.Next(4))
-	p.DstAddr = net.IP(raw_pkt.Next(4))
+	p.SrcAddr = net.IP(buf.Next(4))
+	p.DstAddr = net.IP(buf.Next(4))
 
 	/* TODO: Options */
 

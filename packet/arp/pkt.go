@@ -94,38 +94,38 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(p.HWType)
-	raw_pkt.WriteI(p.ProtoType)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(p.HWType)
+	buf.WriteI(p.ProtoType)
 
-	raw_pkt.WriteI(p.HWAddrLen)
-	raw_pkt.WriteI(p.ProtoAddrLen)
+	buf.WriteI(p.HWAddrLen)
+	buf.WriteI(p.ProtoAddrLen)
 
-	raw_pkt.WriteI(p.Operation)
+	buf.WriteI(p.Operation)
 
-	raw_pkt.Write(p.HWSrcAddr[len(p.HWSrcAddr) - int(p.HWAddrLen):])
-	raw_pkt.Write(p.ProtoSrcAddr[len(p.ProtoSrcAddr) - int(p.ProtoAddrLen):])
+	buf.Write(p.HWSrcAddr[len(p.HWSrcAddr) - int(p.HWAddrLen):])
+	buf.Write(p.ProtoSrcAddr[len(p.ProtoSrcAddr) - int(p.ProtoAddrLen):])
 
-	raw_pkt.Write(p.HWDstAddr[len(p.HWDstAddr) - int(p.HWAddrLen):])
-	raw_pkt.Write(p.ProtoDstAddr[len(p.ProtoDstAddr) - int(p.ProtoAddrLen):])
+	buf.Write(p.HWDstAddr[len(p.HWDstAddr) - int(p.HWAddrLen):])
+	buf.Write(p.ProtoDstAddr[len(p.ProtoDstAddr) - int(p.ProtoAddrLen):])
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.HWType)
-	raw_pkt.ReadI(&p.ProtoType)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.HWType)
+	buf.ReadI(&p.ProtoType)
 
-	raw_pkt.ReadI(&p.HWAddrLen)
-	raw_pkt.ReadI(&p.ProtoAddrLen)
+	buf.ReadI(&p.HWAddrLen)
+	buf.ReadI(&p.ProtoAddrLen)
 
-	raw_pkt.ReadI(&p.Operation)
+	buf.ReadI(&p.Operation)
 
-	p.HWSrcAddr = net.HardwareAddr(raw_pkt.Next(int(p.HWAddrLen)))
-	p.ProtoSrcAddr = net.IP(raw_pkt.Next(int(p.ProtoAddrLen)))
+	p.HWSrcAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
+	p.ProtoSrcAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))
 
-	p.HWDstAddr = net.HardwareAddr(raw_pkt.Next(int(p.HWAddrLen)))
-	p.ProtoDstAddr = net.IP(raw_pkt.Next(int(p.ProtoAddrLen)))
+	p.HWDstAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
+	p.ProtoDstAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))
 
 	return nil
 }

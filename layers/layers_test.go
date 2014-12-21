@@ -59,7 +59,6 @@ var test_eth_arp = []byte{
 }
 
 func TestPackEthArp(t *testing.T) {
-
 	eth_pkt := eth.Make()
 	eth_pkt.SrcAddr, _ = net.ParseMAC(hwsrc_str)
 	eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
@@ -70,13 +69,13 @@ func TestPackEthArp(t *testing.T) {
 	arp_pkt.ProtoSrcAddr = net.ParseIP(ipsrc_str)
 	arp_pkt.ProtoDstAddr = net.ParseIP(ipdst_str)
 
-	raw_pkt, err := layers.Pack(eth_pkt, arp_pkt)
+	buf, err := layers.Pack(eth_pkt, arp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_eth_arp, raw_pkt) {
-		t.Fatalf("Raw packet mismatch: %x", raw_pkt)
+	if !bytes.Equal(test_eth_arp, buf) {
+		t.Fatalf("Raw packet mismatch: %x", buf)
 	}
 }
 
@@ -110,7 +109,6 @@ var test_eth_vlan_arp = []byte{
 }
 
 func TestPackEthVLANArp(t *testing.T) {
-
 	eth_pkt := eth.Make()
 	eth_pkt.SrcAddr, _ = net.ParseMAC(hwsrc_str)
 	eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
@@ -124,13 +122,13 @@ func TestPackEthVLANArp(t *testing.T) {
 	arp_pkt.ProtoSrcAddr = net.ParseIP(ipsrc_str)
 	arp_pkt.ProtoDstAddr = net.ParseIP(ipdst_str)
 
-	raw_pkt, err := layers.Pack(eth_pkt, vlan_pkt, arp_pkt)
+	buf, err := layers.Pack(eth_pkt, vlan_pkt, arp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_eth_vlan_arp, raw_pkt) {
-		t.Fatalf("Raw packet mismatch: %x", raw_pkt)
+	if !bytes.Equal(test_eth_vlan_arp, buf) {
+		t.Fatalf("Raw packet mismatch: %x", buf)
 	}
 }
 
@@ -182,13 +180,13 @@ func TestPackEthIPv4UDP(t *testing.T) {
 	udp_pkt.SrcPort = 41562
 	udp_pkt.DstPort = 8338
 
-	raw_pkt, err := layers.Pack(eth_pkt, ip4_pkt, udp_pkt)
+	buf, err := layers.Pack(eth_pkt, ip4_pkt, udp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_eth_ipv4_udp, raw_pkt) {
-		t.Fatalf("Raw packet mismatch: %x", raw_pkt)
+	if !bytes.Equal(test_eth_ipv4_udp, buf) {
+		t.Fatalf("Raw packet mismatch: %x", buf)
 	}
 }
 
@@ -325,13 +323,13 @@ func TestPackEthIPv4TCP(t *testing.T) {
 	tcp_pkt.Flags   = tcp.Syn
 	tcp_pkt.WindowSize = 8192
 
-	raw_pkt, err := layers.Pack(eth_pkt, ip4_pkt, tcp_pkt)
+	buf, err := layers.Pack(eth_pkt, ip4_pkt, tcp_pkt)
 	if err != nil {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_eth_ipv4_tcp, raw_pkt) {
-		t.Fatalf("Raw packet mismatch: %x", raw_pkt)
+	if !bytes.Equal(test_eth_ipv4_tcp, buf) {
+		t.Fatalf("Raw packet mismatch: %x", buf)
 	}
 }
 
@@ -402,21 +400,21 @@ func ExamplePack() {
 	arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
 	arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
 
-	raw_pkt, err := layers.Pack(eth_pkt, arp_pkt)
+	buf, err := layers.Pack(eth_pkt, arp_pkt)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// do something with the packet
-	log.Println(raw_pkt)
+	log.Println(buf)
 }
 
 func ExampleUnpack() {
-	// Create the raw_pkt data
-	raw_pkt := []byte("random data")
+	// Create the buf data
+	buf := []byte("random data")
 
 	// Assume Ethernet as datalink layer
-	pkt, err := layers.UnpackAll(raw_pkt, packet.Eth)
+	pkt, err := layers.UnpackAll(buf, packet.Eth)
 	if err != nil {
 		log.Fatal(err)
 	}

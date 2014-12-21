@@ -58,14 +58,14 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.Write(p.Data)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.Write(p.Data)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	p.Data   = raw_pkt.Next(raw_pkt.Len())
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	p.Data   = buf.Next(buf.Len())
 	p.Length = uint16(len(p.Data))
 
 	return nil

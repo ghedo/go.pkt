@@ -90,27 +90,27 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return false
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(byte(p.Type))
-	raw_pkt.WriteI(byte(p.Code))
-	raw_pkt.WriteI(uint16(0x00))
-	raw_pkt.WriteI(p.Body)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(byte(p.Type))
+	buf.WriteI(byte(p.Code))
+	buf.WriteI(uint16(0x00))
+	buf.WriteI(p.Body)
 
 	if p.csum_seed != 0 {
-		p.Checksum = ipv4.CalculateChecksum(raw_pkt.BytesOff(), p.csum_seed)
-		raw_pkt.PutUint16Off(2, p.Checksum)
+		p.Checksum = ipv4.CalculateChecksum(buf.BytesOff(), p.csum_seed)
+		buf.PutUint16Off(2, p.Checksum)
 	}
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.Type)
-	raw_pkt.ReadI(&p.Code)
-	raw_pkt.ReadI(&p.Checksum)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.Type)
+	buf.ReadI(&p.Code)
+	buf.ReadI(&p.Checksum)
 
 	/* TODO: data */
-	raw_pkt.ReadI(&p.Body)
+	buf.ReadI(&p.Body)
 
 	return nil
 }

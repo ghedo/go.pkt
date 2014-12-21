@@ -48,7 +48,7 @@ type Handle interface {
 	Activate() error
 
 	Capture() ([]byte, error)
-	Inject(raw_pkt []byte) error
+	Inject(buf []byte) error
 
 	Close()
 }

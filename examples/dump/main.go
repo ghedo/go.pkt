@@ -116,27 +116,27 @@ Options:
 	var i uint64
 
 	for {
-		raw_pkt, err := src.Capture()
+		buf, err := src.Capture()
 		if err != nil {
 			log.Fatalf("Error: %s", err)
 			break
 		}
 
-		if raw_pkt == nil {
+		if buf == nil {
 			break
 		}
 
 		i++
 
 		if dst == nil {
-			rcv_pkt, err := layers.UnpackAll(raw_pkt, src.LinkType())
+			rcv_pkt, err := layers.UnpackAll(buf, src.LinkType())
 			if err != nil {
 				log.Printf("Error: %s\n", err)
 			}
 
 			log.Println(rcv_pkt)
 		} else {
-			dst.Inject(raw_pkt)
+			dst.Inject(buf)
 		}
 
 		if count > 0 && i >= count {

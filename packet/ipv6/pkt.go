@@ -89,17 +89,17 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return true
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(uint8(p.Version << 4 | (p.Class >> 4)))
-	raw_pkt.WriteI(p.Class << 4 | uint8(p.Label >> 16))
-	raw_pkt.WriteI(uint16(p.Label))
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(uint8(p.Version << 4 | (p.Class >> 4)))
+	buf.WriteI(p.Class << 4 | uint8(p.Label >> 16))
+	buf.WriteI(uint16(p.Label))
 
-	raw_pkt.WriteI(p.Length)
-	raw_pkt.WriteI(p.NextHdr)
-	raw_pkt.WriteI(p.HopLimit)
+	buf.WriteI(p.Length)
+	buf.WriteI(p.NextHdr)
+	buf.WriteI(p.HopLimit)
 
-	raw_pkt.Write(p.SrcAddr.To16())
-	raw_pkt.Write(p.DstAddr.To16())
+	buf.Write(p.SrcAddr.To16())
+	buf.Write(p.DstAddr.To16())
 
 	return nil
 }
@@ -120,26 +120,26 @@ func (p *Packet) pseudo_checksum() uint32 {
 	return csum
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
+func (p *Packet) Unpack(buf *packet.Buffer) error {
 	var versclass uint8
-	raw_pkt.ReadI(&versclass)
+	buf.ReadI(&versclass)
 
 	p.Version = versclass >> 4
 
 	p.Class =
-	 uint8((binary.BigEndian.Uint16(raw_pkt.BytesOff()[0:2]) >> 4) & 0x00FF)
+	 uint8((binary.BigEndian.Uint16(buf.BytesOff()[0:2]) >> 4) & 0x00FF)
 
 	p.Label =
-	 binary.BigEndian.Uint32(raw_pkt.BytesOff()[0:4]) & 0x000FFFFF
+	 binary.BigEndian.Uint32(buf.BytesOff()[0:4]) & 0x000FFFFF
 
-	raw_pkt.Next(3)
+	buf.Next(3)
 
-	raw_pkt.ReadI(&p.Length)
-	raw_pkt.ReadI(&p.NextHdr)
-	raw_pkt.ReadI(&p.HopLimit)
+	buf.ReadI(&p.Length)
+	buf.ReadI(&p.NextHdr)
+	buf.ReadI(&p.HopLimit)
 
-	p.SrcAddr = net.IP(raw_pkt.Next(16))
-	p.DstAddr = net.IP(raw_pkt.Next(16))
+	p.SrcAddr = net.IP(buf.Next(16))
+	p.DstAddr = net.IP(buf.Next(16))
 
 	/* TODO: Options */
 

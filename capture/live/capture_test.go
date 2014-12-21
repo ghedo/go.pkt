@@ -47,12 +47,12 @@ func ExampleCapture() {
 	}
 
 	for {
-		raw_pkt, err := src.Capture()
+		buf, err := src.Capture()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if raw_pkt == nil {
+		if buf == nil {
 			break
 		}
 

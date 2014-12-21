@@ -182,7 +182,7 @@ func (h *Handle) Activate() error {
 // (i.e. if the end of the dump file has been reached) it will return a nil
 // slice.
 func (h *Handle) Capture() ([]byte, error) {
-	var raw_pkt []byte
+	var buf []byte
 	var sec, usec, caplen, wirelen uint32
 
 	for {
@@ -195,9 +195,9 @@ func (h *Handle) Capture() ([]byte, error) {
 			return nil, nil
 		}
 
-		raw_pkt = make([]byte, int(caplen))
+		buf = make([]byte, int(caplen))
 
-		_, err := h.file.Read(raw_pkt)
+		_, err := h.file.Read(buf)
 		if err == io.EOF {
 			return nil, nil
 		}
@@ -206,24 +206,24 @@ func (h *Handle) Capture() ([]byte, error) {
 			return nil, fmt.Errorf("Could not capture: %s", err)
 		}
 
-		if h.filter != nil && !h.filter.Match(raw_pkt) {
+		if h.filter != nil && !h.filter.Match(buf) {
 			continue
 		}
 
 		break
 	}
 
-	return raw_pkt, nil
+	return buf, nil
 }
 
 // Inject a packet in the packet source. This will automatically append packets
 // at the end of the dump file, instead of truncating it.
-func (h *Handle) Inject(raw_pkt []byte) error {
+func (h *Handle) Inject(buf []byte) error {
 	var sec, usec, caplen, wirelen uint32
 
 	sec     = 0
 	usec    = 0
-	caplen  = uint32(len(raw_pkt))
+	caplen  = uint32(len(buf))
 	wirelen = caplen
 
 	binary.Write(h.out, h.order, sec)
@@ -231,8 +231,8 @@ func (h *Handle) Inject(raw_pkt []byte) error {
 	binary.Write(h.out, h.order, caplen)
 	binary.Write(h.out, h.order, wirelen)
 
-	n, err := h.out.Write(raw_pkt)
-	if err != nil || n < len(raw_pkt) {
+	n, err := h.out.Write(buf)
+	if err != nil || n < len(buf) {
 		return fmt.Errorf("Could not write packet: %s", err)
 	}
 

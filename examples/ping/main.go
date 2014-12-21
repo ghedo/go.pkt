@@ -91,20 +91,20 @@ func main() {
 	icmp_pkt.Seq = 0
 	icmp_pkt.Id = id_rand
 
-	raw_pkt, _ := layers.Pack(eth_pkt, ipv4_pkt, icmp_pkt)
-	err = c.Inject(raw_pkt)
+	buf, _ := layers.Pack(eth_pkt, ipv4_pkt, icmp_pkt)
+	err = c.Inject(buf)
 	if err != nil {
 		log.Fatalf("Error: %s", err)
 	}
 
 	for {
-		raw_pkt, err := c.Capture()
+		buf, err := c.Capture()
 		if err != nil {
 			log.Fatalf("Error capturing packet: %s", err)
 			break
 		}
 
-		rsp_pkt, err := layers.UnpackAll(raw_pkt, c.LinkType())
+		rsp_pkt, err := layers.UnpackAll(buf, c.LinkType())
 		if err != nil {
 			log.Printf("Error: %s\n", err)
 		}

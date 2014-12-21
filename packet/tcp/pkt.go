@@ -100,11 +100,11 @@ func (p *Packet) Answers(other packet.Packet) bool {
 	return true
 }
 
-func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
-	raw_pkt.WriteI(p.SrcPort)
-	raw_pkt.WriteI(p.DstPort)
-	raw_pkt.WriteI(p.Seq)
-	raw_pkt.WriteI(p.Ack)
+func (p *Packet) Pack(buf *packet.Buffer) error {
+	buf.WriteI(p.SrcPort)
+	buf.WriteI(p.DstPort)
+	buf.WriteI(p.Seq)
+	buf.WriteI(p.Ack)
 
 	flags := uint16(p.DataOff) << 12
 
@@ -144,30 +144,30 @@ func (p *Packet) Pack(raw_pkt *packet.Buffer) error {
 		flags |= 0x0100
 	}
 
-	raw_pkt.WriteI(flags)
+	buf.WriteI(flags)
 
-	raw_pkt.WriteI(p.WindowSize)
-	raw_pkt.WriteI(uint16(0x0000))
-	raw_pkt.WriteI(p.Urgent)
+	buf.WriteI(p.WindowSize)
+	buf.WriteI(uint16(0x0000))
+	buf.WriteI(p.Urgent)
 
 	if p.csum_seed != 0 {
 		p.Checksum =
-		  ipv4.CalculateChecksum(raw_pkt.BytesOff(), p.csum_seed)
+		  ipv4.CalculateChecksum(buf.BytesOff(), p.csum_seed)
 	}
 
-	raw_pkt.PutUint16Off(16, p.Checksum)
+	buf.PutUint16Off(16, p.Checksum)
 
 	return nil
 }
 
-func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
-	raw_pkt.ReadI(&p.SrcPort)
-	raw_pkt.ReadI(&p.DstPort)
-	raw_pkt.ReadI(&p.Seq)
-	raw_pkt.ReadI(&p.Ack)
+func (p *Packet) Unpack(buf *packet.Buffer) error {
+	buf.ReadI(&p.SrcPort)
+	buf.ReadI(&p.DstPort)
+	buf.ReadI(&p.Seq)
+	buf.ReadI(&p.Ack)
 
 	var offns uint8
-	raw_pkt.ReadI(&offns)
+	buf.ReadI(&offns)
 
 	p.DataOff = offns >> 4
 
@@ -176,7 +176,7 @@ func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 	}
 
 	var flags uint8
-	raw_pkt.ReadI(&flags)
+	buf.ReadI(&flags)
 
 	if flags & 0x01 != 0 {
 		p.Flags |= Fin
@@ -210,11 +210,11 @@ func (p *Packet) Unpack(raw_pkt *packet.Buffer) error {
 		p.Flags |= Cwr
 	}
 
-	raw_pkt.ReadI(&p.WindowSize)
-	raw_pkt.ReadI(&p.Checksum)
-	raw_pkt.ReadI(&p.Urgent)
+	buf.ReadI(&p.WindowSize)
+	buf.ReadI(&p.Checksum)
+	buf.ReadI(&p.Urgent)
 
-	if int(p.DataOff * 4) > raw_pkt.LenOff() {
+	if int(p.DataOff * 4) > buf.LenOff() {
 		/* TODO: Options */
 	}
 
