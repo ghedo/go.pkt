@@ -67,8 +67,8 @@ func TestPack(t *testing.T) {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_simple, b.Bytes()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Bytes())
+	if !bytes.Equal(test_simple, b.Buffer()) {
+		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
 	}
 }
 

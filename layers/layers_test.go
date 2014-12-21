@@ -40,6 +40,7 @@ import "github.com/ghedo/hype/packet"
 import "github.com/ghedo/hype/packet/arp"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/ipv4"
+import "github.com/ghedo/hype/packet/raw"
 import "github.com/ghedo/hype/packet/udp"
 import "github.com/ghedo/hype/packet/tcp"
 import "github.com/ghedo/hype/packet/vlan"
@@ -203,6 +204,84 @@ func TestUnpackEthUPv4UDP(t *testing.T) {
 }
 
 func TestUnpackAllEthIPv4UDP(t *testing.T) {
+	pkt, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
+	if err != nil {
+		t.Fatalf("Error unpacking: %s", err)
+	}
+
+	if pkt.GetType() != packet.Eth {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.IPv4 {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.UDP {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+}
+
+var test_eth_ipv4_udp_raw = []byte{
+	0x00, 0x21, 0x96, 0x6e, 0xf0, 0x70, 0x4c, 0x72, 0xb9, 0x54, 0xe5, 0x3d,
+	0x08, 0x00, 0x45, 0x00, 0x00, 0x42, 0x00, 0x01, 0x00, 0x00, 0x40, 0x11,
+	0x27, 0x3a, 0xc0, 0xa8, 0x01, 0x87, 0xc1, 0x1b, 0xd0, 0x25, 0xa2, 0x5a,
+	0x20, 0x92, 0x00, 0x2e, 0x07, 0x03, 0x66, 0x64, 0x67, 0x20, 0x61, 0x67,
+	0x66, 0x68, 0x20, 0x6c, 0x64, 0x66, 0x68, 0x67, 0x6b, 0x20, 0x68, 0x66,
+	0x64, 0x6b, 0x67, 0x68, 0x20, 0x6b, 0x66, 0x6a, 0x64, 0x68, 0x73, 0x67,
+	0x20, 0x6b, 0x73, 0x68, 0x66, 0x64, 0x67, 0x6b,
+}
+
+func TestPackEthIPv4UDPRaw(t *testing.T) {
+	eth_pkt := eth.Make()
+	eth_pkt.SrcAddr, _ = net.ParseMAC(hwsrc_str)
+	eth_pkt.DstAddr, _ = net.ParseMAC(hwdst_str)
+
+	ip4_pkt := ipv4.Make()
+	ip4_pkt.SrcAddr = net.ParseIP(ipsrc_str)
+	ip4_pkt.DstAddr = net.ParseIP(ipdst_str)
+
+	udp_pkt := udp.Make()
+	udp_pkt.SrcPort = 41562
+	udp_pkt.DstPort = 8338
+
+	raw_pkt := raw.Make()
+	raw_pkt.Data = []byte("fdg agfh ldfhgk hfdkgh kfjdhsg kshfdgk")
+
+	data, err := layers.Pack(eth_pkt, ip4_pkt, udp_pkt, raw_pkt)
+	if err != nil {
+		t.Fatalf("Error packing: %s", err)
+	}
+
+	if ip4_pkt.GetLength() != 66 {
+		t.Fatalf("IPv4 length mismatch: %d", ip4_pkt.GetLength())
+	}
+
+	if udp_pkt.GetLength() != 46 {
+		t.Fatalf("UDP length mismatch: %d", udp_pkt.GetLength())
+	}
+
+	if !bytes.Equal(test_eth_ipv4_udp_raw, data) {
+		t.Fatalf("Raw packet mismatch: %x", data)
+	}
+}
+
+func TestUnpackEthUPv4UDPRaw(t *testing.T) {
+	var eth_pkt eth.Packet
+	var ip4_pkt ipv4.Packet
+	var udp_pkt udp.Packet
+	var raw_pkt raw.Packet
+
+	_, err := layers.Unpack(test_eth_ipv4_udp_raw,
+	                        &eth_pkt, &ip4_pkt, &udp_pkt, &raw_pkt)
+	if err != nil {
+		t.Fatalf("Error unpacking: %s", err)
+	}
+}
+
+func TestUnpackAllEthIPv4UDPRaw(t *testing.T) {
 	pkt, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)

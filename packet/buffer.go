@@ -31,7 +31,6 @@
 package packet
 
 import "encoding/binary"
-import "io"
 
 // A Buffer is a variable-sized buffer of bytes with Read and Write methods.
 // It's based on the bytes.Buffer code provided by the standard library, but
@@ -51,9 +50,14 @@ func (b *Buffer) Init(buf []byte) {
 	b.buf = buf
 }
 
-// Return the buffer as slice.
+// Return the unread portion of the buffer as slice.
 func (b *Buffer) Bytes() []byte {
 	return b.buf[b.off:]
+}
+
+// Return the buffer as slice.
+func (b *Buffer) Buffer() []byte {
+	return b.buf
 }
 
 // Return the number of bytes of the unread portion of the buffer.
@@ -61,9 +65,13 @@ func (b *Buffer) Len() int {
 	return len(b.buf) - b.off
 }
 
+func (b *Buffer) SetOffset(off int) {
+	b.off = off
+}
+
 // Set the checkpoint to the current buffer offset.
 func (b *Buffer) Checkpoint() {
-	b.chkoff = b.Len()
+	b.chkoff = len(b.buf) - b.Len()
 }
 
 // Return the buffer starting from the last checkpoint, as slice.
@@ -76,53 +84,17 @@ func (b *Buffer) LenOff() int {
 	return len(b.buf) - b.chkoff
 }
 
-// Discard all but the first n unread bytes from the buffer.
-func (b *Buffer) Truncate(n int) {
-	switch {
-	case n < 0 || n > b.Len():
-		panic("OOR")
-
-	case n == 0:
-		b.off = 0
-	}
-
-	b.buf = b.buf[0 : b.off+n]
-}
-
-func (b *Buffer) grow(n int) int {
-	m := b.Len()
-
-	if m == 0 && b.off != 0 {
-		b.Truncate(0)
-	}
-
-	if len(b.buf)+n > cap(b.buf) {
-		var buf []byte
-
-		if b.buf == nil && n <= len(b.bootstrap) {
-			buf = b.bootstrap[0:]
-		} else if m+n <= cap(b.buf) / 2 {
-			copy(b.buf[:], b.buf[b.off:])
-			buf = b.buf[:m]
-		} else {
-			// not enough space anywhere
-			buf = makeSlice(2 * cap(b.buf) + n)
-			copy(buf, b.buf[b.off:])
-		}
-
-		b.buf = buf
-		b.off = 0
-	}
-
-	b.buf = b.buf[0 : b.off + m + n]
-
-	return b.off + m
-}
-
 // Append the contents of p to the buffer, growing the buffer as needed.
 func (b *Buffer) Write(p []byte) (n int, err error) {
-	m := b.grow(len(p))
-	return copy(b.buf[m:], p), nil
+	if b.Len() < len(p) {
+		slice := make([]byte, len(b.buf) + len(p))
+		copy(slice, b.buf)
+		b.buf = slice
+	}
+
+	n = copy(b.buf[b.off:], p)
+	b.off += n
+	return
 }
 
 // Append the binary representation of data in big endian order to the buffer,
@@ -135,24 +107,8 @@ func (b *Buffer) PutUint16Off(off int, data uint16) {
 	binary.BigEndian.PutUint16(b.buf[b.chkoff + off:], data)
 }
 
-func makeSlice(n int) []byte {
-	defer func() {
-		if recover() != nil {
-			panic("OOM")
-		}
-	}()
-	return make([]byte, n)
-}
-
 // Read the next len(p) bytes from the buffer or until the buffer is drained.
 func (b *Buffer) Read(p []byte) (n int, err error) {
-	if b.off >= len(b.buf) {
-		b.Truncate(0)
-		if len(p) == 0 {
-			return
-		}
-		return 0, io.EOF
-	}
 	n = copy(p, b.buf[b.off:])
 	b.off += n
 	return

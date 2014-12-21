@@ -58,8 +58,8 @@ func TestPack(t *testing.T) {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_simple, b.Bytes()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Bytes())
+	if !bytes.Equal(test_simple, b.Buffer()) {
+		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
 	}
 }
 
@@ -125,8 +125,8 @@ func TestPackWithIPv6(t *testing.T) {
 		t.Fatalf("Error packing: %s", err)
 	}
 
-	if !bytes.Equal(test_with_ipv6, b.Bytes()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Bytes())
+	if !bytes.Equal(test_with_ipv6, b.Buffer()) {
+		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
 	}
 }
 

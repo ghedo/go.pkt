@@ -52,17 +52,17 @@ import "github.com/ghedo/hype/packet/vlan"
 // Compose packets into a chain and update their values (e.g. length, payload
 // protocol) accordingly.
 func Compose(pkts ...packet.Packet) (packet.Packet, error) {
-	prev_pkt := packet.Packet(nil)
+	next_pkt := packet.Packet(nil)
 
-	for _, p := range pkts {
-		if prev_pkt != nil {
-			err := prev_pkt.SetPayload(p)
+	for i := len(pkts) - 1; i >= 0; i-- {
+		if next_pkt != nil {
+			err := pkts[i].SetPayload(next_pkt)
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		prev_pkt = p
+		next_pkt = pkts[i]
 	}
 
 	return pkts[0], nil
@@ -78,7 +78,15 @@ func Pack(pkts ...packet.Packet) ([]byte, error) {
 		return nil, err
 	}
 
-	for cur_pkt := base_pkt; cur_pkt != nil; cur_pkt = cur_pkt.Payload() {
+	tot_len := int(base_pkt.GetLength())
+
+	buf.Init(make([]byte, tot_len))
+
+	for i := len(pkts) - 1; i >= 0; i-- {
+		cur_pkt := pkts[i]
+		cur_len := int(cur_pkt.GetLength())
+
+		buf.SetOffset(tot_len - cur_len)
 		buf.Checkpoint()
 
 		err := cur_pkt.Pack(&buf)
@@ -86,6 +94,8 @@ func Pack(pkts ...packet.Packet) ([]byte, error) {
 			return nil, err
 		}
 	}
+
+	buf.SetOffset(0)
 
 	return buf.Bytes(), nil
 }
