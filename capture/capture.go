@@ -28,9 +28,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Provides the basic interface for packet capturing and injection. This should
-// not be used directly, but one of the implementations ("live", "file", ...)
-// should be used instead.
+// Provides the basic interface for packet capturing and injection. Different
+// implementations ("live", "file", ...) are provided as subpackages.
 package capture
 
 import "github.com/ghedo/hype/filter"

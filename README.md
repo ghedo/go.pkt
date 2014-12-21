@@ -7,8 +7,8 @@ hype
 decoding network packets.
 
 * [capture] [capture]: provides the basic interface for packet capturing and
-  injection. This should not be used directly. Use one of the available
-  subpackages ("live", "file", ...) instead.
+  injection. Different implementations ("live", "file", ...) are provided as
+  subpackages.
 
 * [filter] [filter]: provides an API for compiling and manipulating BPF filters.
   A filter can be either compiled from tcpdump-like expressions, or created from
