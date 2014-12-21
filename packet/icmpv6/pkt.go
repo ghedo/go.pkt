@@ -97,7 +97,7 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 	buf.WriteI(p.Body)
 
 	if p.csum_seed != 0 {
-		p.Checksum = ipv4.CalculateChecksum(buf.BytesOff(), p.csum_seed)
+		p.Checksum = ipv4.CalculateChecksum(buf.BytesChk(), p.csum_seed)
 		buf.PutUint16Off(2, p.Checksum)
 	}
 

@@ -52,6 +52,7 @@ func MakeTestSimple() *udp.Packet {
 
 func TestPack(t *testing.T) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_simple)))
 
 	p := MakeTestSimple()
 
@@ -67,6 +68,7 @@ func TestPack(t *testing.T) {
 
 func BenchmarkPack(bn *testing.B) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_simple)))
 
 	p := MakeTestSimple()
 
@@ -113,6 +115,7 @@ var ipdst_str = "8.8.8.8"
 
 func TestPackWithIPv4(t *testing.T) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_with_ipv4)))
 
 	ip4 := ipv4.Make()
 	ip4.SrcAddr = net.ParseIP(ipsrc_str)

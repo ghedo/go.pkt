@@ -127,10 +127,10 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 	p.Version = versclass >> 4
 
 	p.Class =
-	 uint8((binary.BigEndian.Uint16(buf.BytesOff()[0:2]) >> 4) & 0x00FF)
+	 uint8((binary.BigEndian.Uint16(buf.BytesChk()[0:2]) >> 4) & 0x00FF)
 
 	p.Label =
-	 binary.BigEndian.Uint32(buf.BytesOff()[0:4]) & 0x000FFFFF
+	 binary.BigEndian.Uint32(buf.BytesChk()[0:4]) & 0x000FFFFF
 
 	buf.Next(3)
 

@@ -42,7 +42,6 @@ type Buffer struct {
 	buf       []byte
 	off       int
 	chkoff    int
-	bootstrap [64]byte
 }
 
 // Initialize the buffer with the given slice.
@@ -55,7 +54,7 @@ func (b *Buffer) Bytes() []byte {
 	return b.buf[b.off:]
 }
 
-// Return the buffer as slice.
+// Return the whole buffer as slice.
 func (b *Buffer) Buffer() []byte {
 	return b.buf
 }
@@ -65,6 +64,7 @@ func (b *Buffer) Len() int {
 	return len(b.buf) - b.off
 }
 
+// Manually set the buffer offset to off.
 func (b *Buffer) SetOffset(off int) {
 	b.off = off
 }
@@ -75,34 +75,28 @@ func (b *Buffer) Checkpoint() {
 }
 
 // Return the buffer starting from the last checkpoint, as slice.
-func (b *Buffer) BytesOff() []byte {
+func (b *Buffer) BytesChk() []byte {
 	return b.buf[b.chkoff:]
 }
 
 // Return the number of bytes of the buffer since the last checkpoint.
-func (b *Buffer) LenOff() int {
+func (b *Buffer) LenChk() int {
 	return len(b.buf) - b.chkoff
 }
 
-// Append the contents of p to the buffer, growing the buffer as needed.
+// Append the contents of p to the buffer.
 func (b *Buffer) Write(p []byte) (n int, err error) {
-	if b.Len() < len(p) {
-		slice := make([]byte, len(b.buf) + len(p))
-		copy(slice, b.buf)
-		b.buf = slice
-	}
-
 	n = copy(b.buf[b.off:], p)
 	b.off += n
 	return
 }
 
-// Append the binary representation of data in big endian order to the buffer,
-// growing the buffer as needed.
+// Append the binary representation of data in big endian order to the buffer.
 func (b *Buffer) WriteI(data interface{}) error {
 	return binary.Write(b, binary.BigEndian, data)
 }
 
+// Write data in big endian order to specified offset since the last checkpoint.
 func (b *Buffer) PutUint16Off(off int, data uint16) {
 	binary.BigEndian.PutUint16(b.buf[b.chkoff + off:], data)
 }

@@ -142,7 +142,7 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 	buf.Write(p.SrcAddr.To4())
 	buf.Write(p.DstAddr.To4())
 
-	p.checksum(buf.BytesOff()[:20])
+	p.checksum(buf.BytesChk()[:20])
 	buf.PutUint16Off(10, p.Checksum)
 
 	return nil

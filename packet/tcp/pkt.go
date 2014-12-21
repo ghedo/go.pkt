@@ -152,7 +152,7 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 
 	if p.csum_seed != 0 {
 		p.Checksum =
-		  ipv4.CalculateChecksum(buf.BytesOff(), p.csum_seed)
+		  ipv4.CalculateChecksum(buf.BytesChk(), p.csum_seed)
 	}
 
 	buf.PutUint16Off(16, p.Checksum)
@@ -214,7 +214,7 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 	buf.ReadI(&p.Checksum)
 	buf.ReadI(&p.Urgent)
 
-	if int(p.DataOff * 4) > buf.LenOff() {
+	if int(p.DataOff * 4) > buf.LenChk() {
 		/* TODO: Options */
 	}
 

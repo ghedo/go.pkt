@@ -50,6 +50,7 @@ func MakeTestSimple() *icmpv6.Packet {
 
 func TestPack(t *testing.T) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_simple)))
 
 	p := MakeTestSimple()
 
@@ -65,6 +66,7 @@ func TestPack(t *testing.T) {
 
 func BenchmarkPack(bn *testing.B) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_simple)))
 
 	p := MakeTestSimple()
 
@@ -111,6 +113,7 @@ var ipdst_str = "2001:4860:4860::8888"
 
 func TestPackWithIPv6(t *testing.T) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_with_ipv6)))
 
 	ip6 := ipv6.Make()
 	ip6.SrcAddr = net.ParseIP(ipsrc_str)

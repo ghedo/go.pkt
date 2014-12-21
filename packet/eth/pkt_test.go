@@ -58,6 +58,7 @@ func MakeTestSimple() *eth.Packet {
 
 func TestPack(t *testing.T) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_simple)))
 
 	p := MakeTestSimple()
 
@@ -73,6 +74,7 @@ func TestPack(t *testing.T) {
 
 func BenchmarkPack(bn *testing.B) {
 	var b packet.Buffer
+	b.Init(make([]byte, len(test_simple)))
 
 	p := MakeTestSimple()
 

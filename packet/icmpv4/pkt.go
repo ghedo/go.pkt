@@ -109,7 +109,7 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 	buf.WriteI(p.Id)
 	buf.WriteI(p.Seq)
 
-	p.Checksum = ipv4.CalculateChecksum(buf.BytesOff(), 0)
+	p.Checksum = ipv4.CalculateChecksum(buf.BytesChk(), 0)
 	buf.PutUint16Off(2, p.Checksum)
 
 	return nil
