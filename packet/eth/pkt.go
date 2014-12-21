@@ -153,24 +153,24 @@ func (p *Packet) String() string {
 	return packet.Stringify(p)
 }
 
-var ethertype_to_type_map = [][2]uint16{
-	{ uint16(None),  uint16(packet.None)  },
-	{ uint16(ARP),   uint16(packet.ARP)   },
-	{ uint16(IPv4),  uint16(packet.IPv4)  },
-	{ uint16(IPv6),  uint16(packet.IPv6)  },
-	{ uint16(LLC),   uint16(packet.LLC)   },
-	{ uint16(LLDP),  uint16(packet.LLDP)  },
-	{ uint16(VLAN),  uint16(packet.VLAN)  },
-	{ uint16(QinQ),  uint16(packet.VLAN)  },
-	{ uint16(TRILL), uint16(packet.TRILL) },
-	{ uint16(WoL),   uint16(packet.WoL)   },
+var ethertype_to_type_map = map[EtherType]packet.Type{
+	None:  packet.None,
+	ARP:   packet.ARP,
+	IPv4:  packet.IPv4,
+	IPv6:  packet.IPv6,
+	LLC:   packet.LLC,
+	LLDP:  packet.LLDP,
+	VLAN:  packet.VLAN,
+	QinQ:  packet.VLAN,
+	TRILL: packet.TRILL,
+	WoL:   packet.WoL,
 }
 
 // Create a new Type from the given EtherType.
 func EtherTypeToType(ethertype EtherType) packet.Type {
-	for _, t := range ethertype_to_type_map {
-		if t[0] == uint16(ethertype) {
-			return packet.Type(t[1])
+	for e, t := range ethertype_to_type_map {
+		if e == ethertype {
+			return t
 		}
 	}
 
@@ -179,9 +179,9 @@ func EtherTypeToType(ethertype EtherType) packet.Type {
 
 // Convert the Type to the corresponding EtherType.
 func TypeToEtherType(pkttype packet.Type) EtherType {
-	for _, t := range ethertype_to_type_map {
-		if t[1] == uint16(pkttype) {
-			return EtherType(t[0])
+	for e, t := range ethertype_to_type_map {
+		if t == pkttype {
+			return e
 		}
 	}
 

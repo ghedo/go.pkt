@@ -258,28 +258,29 @@ func CalculateChecksum(raw_bytes []byte, csum uint32) uint16 {
 	return ^uint16(csum + (csum >> 16))
 }
 
-var ipv4proto_to_type_map = [][2]uint16{
-	{ uint16(GRE),      uint16(packet.GRE)     },
-	{ uint16(ICMPv4),   uint16(packet.ICMPv4)  },
-	{ uint16(ICMPv6),   uint16(packet.ICMPv6)  },
-	{ uint16(IGMP),     uint16(packet.IGMP)    },
-	{ uint16(IPSecAH),  uint16(packet.IPSec)   }, /* IPSec AH */
-	{ uint16(IPSecESP), uint16(packet.IPSec)   }, /* IPSec ESP */
-	{ uint16(IPv6),     uint16(packet.IPv6)    },
-	{ uint16(UDP),      uint16(packet.UDP)     },
-	{ uint16(ISIS),     uint16(packet.ISIS)    },
-	{ uint16(L2TP),     uint16(packet.L2TP)    },
-	{ uint16(OSPF),     uint16(packet.OSPF)    },
-	{ uint16(SCTP),     uint16(packet.SCTP)    },
-	{ uint16(UDPLite),  uint16(packet.UDPLite) },
-	{ uint16(TCP),      uint16(packet.TCP)     },
+var ipv4proto_to_type_map = map[Protocol]packet.Type{
+	None:     packet.None,
+	GRE:      packet.GRE,
+	ICMPv4:   packet.ICMPv4,
+	ICMPv6:   packet.ICMPv6,
+	IGMP:     packet.IGMP,
+	IPSecAH:  packet.IPSec,
+	IPSecESP: packet.IPSec,
+	IPv6:     packet.IPv6,
+	UDP:      packet.UDP,
+	ISIS:     packet.ISIS,
+	L2TP:     packet.L2TP,
+	OSPF:     packet.OSPF,
+	SCTP:     packet.SCTP,
+	UDPLite:  packet.UDPLite,
+	TCP:      packet.TCP,
 }
 
 // Create a new Type from the given IP protocol ID.
 func ProtocolToType(proto Protocol) packet.Type {
-	for _, t := range ipv4proto_to_type_map {
-		if t[0] == uint16(proto) {
-			return packet.Type(t[1])
+	for p, t := range ipv4proto_to_type_map {
+		if p == proto {
+			return t
 		}
 	}
 
@@ -288,9 +289,9 @@ func ProtocolToType(proto Protocol) packet.Type {
 
 // Convert the Type to the corresponding IP protocol ID.
 func TypeToProtocol(pkttype packet.Type) Protocol {
-	for _, t := range ipv4proto_to_type_map {
-		if t[1] == uint16(pkttype) {
-			return Protocol(t[0])
+	for p, t := range ipv4proto_to_type_map {
+		if t == pkttype {
+			return p
 		}
 	}
 
