@@ -36,7 +36,7 @@ import "strconv"
 import "github.com/docopt/docopt-go"
 
 import "github.com/ghedo/hype/capture"
-import "github.com/ghedo/hype/capture/live"
+import "github.com/ghedo/hype/capture/pcap"
 import "github.com/ghedo/hype/capture/file"
 import "github.com/ghedo/hype/filter"
 import "github.com/ghedo/hype/layers"
@@ -69,7 +69,7 @@ Options:
 	var src capture.Handle
 
 	if args["-i"] != nil {
-		src, err = live.Open(args["-i"].(string))
+		src, err = pcap.Open(args["-i"].(string))
 		if err != nil {
 			log.Fatalf("Error opening iface: %s", err)
 		}

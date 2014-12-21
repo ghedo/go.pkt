@@ -36,7 +36,7 @@ import "net"
 
 import "github.com/docopt/docopt-go"
 
-import "github.com/ghedo/hype/capture/live"
+import "github.com/ghedo/hype/capture/pcap"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/ipv4"
 import "github.com/ghedo/hype/packet/icmpv4"
@@ -65,7 +65,7 @@ func main() {
 		log.Println("No route found")
 	}
 
-	c, err := live.Open(route.Iface.Name)
+	c, err := pcap.Open(route.Iface.Name)
 	if err != nil {
 		log.Fatalf("Error opening interface: %s", err)
 	}

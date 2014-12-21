@@ -28,12 +28,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package live_test
+package pcap_test
 
-import "github.com/ghedo/hype/capture/live"
+import "github.com/ghedo/hype/capture/pcap"
 
 func ExampleCapture() {
-	src, err := live.Open("eth0")
+	src, err := pcap.Open("eth0")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func ExampleCapture() {
 }
 
 func ExampleInject() {
-	dst, err := live.Open("eth0")
+	dst, err := pcap.Open("eth0")
 	if err != nil {
 		log.Fatal(err)
 	}

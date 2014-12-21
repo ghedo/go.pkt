@@ -29,7 +29,7 @@
  */
 
 // Provides the basic interface for packet capturing and injection. Different
-// implementations ("live", "file", ...) are provided as subpackages.
+// implementations ("pcap", "file", ...) are provided as subpackages.
 package capture
 
 import "github.com/ghedo/hype/filter"

@@ -7,7 +7,7 @@ hype
 decoding network packets.
 
 * [capture] [capture]: provides the basic interface for packet capturing and
-  injection. Different implementations ("live", "file", ...) are provided as
+  injection. Different implementations ("pcap", "file", ...) are provided as
   subpackages.
 
 * [filter] [filter]: provides an API for compiling and manipulating BPF filters.
@@ -41,12 +41,12 @@ decoding network packets.
 Packet capturing is done using a packet "source" such as a network interface or
 a dump file.
 
-In the following example we create a "live" capture handle using the `eth0`
+In the following example we create a "pcap" capture handle using the `eth0`
 network interface, we activate it and then capture packets using the `Capture()`
 method.
 
 ```go
-src, err := live.Open("eth0")
+src, err := pcap.Open("eth0")
 if err != nil {
 	log.Fatal(err)
 }
@@ -84,7 +84,7 @@ the `Inject()` method to send some data (we'll see later how to encode data in
 the propert formats).
 
 ```go
-dst, err := live.Open("eth0")
+dst, err := pcap.Open("eth0")
 if err != nil {
 	log.Fatal(err)
 }

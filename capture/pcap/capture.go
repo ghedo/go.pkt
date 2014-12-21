@@ -30,7 +30,7 @@
 
 // Provides packet capturing and injection on live network interfaces via
 // libpcap.
-package live
+package pcap
 
 // #cgo LDFLAGS: -lpcap
 // #include <stdlib.h>
