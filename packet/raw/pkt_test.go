@@ -44,7 +44,6 @@ var test_simple = []byte{
 func MakeTestSimple() *raw.Packet {
 	return &raw.Packet{
 		Data: []byte("asdasd asd asd as"),
-		Length: 17,
 	}
 }
 

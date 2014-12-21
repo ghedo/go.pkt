@@ -31,10 +31,11 @@
 // Provides encoding and decoding for raw data packets.
 package raw
 
+import "fmt"
+
 import "github.com/ghedo/hype/packet"
 
 type Packet struct {
-	Length uint16 `string:"len"`
 	Data   []byte `string:"skip"`
 }
 
@@ -66,7 +67,6 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
 	p.Data   = buf.Next(buf.Len())
-	p.Length = uint16(len(p.Data))
 
 	return nil
 }
@@ -87,5 +87,5 @@ func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+	return fmt.Sprintf("data(len=%d)", len(p.Data))
 }
