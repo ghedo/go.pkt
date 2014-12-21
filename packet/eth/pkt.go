@@ -179,6 +179,11 @@ func EtherTypeToType(ethertype EtherType) packet.Type {
 
 // Convert the Type to the corresponding EtherType.
 func TypeToEtherType(pkttype packet.Type) EtherType {
+	/* Hack to avoid non-determinism due to map iteration ordering */
+	if pkttype == packet.VLAN {
+		return VLAN
+	}
+
 	for e, t := range ethertype_to_type_map {
 		if t == pkttype {
 			return e
