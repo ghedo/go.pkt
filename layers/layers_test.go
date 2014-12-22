@@ -86,6 +86,15 @@ func TestUnpackEthArp(t *testing.T) {
 	}
 }
 
+func BenchmarkUnpackEthArp(bn *testing.B) {
+	var eth_pkt eth.Packet
+	var arp_pkt arp.Packet
+
+	for n := 0; n < bn.N; n++ {
+		layers.Unpack(test_eth_arp, &eth_pkt, &arp_pkt)
+	}
+}
+
 func TestUnpackAllEthArp(t *testing.T) {
 	pkt, err := layers.UnpackAll(test_eth_arp, packet.Eth)
 	if err != nil {
@@ -98,6 +107,12 @@ func TestUnpackAllEthArp(t *testing.T) {
 
 	if pkt.Payload().GetType() != packet.ARP {
 		t.Fatalf("Packet type mismatch, %s", pkt.Payload().GetType())
+	}
+}
+
+func BenchmarkUnpackAllEthArp(bn *testing.B) {
+	for n := 0; n < bn.N; n++ {
+		layers.UnpackAll(test_eth_arp, packet.Eth)
 	}
 }
 
@@ -139,6 +154,16 @@ func TestUnpackEthVLANArp(t *testing.T) {
 	}
 }
 
+func BenchmarkUnpackEthVLANArp(bn *testing.B) {
+	var eth_pkt eth.Packet
+	var vlan_pkt vlan.Packet
+	var arp_pkt arp.Packet
+
+	for n := 0; n < bn.N; n++ {
+		layers.Unpack(test_eth_vlan_arp, &eth_pkt, &vlan_pkt, &arp_pkt)
+	}
+}
+
 func TestUnpackAllEthVLANArp(t *testing.T) {
 	pkt, err := layers.UnpackAll(test_eth_vlan_arp, packet.Eth)
 	if err != nil {
@@ -157,6 +182,12 @@ func TestUnpackAllEthVLANArp(t *testing.T) {
 	pkt = pkt.Payload()
 	if pkt.GetType() != packet.ARP {
 		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+}
+
+func BenchmarkUnpackAllEthVLANArp(bn *testing.B) {
+	for n := 0; n < bn.N; n++ {
+		layers.UnpackAll(test_eth_vlan_arp, packet.Eth)
 	}
 }
 
@@ -201,6 +232,16 @@ func TestUnpackEthUPv4UDP(t *testing.T) {
 	}
 }
 
+func BenchmarkUnpackEthUPv4UDP(bn *testing.B) {
+	var eth_pkt eth.Packet
+	var ip4_pkt ipv4.Packet
+	var udp_pkt udp.Packet
+
+	for n := 0; n < bn.N; n++ {
+		layers.Unpack(test_eth_ipv4_udp, &eth_pkt, &ip4_pkt, &udp_pkt)
+	}
+}
+
 func TestUnpackAllEthIPv4UDP(t *testing.T) {
 	pkt, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
 	if err != nil {
@@ -219,6 +260,12 @@ func TestUnpackAllEthIPv4UDP(t *testing.T) {
 	pkt = pkt.Payload()
 	if pkt.GetType() != packet.UDP {
 		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+}
+
+func BenchmarkUnpackAllEthIPv4UDP(bn *testing.B) {
+	for n := 0; n < bn.N; n++ {
+		layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
 	}
 }
 
@@ -279,6 +326,18 @@ func TestUnpackEthUPv4UDPRaw(t *testing.T) {
 	}
 }
 
+func BenchmarkUnpackEthUPv4UDPRaw(bn *testing.B) {
+	var eth_pkt eth.Packet
+	var ip4_pkt ipv4.Packet
+	var udp_pkt udp.Packet
+	var raw_pkt raw.Packet
+
+	for n := 0; n < bn.N; n++ {
+		layers.Unpack(test_eth_ipv4_udp_raw,
+		              &eth_pkt, &ip4_pkt, &udp_pkt, &raw_pkt)
+	}
+}
+
 func TestUnpackAllEthIPv4UDPRaw(t *testing.T) {
 	pkt, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
 	if err != nil {
@@ -297,6 +356,12 @@ func TestUnpackAllEthIPv4UDPRaw(t *testing.T) {
 	pkt = pkt.Payload()
 	if pkt.GetType() != packet.UDP {
 		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+}
+
+func BenchmarkUnpackAllEthIPv4UDPRaw(bn *testing.B) {
+	for n := 0; n < bn.N; n++ {
+		layers.UnpackAll(test_eth_ipv4_udp_raw, packet.Eth)
 	}
 }
 
@@ -344,6 +409,16 @@ func TestUnpackEthUPv4TCP(t *testing.T) {
 	}
 }
 
+func BenchmarkUnpackEthUPv4TCP(bn *testing.B) {
+	var eth_pkt eth.Packet
+	var ip4_pkt ipv4.Packet
+	var tcp_pkt tcp.Packet
+
+	for n := 0; n < bn.N; n++ {
+		layers.Unpack(test_eth_ipv4_tcp, &eth_pkt, &ip4_pkt, &tcp_pkt)
+	}
+}
+
 func TestUnpackAllEthIPv4TCP(t *testing.T) {
 	pkt, err := layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
 	if err != nil {
@@ -362,6 +437,12 @@ func TestUnpackAllEthIPv4TCP(t *testing.T) {
 	pkt = pkt.Payload()
 	if pkt.GetType() != packet.TCP {
 		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+}
+
+func BenchmarkUnpackAllEthIPv4TCP(bn *testing.B) {
+	for n := 0; n < bn.N; n++ {
+		layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
 	}
 }
 
