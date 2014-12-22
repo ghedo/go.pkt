@@ -47,6 +47,8 @@ type Buffer struct {
 // Initialize the buffer with the given slice.
 func (b *Buffer) Init(buf []byte) {
 	b.buf = buf
+	b.off = 0
+	b.layer_off = 0
 }
 
 // Return the unread portion of the buffer as slice.

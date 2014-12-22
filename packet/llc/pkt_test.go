@@ -95,11 +95,10 @@ func TestUnpack(t *testing.T) {
 
 func BenchmarkUnpack(bn *testing.B) {
 	var p llc.Packet
-
 	var b packet.Buffer
-	b.Init(test_simple)
 
 	for n := 0; n < bn.N; n++ {
+		b.Init(test_simple)
 		p.Unpack(&b)
 	}
 }
