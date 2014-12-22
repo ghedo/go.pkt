@@ -64,12 +64,12 @@ func (b *Builder) Build() *Filter {
 	for i := 0; i < flen; i++ {
 		insn := C.bpf_get_insn(prog, C.int(i))
 
-		/* if lbl, ok := b.jumps_k[i]; ok { */
-		/* 	addr := b.labels[lbl] */
-		/* 	if addr != 0 { */
-		/* 		insn.k = C.uint(addr - i - 1) */
-		/* 	} */
-		/* } */
+		if lbl, ok := b.jumps_k[i]; ok {
+			addr := b.labels[lbl]
+			if addr != 0 {
+				insn.k = C.bpf_u_int32(addr - i - 1)
+			}
+		}
 
 		if lbl, ok := b.jumps_jt[i]; ok {
 			addr := b.labels[lbl]

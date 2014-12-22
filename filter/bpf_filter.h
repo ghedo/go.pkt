@@ -37,6 +37,8 @@
  * $FreeBSD$
  */
 
+typedef unsigned int bpf_u_int32; /* cgo is stupid... */
+
 struct bpf_program {
 	unsigned int    bf_len; /* u_int */
 	struct bpf_insn *bf_insns;
