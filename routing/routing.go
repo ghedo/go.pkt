@@ -35,6 +35,7 @@ package routing
 
 import "fmt"
 import "net"
+import "sort"
 import "strings"
 
 type Route struct {
@@ -46,6 +47,37 @@ type Route struct {
 	PrefSrc net.IP
 }
 
+type route_slice []*Route
+
+func (r route_slice) Len() int {
+	return len(r)
+}
+
+func (r route_slice) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+func (r route_slice) Less(i, j int) bool {
+	a := r[i]
+	b := r[j]
+
+	if a.Default {
+		return true
+	}
+
+	if b.Default {
+		return false
+	}
+
+	a_len, _ := a.DstNet.Mask.Size()
+	b_len, _ := b.DstNet.Mask.Size()
+	if a_len < b_len {
+		return false
+	}
+
+	return true
+}
+
 // Return the route that matches the given destination address.
 func RouteTo(dst net.IP) (*Route, error) {
 	var def *Route
@@ -54,6 +86,8 @@ func RouteTo(dst net.IP) (*Route, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Could not get routes: %s", err)
 	}
+
+	sort.Sort(route_slice(routes))
 
 	for _, r := range routes {
 		if r.Default &&
