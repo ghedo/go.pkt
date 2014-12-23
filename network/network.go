@@ -62,7 +62,7 @@ func Send(c capture.Handle, pkts ...packet.Packet) error {
 }
 
 // Capture a single packet from the given capture handle, unpack it and return
-// it. This will block until a acket is received.
+// it. This will block until a packet is received.
 func Recv(c capture.Handle) (packet.Packet, error) {
 	buf, err := c.Capture()
 	if err != nil {

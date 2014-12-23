@@ -154,8 +154,8 @@ func (h *Handle) Activate() error {
 	return nil
 }
 
-// Capture a single packet from the packet source. This will block until a acket
-// is received.
+// Capture a single packet from the packet source. This will block until a
+// packet is received.
 func (h *Handle) Capture() ([]byte, error) {
 	var buf *C.u_char
 	var pkt_hdr *C.struct_pcap_pkthdr
