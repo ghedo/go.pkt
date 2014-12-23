@@ -339,7 +339,7 @@ func BenchmarkUnpackEthUPv4UDPRaw(bn *testing.B) {
 }
 
 func TestUnpackAllEthIPv4UDPRaw(t *testing.T) {
-	pkt, err := layers.UnpackAll(test_eth_ipv4_udp, packet.Eth)
+	pkt, err := layers.UnpackAll(test_eth_ipv4_udp_raw, packet.Eth)
 	if err != nil {
 		t.Fatalf("Error unpacking: %s", err)
 	}
@@ -355,6 +355,11 @@ func TestUnpackAllEthIPv4UDPRaw(t *testing.T) {
 
 	pkt = pkt.Payload()
 	if pkt.GetType() != packet.UDP {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.Raw {
 		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
 	}
 }
@@ -443,6 +448,110 @@ func TestUnpackAllEthIPv4TCP(t *testing.T) {
 func BenchmarkUnpackAllEthIPv4TCP(bn *testing.B) {
 	for n := 0; n < bn.N; n++ {
 		layers.UnpackAll(test_eth_ipv4_tcp, packet.Eth)
+	}
+}
+
+var test_eth_ipv4_tcp_raw = []byte{
+	0x00, 0x21, 0x96, 0x6e, 0xf0, 0x70, 0x4c, 0x72, 0xb9, 0x54, 0xe5, 0x3d,
+	0x08, 0x00, 0x45, 0x00, 0x00, 0x4e, 0x00, 0x01, 0x00, 0x00, 0x40, 0x06,
+	0x27, 0x39, 0xc0, 0xa8, 0x01, 0x87, 0xc1, 0x1b, 0xd0, 0x25, 0xa2, 0x5a,
+	0x20, 0x92, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x02,
+	0x20, 0x00, 0x97, 0x2d, 0x00, 0x00, 0x66, 0x64, 0x67, 0x20, 0x61, 0x67,
+	0x66, 0x68, 0x20, 0x6c, 0x64, 0x66, 0x68, 0x67, 0x6b, 0x20, 0x68, 0x66,
+	0x64, 0x6b, 0x67, 0x68, 0x20, 0x6b, 0x66, 0x6a, 0x64, 0x68, 0x73, 0x67,
+	0x20, 0x6b, 0x73, 0x68, 0x66, 0x64, 0x67, 0x6b,
+}
+
+func TestPackEthIPv4TCPRaw(t *testing.T) {
+	eth_pkt := eth.Make()
+	eth_pkt.SrcAddr, _ = net.ParseMAC(hwsrc_str)
+	eth_pkt.DstAddr, _ = net.ParseMAC(hwdst_str)
+
+	ip4_pkt := ipv4.Make()
+	ip4_pkt.SrcAddr = net.ParseIP(ipsrc_str)
+	ip4_pkt.DstAddr = net.ParseIP(ipdst_str)
+
+	tcp_pkt := tcp.Make()
+	tcp_pkt.SrcPort = 41562
+	tcp_pkt.DstPort = 8338
+	tcp_pkt.Flags   = tcp.Syn
+	tcp_pkt.WindowSize = 8192
+
+	raw_pkt := raw.Make()
+	raw_pkt.Data = []byte("fdg agfh ldfhgk hfdkgh kfjdhsg kshfdgk")
+
+	data, err := layers.Pack(eth_pkt, ip4_pkt, tcp_pkt, raw_pkt)
+	if err != nil {
+		t.Fatalf("Error packing: %s", err)
+	}
+
+	if ip4_pkt.GetLength() != 78 {
+		t.Fatalf("IPv4 length mismatch: %d", ip4_pkt.GetLength())
+	}
+
+	if tcp_pkt.GetLength() != 58 {
+		t.Fatalf("TCP length mismatch: %d", tcp_pkt.GetLength())
+	}
+
+	if !bytes.Equal(test_eth_ipv4_tcp_raw, data) {
+		t.Fatalf("Raw packet mismatch: %x", data)
+	}
+}
+
+func TestUnpackEthUPv4TCPRaw(t *testing.T) {
+	var eth_pkt eth.Packet
+	var ip4_pkt ipv4.Packet
+	var tcp_pkt tcp.Packet
+	var raw_pkt raw.Packet
+
+	_, err := layers.Unpack(test_eth_ipv4_tcp_raw,
+	                        &eth_pkt, &ip4_pkt, &tcp_pkt, &raw_pkt)
+	if err != nil {
+		t.Fatalf("Error unpacking: %s", err)
+	}
+}
+
+func BenchmarkUnpackEthUPv4TCPRaw(bn *testing.B) {
+	var eth_pkt eth.Packet
+	var ip4_pkt ipv4.Packet
+	var tcp_pkt tcp.Packet
+	var raw_pkt raw.Packet
+
+	for n := 0; n < bn.N; n++ {
+		layers.Unpack(test_eth_ipv4_tcp_raw,
+		              &eth_pkt, &ip4_pkt, &tcp_pkt, &raw_pkt)
+	}
+}
+
+func TestUnpackAllEthIPv4TCPRaw(t *testing.T) {
+	pkt, err := layers.UnpackAll(test_eth_ipv4_tcp_raw, packet.Eth)
+	if err != nil {
+		t.Fatalf("Error unpacking: %s", err)
+	}
+
+	if pkt.GetType() != packet.Eth {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.IPv4 {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.TCP {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+
+	pkt = pkt.Payload()
+	if pkt.GetType() != packet.Raw {
+		t.Fatalf("Packet type mismatch, %s", pkt.GetType())
+	}
+}
+
+func BenchmarkUnpackAllEthIPv4TCPRaw(bn *testing.B) {
+	for n := 0; n < bn.N; n++ {
+		layers.UnpackAll(test_eth_ipv4_tcp_raw, packet.Eth)
 	}
 }
 
