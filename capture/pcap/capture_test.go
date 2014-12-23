@@ -53,10 +53,6 @@ func ExampleCapture() {
 			log.Fatal(err)
 		}
 
-		if buf == nil {
-			break
-		}
-
 		log.Println("PACKET!!!")
 
 		// do something with the packet

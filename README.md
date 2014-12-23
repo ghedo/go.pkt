@@ -12,8 +12,8 @@ decoding network packets.
 
 * [filter] [filter]: provides an API for compiling and manipulating BPF filters.
   A filter can be either compiled from tcpdump-like expressions, or created from
-  basic BPF instructions. Filters can then be either applied directly to packet
-  sources (see the capture package) or directly run against binary data.
+  basic BPF instructions. Filters can then be either applied to packet sources
+  (see the capture package) or directly run against binary data.
 
 * [packet] [packet]: provides the interfaces for implementing packet encoders
   and decoders. Every supported protocol implements the Packet interface as a
@@ -21,8 +21,8 @@ decoding network packets.
 
 * [layers] [layers]: provides utility functions for encoding and decoding
   packets to/from binary data. Differently from the basic "packet" interface,
-  this can encode and decode complete "stacks" of packets (e.g. ethernet -> ipv4
-  -> udp), instead of manipulating single ones.
+  this can encode and decode complete "stacks" of packets, instead of
+  manipulating single ones.
 
 * [network] [network]: provides utility functions for sending and receiving
   packets over the network. Basically, it hides some of the complexity of using
@@ -71,10 +71,6 @@ for {
 		log.Fatal(err)
 	}
 
-	if buf == nil {
-		break
-	}
-
 	log.Println("PACKET!!!")
 
 	// do something with the packet
@@ -92,7 +88,7 @@ the propert formats).
 ```go
 dst, err := pcap.Open("eth0")
 if err != nil {
-	log.fatal(err)
+	log.Fatal(err)
 }
 defer dst.Close()
 
@@ -101,7 +97,7 @@ defer dst.Close()
 
 err = dst.Activate()
 if err != nil {
-	log.fatal(err)
+	log.Fatal(err)
 }
 
 err = dst.Inject([]byte("random data"))
