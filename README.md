@@ -24,6 +24,10 @@ decoding network packets.
   this can encode and decode complete "stacks" of packets (e.g. ethernet -> ipv4
   -> udp), instead of manipulating single ones.
 
+* [network] [network]: provides utility functions for sending and receiving
+  packets over the network. Basically, it hides some of the complexity of using
+  the capture and layers packages together.
+
 * [routing] [routing]: provides network routing information about the system. It
   can either return all available routes or select a specific route depending on
   a destination address.
@@ -32,6 +36,7 @@ decoding network packets.
 [filter]: http://godoc.org/github.com/ghedo/hype/filter
 [packet]: http://godoc.org/github.com/ghedo/hype/packet
 [layers]: http://godoc.org/github.com/ghedo/hype/layers
+[network]: http://godoc.org/github.com/ghedo/hype/network
 [routing]: http://godoc.org/github.com/ghedo/hype/routing
 
 ## GETTING STARTED
@@ -84,17 +89,17 @@ the `Inject()` method to send some data (we'll see later how to encode data in
 the propert formats).
 
 ```go
-dst, err := pcap.Open("eth0")
+dst, err := pcap.open("eth0")
 if err != nil {
-	log.Fatal(err)
+	log.fatal(err)
 }
 
 // you may configure the source further, e.g. by activating
 // promiscuous mode.
 
-err = dst.Activate()
+err = dst.activate()
 if err != nil {
-	log.Fatal(err)
+	log.fatal(err)
 }
 
 err = dst.Inject([]byte("random data"))
@@ -174,6 +179,45 @@ if err != nil {
 }
 
 log.Println(pkt)
+```
+
+### Network
+
+Instead of using the layers and capture packages together, the network package
+can be used instead.
+
+The following example creates an ARP request packet and uses `SendRecv()` to
+send it and receive a suitable answer.
+
+```go
+c, err := pcap.Open("eth0")
+if err != nil {
+	log.Fatal(err)
+}
+
+err = c.Activate()
+if err != nil {
+	log.Fatal(err)
+}
+
+// Create an Ethernet packet
+eth_pkt := eth.Make()
+eth_pkt.SrcAddr, _ = net.ParseMAC("4c:72:b9:54:e5:3d")
+eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
+
+// Create an ARP packet
+arp_pkt := arp.Make()
+arp_pkt.HWSrcAddr, _ = net.ParseMAC("4c:72:b9:54:e5:3d")
+arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
+arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
+arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
+
+rsp_pkt, err := network.SendRecv(c, eth_pkt, arp_pkt)
+if err != nil {
+	log.Fatal(err)
+}
+
+log.Println(rsp_pkt)
 ```
 
 ### Routing

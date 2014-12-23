@@ -44,7 +44,7 @@ import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/icmpv4"
 import "github.com/ghedo/hype/packet/ipv4"
 
-import "github.com/ghedo/hype/layers"
+import "github.com/ghedo/hype/network"
 import "github.com/ghedo/hype/routing"
 
 func main() {
@@ -99,29 +99,12 @@ func main() {
 	icmp_pkt.Seq = 0
 	icmp_pkt.Id = id_rand
 
-	buf, _ := layers.Pack(eth_pkt, ipv4_pkt, icmp_pkt)
-	err = c.Inject(buf)
+	_, err = network.SendRecv(c, eth_pkt, ipv4_pkt, icmp_pkt)
 	if err != nil {
-		log.Fatalf("Error: %s", err)
+		log.Fatal(err)
 	}
 
-	for {
-		buf, err := c.Capture()
-		if err != nil {
-			log.Fatalf("Error capturing packet: %s", err)
-			break
-		}
-
-		rsp_pkt, err := layers.UnpackAll(buf, c.LinkType())
-		if err != nil {
-			log.Printf("Error: %s\n", err)
-		}
-
-		if rsp_pkt.Answers(eth_pkt) {
-			log.Println("ping")
-			break
-		}
-	}
+	log.Println("ping")
 }
 
 func ResolveARP(c capture.Handle, r *routing.Route, addr net.IP) net.HardwareAddr {
@@ -135,29 +118,10 @@ func ResolveARP(c capture.Handle, r *routing.Route, addr net.IP) net.HardwareAdd
 	arp_pkt.ProtoSrcAddr = r.PrefSrc
 	arp_pkt.ProtoDstAddr = addr
 
-	buf, _ := layers.Pack(eth_pkt, arp_pkt)
-
-	err := c.Inject(buf)
+	pkt, err := network.SendRecv(c, eth_pkt, arp_pkt)
 	if err != nil {
-		log.Fatalf("Error injecting packet: %s", err)
+		log.Fatal(err)
 	}
 
-	for {
-		buf, err := c.Capture()
-		if err != nil {
-			log.Fatalf("Error capturing packet: %s", err)
-			break
-		}
-
-		rsp_pkt, err := layers.UnpackAll(buf, c.LinkType())
-		if err != nil {
-			log.Printf("Error: %s\n", err)
-		}
-
-		if rsp_pkt.Answers(eth_pkt) {
-			return rsp_pkt.Payload().(*arp.Packet).HWSrcAddr
-		}
-	}
-
-	return nil
+	return pkt.Payload().(*arp.Packet).HWSrcAddr
 }

@@ -38,7 +38,8 @@ import "github.com/docopt/docopt-go"
 import "github.com/ghedo/hype/capture/pcap"
 import "github.com/ghedo/hype/packet/eth"
 import "github.com/ghedo/hype/packet/arp"
-import "github.com/ghedo/hype/layers"
+
+import "github.com/ghedo/hype/network"
 import "github.com/ghedo/hype/routing"
 
 func main() {
@@ -83,28 +84,10 @@ func main() {
 	arp_pkt.ProtoSrcAddr = route.PrefSrc
 	arp_pkt.ProtoDstAddr = addr_ip
 
-	buf, _ := layers.Pack(eth_pkt, arp_pkt)
-
-	err = c.Inject(buf)
+	pkt, err := network.SendRecv(c, eth_pkt, arp_pkt)
 	if err != nil {
-		log.Fatalf("Error injecting packet: %s", err)
+		log.Fatal(err)
 	}
 
-	for {
-		buf, err := c.Capture()
-		if err != nil {
-			log.Fatalf("Error capturing packet: %s", err)
-			break
-		}
-
-		rsp_pkt, err := layers.UnpackAll(buf, c.LinkType())
-		if err != nil {
-			log.Printf("Error: %s\n", err)
-		}
-
-		if rsp_pkt.Answers(eth_pkt) {
-			log.Println(rsp_pkt.(*arp.Packet).HWSrcAddr)
-			break
-		}
-	}
+	log.Println(pkt.Payload().(*arp.Packet).HWSrcAddr)
 }
