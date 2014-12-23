@@ -71,7 +71,9 @@ const (
 )
 
 func Make() *Packet {
-	return &Packet{ }
+	return &Packet{
+		Type: EchoRequest,
+	}
 }
 
 func (p *Packet) GetType() packet.Type {

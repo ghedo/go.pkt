@@ -42,8 +42,7 @@ type Packet struct {
 }
 
 func Make() *Packet {
-	return &Packet{
-	}
+	return &Packet{ }
 }
 
 func (p *Packet) GetType() packet.Type {

@@ -67,7 +67,9 @@ const (
 
 func Make() *Packet {
 	return &Packet{
+		Flags: Syn,
 		DataOff: 5,
+		WindowSize: 5840,
 	}
 }
 
