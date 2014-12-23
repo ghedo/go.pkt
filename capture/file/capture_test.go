@@ -41,6 +41,7 @@ func TestCapture(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error opening: %s", err)
 	}
+	defer src.Close()
 
 	var count uint64
 	for {
@@ -66,6 +67,7 @@ func TestCaptureFilter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error opening: %s", err)
 	}
+	defer src.Close()
 
 	flt, err := filter.Compile("arp", src.LinkType())
 	if err != nil {
@@ -102,6 +104,7 @@ func ExampleCapture() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer src.Close()
 
 	// you may configure the source further, e.g. by activating
 	// promiscuous mode.
@@ -132,6 +135,7 @@ func ExampleInject() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer dst.Close()
 
 	// you may configure the source further, e.g. by activating
 	// promiscuous mode.

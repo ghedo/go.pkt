@@ -83,6 +83,7 @@ Options:
 	if err != nil {
 		log.Fatalf("Error opening interface: %s", err)
 	}
+	defer c.Close()
 
 	err = c.Activate()
 	if err != nil {

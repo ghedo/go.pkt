@@ -55,6 +55,7 @@ src, err := pcap.Open("eth0")
 if err != nil {
 	log.Fatal(err)
 }
+defer src.Close()
 
 // you may configure the source further, e.g. by activating
 // promiscuous mode.
@@ -89,15 +90,16 @@ the `Inject()` method to send some data (we'll see later how to encode data in
 the propert formats).
 
 ```go
-dst, err := pcap.open("eth0")
+dst, err := pcap.Open("eth0")
 if err != nil {
 	log.fatal(err)
 }
+defer dst.Close()
 
 // you may configure the source further, e.g. by activating
 // promiscuous mode.
 
-err = dst.activate()
+err = dst.Activate()
 if err != nil {
 	log.fatal(err)
 }
@@ -194,6 +196,7 @@ c, err := pcap.Open("eth0")
 if err != nil {
 	log.Fatal(err)
 }
+defer c.Close()
 
 err = c.Activate()
 if err != nil {

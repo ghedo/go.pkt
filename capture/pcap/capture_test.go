@@ -37,6 +37,7 @@ func ExampleCapture() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer src.Close()
 
 	// you may configure the source further, e.g. by activating
 	// promiscuous mode.
@@ -67,6 +68,7 @@ func ExampleInject() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer dst.Close()
 
 	// you may configure the source further, e.g. by activating
 	// promiscuous mode.
