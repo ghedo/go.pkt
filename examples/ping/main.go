@@ -36,10 +36,14 @@ import "net"
 
 import "github.com/docopt/docopt-go"
 
+import "github.com/ghedo/hype/capture"
 import "github.com/ghedo/hype/capture/pcap"
+
+import "github.com/ghedo/hype/packet/arp"
 import "github.com/ghedo/hype/packet/eth"
-import "github.com/ghedo/hype/packet/ipv4"
 import "github.com/ghedo/hype/packet/icmpv4"
+import "github.com/ghedo/hype/packet/ipv4"
+
 import "github.com/ghedo/hype/layers"
 import "github.com/ghedo/hype/routing"
 
@@ -77,8 +81,12 @@ func main() {
 
 	eth_pkt := eth.Make()
 	eth_pkt.SrcAddr = route.Iface.HardwareAddr
-	/* TODO: resolve route.Gateway via ARP */
-	eth_pkt.DstAddr, _ = net.ParseMAC("00:21:96:6e:f0:70")
+
+	if route.Default {
+		eth_pkt.DstAddr = ResolveARP(c, route, route.Gateway)
+	} else {
+		eth_pkt.DstAddr = ResolveARP(c, route, addr_ip)
+	}
 
 	ipv4_pkt := ipv4.Make()
 	ipv4_pkt.SrcAddr = route.PrefSrc
@@ -114,4 +122,42 @@ func main() {
 			break
 		}
 	}
+}
+
+func ResolveARP(c capture.Handle, r *routing.Route, addr net.IP) net.HardwareAddr {
+	eth_pkt := eth.Make()
+	eth_pkt.SrcAddr = r.Iface.HardwareAddr
+	eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
+
+	arp_pkt := arp.Make()
+	arp_pkt.HWSrcAddr = r.Iface.HardwareAddr
+	arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
+	arp_pkt.ProtoSrcAddr = r.PrefSrc
+	arp_pkt.ProtoDstAddr = addr
+
+	buf, _ := layers.Pack(eth_pkt, arp_pkt)
+
+	err := c.Inject(buf)
+	if err != nil {
+		log.Fatalf("Error injecting packet: %s", err)
+	}
+
+	for {
+		buf, err := c.Capture()
+		if err != nil {
+			log.Fatalf("Error capturing packet: %s", err)
+			break
+		}
+
+		rsp_pkt, err := layers.UnpackAll(buf, c.LinkType())
+		if err != nil {
+			log.Printf("Error: %s\n", err)
+		}
+
+		if rsp_pkt.Answers(eth_pkt) {
+			return rsp_pkt.Payload().(*arp.Packet).HWSrcAddr
+		}
+	}
+
+	return nil
 }
