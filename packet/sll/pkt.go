@@ -42,7 +42,7 @@ type Packet struct {
 	AddrLen     uint16           `string:"alen"`
 	SrcAddr     net.HardwareAddr `string:"src"`
 	EtherType   eth.EtherType
-	pkt_payload packet.Packet    `string:"skip"`
+	pkt_payload packet.Packet    `cmp:"skip" string:"skip"`
 }
 
 type Type uint16

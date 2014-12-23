@@ -43,10 +43,10 @@ type Packet struct {
 	Label       uint32
 	Length      uint16        `string:"len"`
 	NextHdr     ipv4.Protocol `string:"next"`
-	HopLimit    uint8         `string:"hop"`
+	HopLimit    uint8         `cmp:"skip" string:"hop"`
 	SrcAddr     net.IP        `string:"src"`
 	DstAddr     net.IP        `string:"dst"`
-	pkt_payload packet.Packet `string:"skip"`
+	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Flags uint8

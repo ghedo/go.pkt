@@ -41,8 +41,8 @@ type Packet struct {
 	DstAddr     net.HardwareAddr `string:"dst"`
 	SrcAddr     net.HardwareAddr `string:"src"`
 	Type        EtherType
-	Length      uint16
-	pkt_payload packet.Packet    `string:"skip"`
+	Length      uint16           `cmp:"skip"`
+	pkt_payload packet.Packet    `cmp:"skip" string:"skip"`
 }
 
 type EtherType uint16

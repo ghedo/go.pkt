@@ -40,8 +40,8 @@ type Packet struct {
 	Type      Type
 	Code      Code
 	Checksum  uint16 `string:"sum"`
-	csum_seed uint32 `string:"skip"`
-	Body      uint32 `string:"skip"`
+	csum_seed uint32 `cmp:"skip" string:"skip"`
+	Body      uint32 `cmp:"skip" string:"skip"`
 }
 
 type Type uint8

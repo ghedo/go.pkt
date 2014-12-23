@@ -39,8 +39,8 @@ type Packet struct {
 	DstPort     uint16        `string:"dport"`
 	Length      uint16        `string:"len"`
 	Checksum    uint16        `string:"sum"`
-	csum_seed   uint32        `string:"skip"`
-	pkt_payload packet.Packet `string:"skip"`
+	csum_seed   uint32        `cmp:"skip" string:"skip"`
+	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 func Make() *Packet {

@@ -182,6 +182,12 @@ func Compare(a, b Packet) bool {
 	bval := reflect.ValueOf(b).Elem()
 
 	for i := 0; i < aval.NumField(); i++ {
+		ftype := aval.Type().Field(i)
+
+		if ftype.Tag.Get("cmp") == "skip" {
+			continue
+		}
+
 		if !compare_value(aval.Field(i), bval.Field(i)) {
 			return false
 		}

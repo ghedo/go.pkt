@@ -47,8 +47,8 @@ type Packet struct {
 	WindowSize  uint16        `string:"win"`
 	Checksum    uint16        `string:"sum"`
 	Urgent      uint16        `string:"urg"`
-	csum_seed   uint32        `string:"skip"`
-	pkt_payload packet.Packet `string:"skip"`
+	csum_seed   uint32        `cmp:"skip" string:"skip"`
+	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Flags uint16

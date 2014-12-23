@@ -39,7 +39,7 @@ type Packet struct {
 	DropEligible bool          `string:"drop"`
 	VLAN         uint16
 	Type         eth.EtherType
-	pkt_payload  packet.Packet `string:"skip"`
+	pkt_payload  packet.Packet `cmp:"skip" string:"skip"`
 }
 
 func Make() *Packet {

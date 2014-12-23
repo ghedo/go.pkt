@@ -40,17 +40,17 @@ import "github.com/ghedo/hype/packet"
 type Packet struct {
 	Version     uint8
 	IHL         uint8
-	TOS         uint8
-	Length      uint16
+	TOS         uint8         `cmp:"skip"`
+	Length      uint16        `cmp:"skip"`
 	Id          uint16
 	Flags       Flags
 	FragOff     uint16
-	TTL         uint8
+	TTL         uint8         `cmp:"skip"`
 	Protocol    Protocol      `string:"proto"`
-	Checksum    uint16        `string:"sum"`
+	Checksum    uint16        `cmp:"skip" string:"sum"`
 	SrcAddr     net.IP        `string:"src"`
 	DstAddr     net.IP        `string:"dst"`
-	pkt_payload packet.Packet `string:"skip"`
+	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Flags uint8
