@@ -213,7 +213,7 @@ func (p *Packet) GuessPayloadType() packet.Type {
 func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.pkt_payload = pl
 	p.Protocol    = TypeToProtocol(pl.GetType())
-	p.Length     += pl.GetLength()
+	p.Length      = p.GetLength()
 
 	pl.InitChecksum(p.pseudo_checksum())
 

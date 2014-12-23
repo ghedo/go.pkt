@@ -112,7 +112,7 @@ func (p *Packet) GuessPayloadType() packet.Type {
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.pkt_payload = pl
-	p.Length     += pl.GetLength()
+	p.Length      = p.GetLength()
 
 	return nil
 }

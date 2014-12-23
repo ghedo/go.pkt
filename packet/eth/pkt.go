@@ -140,7 +140,7 @@ func (p *Packet) SetPayload(pl packet.Packet) error {
 	p.Type        = TypeToEtherType(pl.GetType())
 
 	if p.Type < 0x0600 {
-		p.Length += pl.GetLength()
+		p.Length = p.GetLength()
 	}
 
 	return nil
