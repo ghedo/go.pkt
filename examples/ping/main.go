@@ -50,7 +50,9 @@ import "github.com/ghedo/hype/routing"
 func main() {
 	log.SetFlags(0)
 
-	usage := `Usage: ping <addr>`
+	usage := `Usage: ping <addr>
+
+Ping the given IP address.`
 
 	args, err := docopt.Parse(usage, nil, true, "", false)
 	if err != nil {

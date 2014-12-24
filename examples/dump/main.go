@@ -46,6 +46,8 @@ func main() {
 
 	usage := `Usage: dump [options] [<expression>]
 
+Dump the traffic on the network (like tcpdump).
+
 Options:
   -c <count>  Exit after receiving count packets.
   -i <iface>  Listen on interface.

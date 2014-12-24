@@ -45,7 +45,9 @@ import "github.com/ghedo/hype/routing"
 func main() {
 	log.SetFlags(0)
 
-	usage := `Usage: arp <addr>`
+	usage := `Usage: arp <addr>
+
+Resolve the given IP address using ARP.`
 
 	args, err := docopt.Parse(usage, nil, true, "", false)
 	if err != nil {

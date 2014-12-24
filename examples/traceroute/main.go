@@ -57,6 +57,8 @@ func main() {
 
 	usage := `Usage: traceroute (--icmp | --udp | --tcp ) <addr>
 
+Find the route to the given IP address using ICMP, UDP or TCP packets.
+
 Options:
   --icmp  Use ICMP packets.
   --udp   Use UDP packets.

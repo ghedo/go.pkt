@@ -42,6 +42,9 @@ func main() {
 
 	usage := `Usage: route [options] [<dest_addr>]
 
+Find the best route on the local routing table to the given destination IP
+address (or dump all routes).
+
 Options:
   -a  Dump all routes.`
 
