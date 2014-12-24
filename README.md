@@ -211,7 +211,7 @@ arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
 arp_pkt.ProtoSrcAddr = net.ParseIP("192.168.1.135")
 arp_pkt.ProtoDstAddr = net.ParseIP("192.168.1.254")
 
-rsp_pkt, err := network.SendRecv(c, eth_pkt, arp_pkt)
+rsp_pkt, err := network.SendRecv(c, 0, eth_pkt, arp_pkt)
 if err != nil {
 	log.Fatal(err)
 }

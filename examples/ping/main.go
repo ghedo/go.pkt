@@ -33,6 +33,7 @@ package main
 import "log"
 import "math/rand"
 import "net"
+import "time"
 
 import "github.com/docopt/docopt-go"
 
@@ -61,6 +62,7 @@ Ping the given IP address.`
 
 	addr    := args["<addr>"].(string)
 	addr_ip := net.ParseIP(addr)
+	timeout := 5 * time.Second
 
 	route, err := routing.RouteTo(addr_ip)
 	if err != nil {
@@ -86,9 +88,9 @@ Ping the given IP address.`
 	eth_pkt.SrcAddr = route.Iface.HardwareAddr
 
 	if route.Default {
-		eth_pkt.DstAddr = ResolveARP(c, route, route.Gateway)
+		eth_pkt.DstAddr = ResolveARP(c, timeout, route, route.Gateway)
 	} else {
-		eth_pkt.DstAddr = ResolveARP(c, route, addr_ip)
+		eth_pkt.DstAddr = ResolveARP(c, timeout, route, addr_ip)
 	}
 
 	ipv4_pkt := ipv4.Make()
@@ -102,7 +104,7 @@ Ping the given IP address.`
 	icmp_pkt.Seq = 0
 	icmp_pkt.Id = id_rand
 
-	_, err = network.SendRecv(c, eth_pkt, ipv4_pkt, icmp_pkt)
+	_, err = network.SendRecv(c, timeout, eth_pkt, ipv4_pkt, icmp_pkt)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,7 +112,7 @@ Ping the given IP address.`
 	log.Println("ping")
 }
 
-func ResolveARP(c capture.Handle, r *routing.Route, addr net.IP) net.HardwareAddr {
+func ResolveARP(c capture.Handle, t time.Duration, r *routing.Route, addr net.IP) net.HardwareAddr {
 	eth_pkt := eth.Make()
 	eth_pkt.SrcAddr = r.Iface.HardwareAddr
 	eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
@@ -121,7 +123,7 @@ func ResolveARP(c capture.Handle, r *routing.Route, addr net.IP) net.HardwareAdd
 	arp_pkt.ProtoSrcAddr = r.PrefSrc
 	arp_pkt.ProtoDstAddr = addr
 
-	pkt, err := network.SendRecv(c, eth_pkt, arp_pkt)
+	pkt, err := network.SendRecv(c, t, eth_pkt, arp_pkt)
 	if err != nil {
 		log.Fatal(err)
 	}

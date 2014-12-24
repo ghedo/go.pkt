@@ -32,6 +32,7 @@ package main
 
 import "log"
 import "net"
+import "time"
 
 import "github.com/docopt/docopt-go"
 
@@ -56,6 +57,7 @@ Resolve the given IP address using ARP.`
 
 	addr    := args["<addr>"].(string)
 	addr_ip := net.ParseIP(addr)
+	timeout := 5 * time.Second
 
 	route, err := routing.RouteTo(addr_ip)
 	if err != nil {
@@ -87,7 +89,7 @@ Resolve the given IP address using ARP.`
 	arp_pkt.ProtoSrcAddr = route.PrefSrc
 	arp_pkt.ProtoDstAddr = addr_ip
 
-	pkt, err := network.SendRecv(c, eth_pkt, arp_pkt)
+	pkt, err := network.SendRecv(c, timeout, eth_pkt, arp_pkt)
 	if err != nil {
 		log.Fatal(err)
 	}

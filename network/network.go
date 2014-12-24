@@ -34,6 +34,7 @@
 package network
 
 import "fmt"
+import "time"
 
 import "github.com/ghedo/hype/capture"
 import "github.com/ghedo/hype/packet"
@@ -78,12 +79,15 @@ func Recv(c capture.Handle) (packet.Packet, error) {
 }
 
 // Like Send() and Recv() combined. This only returns a suitable answer for the
-// sent packets.
-func SendRecv(c capture.Handle, pkts ...packet.Packet) (packet.Packet, error) {
+// sent packets. If t is not zero, this will return if not answer is received
+// before t expires.
+func SendRecv(c capture.Handle, t time.Duration, pkts ...packet.Packet) (packet.Packet, error) {
 	err := Send(c, pkts...)
 	if err != nil {
 		return nil, err
 	}
+
+	now := time.Now()
 
 	for {
 		pkt, err := Recv(c)
@@ -97,6 +101,11 @@ func SendRecv(c capture.Handle, pkts ...packet.Packet) (packet.Packet, error) {
 
 		if pkt.Answers(pkts[0]) {
 			return pkt, nil
+		}
+
+		if int64(t) > 0 &&
+		   int64(time.Since(now)) > int64(t.Nanoseconds()) {
+			return nil, fmt.Errorf("Timeout")
 		}
 	}
 
