@@ -84,7 +84,7 @@ type Packet interface {
 	/* Check if the packet matches another packet */
 	Equals(other Packet) bool
 
-	/* Check if the packet in an answer to another packet */
+	/* Check if the packet is an answer to another packet */
 	Answers(other Packet) bool
 
 	/* Encode the packet and write it to the given buffer */
