@@ -97,12 +97,10 @@ Ping the given IP address.`
 	ipv4_pkt.SrcAddr = route.PrefSrc
 	ipv4_pkt.DstAddr = addr_ip
 
-	id_rand := uint16(rand.Intn(65535))
-
 	icmp_pkt := icmpv4.Make()
 	icmp_pkt.Type = icmpv4.EchoRequest
 	icmp_pkt.Seq = 0
-	icmp_pkt.Id = id_rand
+	icmp_pkt.Id = uint16(rand.Intn(65535))
 
 	_, err = network.SendRecv(c, timeout, eth_pkt, ipv4_pkt, icmp_pkt)
 	if err != nil {

@@ -50,6 +50,7 @@ import "github.com/ghedo/hype/packet/raw"
 import "github.com/ghedo/hype/packet/tcp"
 import "github.com/ghedo/hype/packet/udp"
 
+import "github.com/ghedo/hype/layers"
 import "github.com/ghedo/hype/network"
 import "github.com/ghedo/hype/routing"
 
@@ -163,9 +164,11 @@ Options:
 			log.Fatal(err)
 		}
 
-		log.Println(pkt.Payload().(*ipv4.Packet).SrcAddr)
+		ipv4_rsp := layers.FindLayer(pkt, packet.IPv4).(*ipv4.Packet)
 
-		if pkt.Payload().(*ipv4.Packet).SrcAddr.Equal(addr_ip) {
+		log.Println(ipv4_rsp.SrcAddr)
+
+		if ipv4_rsp.SrcAddr.Equal(addr_ip) {
 			return
 		}
 
