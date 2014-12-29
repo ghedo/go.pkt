@@ -98,6 +98,11 @@ func (b *Buffer) WriteN(data interface{}) error {
 	return binary.Write(b, binary.BigEndian, data)
 }
 
+// Append the value of data to the buffer in little endian byter order.
+func (b *Buffer) WriteL(data interface{}) error {
+	return binary.Write(b, binary.LittleEndian, data)
+}
+
 // Write data in network byte order to the specified offset relative to the
 // start of the current layer.
 func (b *Buffer) PutUint16N(off int, data uint16) {
@@ -114,6 +119,18 @@ func (b *Buffer) Read(p []byte) (n int, err error) {
 // Read structured data from the buffer in network byte order.
 func (p *Buffer) ReadN(data interface{}) error {
 	return binary.Read(p, binary.BigEndian, data)
+}
+
+// Read structured data from the buffer in little endian byte order.
+func (p *Buffer) ReadL(data interface{}) error {
+	return binary.Read(p, binary.LittleEndian, data)
+}
+
+// Read aligned structured data from the buffer in little endian byte order.
+func (p *Buffer) ReadLAligned(data interface{}, width uintptr) error {
+	p.off = ((((p.off) + ((int(width)) - 1)) & (^((int(width)) - 1))) - p.off)
+
+	return binary.Read(p, binary.LittleEndian, data)
 }
 
 // Return a slice containing the next n bytes from the buffer, advancing the

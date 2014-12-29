@@ -42,6 +42,7 @@ import "github.com/ghedo/hype/packet/icmpv6"
 import "github.com/ghedo/hype/packet/ipv4"
 import "github.com/ghedo/hype/packet/ipv6"
 import "github.com/ghedo/hype/packet/llc"
+import "github.com/ghedo/hype/packet/radiotap"
 import "github.com/ghedo/hype/packet/raw"
 import "github.com/ghedo/hype/packet/sll"
 import "github.com/ghedo/hype/packet/snap"
@@ -164,19 +165,20 @@ func UnpackAll(buf []byte, link_type packet.Type) (packet.Packet, error) {
 		}
 
 		switch link_type {
-		case packet.ARP:    p = &arp.Packet{}
-		case packet.Eth:    p = &eth.Packet{}
-		case packet.ICMPv4: p = &icmpv4.Packet{}
-		case packet.ICMPv6: p = &icmpv6.Packet{}
-		case packet.IPv4:   p = &ipv4.Packet{}
-		case packet.IPv6:   p = &ipv6.Packet{}
-		case packet.LLC:    p = &llc.Packet{}
-		case packet.SLL:    p = &sll.Packet{}
-		case packet.SNAP:   p = &snap.Packet{}
-		case packet.TCP:    p = &tcp.Packet{}
-		case packet.UDP:    p = &udp.Packet{}
-		case packet.VLAN:   p = &vlan.Packet{}
-		default:            p = &raw.Packet{}
+		case packet.ARP:      p = &arp.Packet{}
+		case packet.Eth:      p = &eth.Packet{}
+		case packet.ICMPv4:   p = &icmpv4.Packet{}
+		case packet.ICMPv6:   p = &icmpv6.Packet{}
+		case packet.IPv4:     p = &ipv4.Packet{}
+		case packet.IPv6:     p = &ipv6.Packet{}
+		case packet.LLC:      p = &llc.Packet{}
+		case packet.RadioTap: p = &radiotap.Packet{}
+		case packet.SLL:      p = &sll.Packet{}
+		case packet.SNAP:     p = &snap.Packet{}
+		case packet.TCP:      p = &tcp.Packet{}
+		case packet.UDP:      p = &udp.Packet{}
+		case packet.VLAN:     p = &vlan.Packet{}
+		default:              p = &raw.Packet{}
 		}
 
 		if p == nil {

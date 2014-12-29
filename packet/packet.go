@@ -109,8 +109,9 @@ type Packet interface {
 }
 
 var pcap_link_type_to_type_map = [][2]uint32{
-	{   1, uint32(Eth)  },
-	{ 113, uint32(SLL)  },
+	{   1, uint32(Eth)      },
+	{ 113, uint32(SLL)      },
+	{ 127, uint32(RadioTap) },
 }
 
 // Create a new type from the given PCAP link type.
@@ -189,6 +190,7 @@ func Compare(a, b Packet) bool {
 		}
 
 		if !compare_value(aval.Field(i), bval.Field(i)) {
+			fmt.Println(aval.Type().Field(i).Name)
 			return false
 		}
 	}
@@ -211,7 +213,7 @@ func compare_value(a, b reflect.Value) bool {
 	case reflect.Bool:
 		return a.Bool() == b.Bool()
 
-	case reflect.Uint8, reflect.Uint16, reflect.Uint32:
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return a.Uint() == b.Uint()
 
 	case reflect.Array:
@@ -295,7 +297,7 @@ func stringify_value(key string, val reflect.Value) string {
 	}
 
 	switch val.Kind() {
-	case reflect.Uint8, reflect.Uint16, reflect.Uint32:
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		if val.Uint() > 0 {
 			if key == "sum" || key == "type" {
 				s = "0x" + strconv.FormatUint(val.Uint(), 16)
