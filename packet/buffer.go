@@ -81,9 +81,9 @@ func (b *Buffer) LayerBytes() []byte {
 	return b.buf[b.layer_off:]
 }
 
-// Return the length of the current layer..
+// Return the length of the current decoded layer.
 func (b *Buffer) LayerLen() int {
-	return len(b.buf) - b.layer_off
+	return b.off - b.layer_off
 }
 
 // Append the contents of p to the buffer.

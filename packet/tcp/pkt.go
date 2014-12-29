@@ -47,6 +47,7 @@ type Packet struct {
 	WindowSize  uint16        `string:"win"`
 	Checksum    uint16        `string:"sum"`
 	Urgent      uint16        `string:"urg"`
+	Options     []Option      `cmp:"skip" string:"skip"`
 	csum_seed   uint32        `cmp:"skip" string:"skip"`
 	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
@@ -63,6 +64,24 @@ const (
 	ECE       = 1<<7
 	Cwr       = 1<<8
 	NS        = 1<<9
+)
+
+type Option struct {
+	Type OptType
+	Len  uint8
+	Data []byte
+}
+
+type OptType uint8
+
+const (
+	End OptType = 0x00
+	Nop         = 0x01
+	MSS         = 0x02
+	WindowScale = 0x03
+	SAckOk      = 0x04
+	SAck        = 0x05
+	Timestamp   = 0x08
 )
 
 func Make() *Packet {
@@ -152,6 +171,12 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 	buf.WriteN(uint16(0x0000))
 	buf.WriteN(p.Urgent)
 
+	for _, opt := range p.Options {
+		buf.WriteN(opt.Type)
+		buf.WriteN(opt.Len)
+		buf.WriteN(opt.Data)
+	}
+
 	if p.csum_seed != 0 {
 		p.Checksum =
 		  ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
@@ -216,8 +241,26 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 	buf.ReadN(&p.Checksum)
 	buf.ReadN(&p.Urgent)
 
-	if int(p.DataOff * 4) > buf.LayerLen() {
-		/* TODO: Options */
+options:
+	for buf.LayerLen() < int(p.DataOff) * 4 {
+		var opt_type OptType
+		buf.ReadN(&opt_type)
+
+		switch opt_type {
+		case End: /* end of options */
+			break options
+
+		case Nop: /* padding */
+			continue
+
+		default:
+			opt := Option{ Type: opt_type }
+
+			buf.ReadN(&opt.Len)
+			opt.Data = buf.Next(int(opt.Len) - 2)
+
+			p.Options = append(p.Options, opt)
+		}
 	}
 
 	return nil

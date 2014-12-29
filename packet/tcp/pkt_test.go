@@ -159,3 +159,97 @@ func TestUnpackWithIPv4(t *testing.T) {
 		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
 	}
 }
+
+var test_options = []byte{
+	0x00, 0x14, 0x00, 0x50, 0x00, 0x00, 0x15, 0x18, 0x00, 0x00, 0x01, 0xb0,
+	0xa0, 0x02, 0x20, 0x00, 0x00, 0x00, 0x00, 0x28, 0x02, 0x04, 0x05, 0x78,
+	0x04, 0x02, 0x08, 0x0a, 0x61, 0x25, 0xe5, 0xb2, 0x00, 0x13, 0x15, 0x66,
+	0x03, 0x03, 0x0a, 0x00,
+}
+
+func TestPackOptions(t *testing.T) {
+	var b packet.Buffer
+	b.Init(make([]byte, len(test_options)))
+
+	p := MakeTestSimple()
+
+	p.DataOff = 10
+
+	p.Options = append(p.Options,
+		tcp.Option{
+			Type: tcp.MSS,
+			Len:  4,
+			Data: []byte{0x05, 0x78},
+		},
+	)
+
+	p.Options = append(p.Options,
+		tcp.Option{
+			Type: tcp.SAckOk,
+			Len:  2,
+		},
+	)
+
+	p.Options = append(p.Options,
+		tcp.Option{
+			Type: tcp.Timestamp,
+			Len:  10,
+			Data: []byte{0x61, 0x25, 0xE5, 0xB2, 0x00, 0x13, 0x15, 0x66},
+		},
+	)
+
+	p.Options = append(p.Options,
+		tcp.Option{
+			Type: tcp.WindowScale,
+			Len:  3,
+			Data: []byte{0x0A},
+		},
+	)
+
+	p.Options = append(p.Options,
+		tcp.Option{
+			Type: tcp.End,
+		},
+	)
+
+	err := p.Pack(&b)
+	if err != nil {
+		t.Fatalf("Error packing: %s", err)
+	}
+
+	if !bytes.Equal(test_options, b.Buffer()) {
+		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+	}
+}
+
+func TestUnpackOptions(t *testing.T) {
+	var p tcp.Packet
+
+	var b packet.Buffer
+	b.Init(test_options)
+
+	err := p.Unpack(&b)
+	if err != nil {
+		t.Fatalf("Error unpacking: %s", err)
+	}
+
+	if len(p.Options) != 4 {
+		t.Fatalf("Options number mismatch: %d", len(p.Options))
+	}
+
+	if p.Options[0].Type != tcp.MSS {
+		t.Fatalf("Option MSS mismatch: %x", p.Options[0].Data)
+	}
+
+	if p.Options[1].Type != tcp.SAckOk {
+		t.Fatalf("Option SAckOk mismatch: %x", p.Options[1].Data)
+	}
+
+	if p.Options[2].Type != tcp.Timestamp {
+		t.Fatalf("Option Timestamp mismatch: %x", p.Options[2].Data)
+	}
+
+	if p.Options[3].Type != tcp.WindowScale {
+		t.Fatalf("Option WindowScale mismatch: %x", p.Options[3].Data)
+	}
+}
