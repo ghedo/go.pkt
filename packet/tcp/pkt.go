@@ -184,6 +184,11 @@ func (p *Packet) Pack(buf *packet.Buffer) error {
 
 	buf.PutUint16N(16, p.Checksum)
 
+	/* add padding */
+	for buf.LayerLen() < int(p.DataOff) * 4 {
+		buf.WriteN(uint8(0x00))
+	}
+
 	return nil
 }
 
@@ -261,6 +266,11 @@ options:
 
 			p.Options = append(p.Options, opt)
 		}
+	}
+
+	/* remove padding */
+	if buf.LayerLen() < int(p.DataOff) * 4 {
+		buf.Next(int(p.DataOff) * 4 - buf.LayerLen())
 	}
 
 	return nil
