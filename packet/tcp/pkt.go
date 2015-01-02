@@ -42,7 +42,6 @@ type Packet struct {
 	Seq         uint32
 	Ack         uint32
 	DataOff     uint8         `string:"off"`
-	NS          bool
 	Flags       Flags
 	WindowSize  uint16        `string:"win"`
 	Checksum    uint16        `string:"sum"`
