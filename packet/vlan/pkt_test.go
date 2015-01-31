@@ -33,9 +33,9 @@ package vlan_test
 import "bytes"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/eth"
-import "github.com/ghedo/hype/packet/vlan"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/eth"
+import "github.com/ghedo/go.pkt/packet/vlan"
 
 var test_simple = []byte{
 	0x64, 0x00, 0x08, 0x00,

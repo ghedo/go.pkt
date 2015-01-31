@@ -1,9 +1,9 @@
-hype
-====
+go.pkt
+======
 
-![Travis CI](https://secure.travis-ci.org/ghedo/hype.png)
+![Travis CI](https://secure.travis-ci.org/ghedo/go.pkt.png)
 
-**hype** provides Go libraries for capturing, injecting, filtering, encoding and
+**go.pkt** provides Go libraries for capturing, injecting, filtering, encoding and
 decoding network packets.
 
 * [capture] [capture]: provides the basic interface for packet capturing and
@@ -32,12 +32,12 @@ decoding network packets.
   can either return all available routes or select a specific route depending on
   a destination address.
 
-[capture]: http://godoc.org/github.com/ghedo/hype/capture
-[filter]: http://godoc.org/github.com/ghedo/hype/filter
-[packet]: http://godoc.org/github.com/ghedo/hype/packet
-[layers]: http://godoc.org/github.com/ghedo/hype/layers
-[network]: http://godoc.org/github.com/ghedo/hype/network
-[routing]: http://godoc.org/github.com/ghedo/hype/routing
+[capture]: http://godoc.org/github.com/ghedo/go.pkt/capture
+[filter]: http://godoc.org/github.com/ghedo/go.pkt/filter
+[packet]: http://godoc.org/github.com/ghedo/go.pkt/packet
+[layers]: http://godoc.org/github.com/ghedo/go.pkt/layers
+[network]: http://godoc.org/github.com/ghedo/go.pkt/network
+[routing]: http://godoc.org/github.com/ghedo/go.pkt/routing
 
 ## GETTING STARTED
 

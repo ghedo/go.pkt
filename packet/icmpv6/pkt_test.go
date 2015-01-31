@@ -34,9 +34,9 @@ import "bytes"
 import "net"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/icmpv6"
-import "github.com/ghedo/hype/packet/ipv6"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/icmpv6"
+import "github.com/ghedo/go.pkt/packet/ipv6"
 
 var test_simple = []byte{
 	0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

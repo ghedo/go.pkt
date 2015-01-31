@@ -30,7 +30,7 @@
 
 package pcap_test
 
-import "github.com/ghedo/hype/capture/pcap"
+import "github.com/ghedo/go.pkt/capture/pcap"
 
 func ExampleCapture() {
 	src, err := pcap.Open("eth0")

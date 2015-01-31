@@ -31,7 +31,7 @@
 // Provides encoding and decoding for LLC (802.2 Logical Link Control) packets.
 package llc
 
-import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/go.pkt/packet"
 
 type Packet struct {
 	DSAP        uint8

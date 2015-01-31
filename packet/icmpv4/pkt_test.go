@@ -33,8 +33,8 @@ package icmpv4_test
 import "bytes"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/icmpv4"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/icmpv4"
 
 var test_simple = []byte{
 	0x08, 0x00, 0xf7, 0xd2, 0x00, 0x0f, 0x00, 0x1e,

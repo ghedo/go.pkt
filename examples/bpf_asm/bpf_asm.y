@@ -1,7 +1,7 @@
 %{
 package main
 
-import "github.com/ghedo/hype/filter"
+import "github.com/ghedo/go.pkt/filter"
 %}
 
 %union {

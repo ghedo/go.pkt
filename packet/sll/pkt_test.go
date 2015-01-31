@@ -34,9 +34,9 @@ import "bytes"
 import "net"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/eth"
-import "github.com/ghedo/hype/packet/sll"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/eth"
+import "github.com/ghedo/go.pkt/packet/sll"
 
 var hwsrc_str = "4c:72:b9:54:e5:3d"
 

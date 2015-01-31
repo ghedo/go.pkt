@@ -33,9 +33,9 @@ package snap_test
 import "bytes"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/eth"
-import "github.com/ghedo/hype/packet/snap"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/eth"
+import "github.com/ghedo/go.pkt/packet/snap"
 
 var test_simple = []byte{
 	0x00, 0x00, 0x00, 0x08, 0x00,

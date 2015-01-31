@@ -33,8 +33,8 @@ package raw_test
 import "bytes"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/raw"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/raw"
 
 var test_simple = []byte{
 	0x61, 0x73, 0x64, 0x61, 0x73, 0x64, 0x20, 0x61, 0x73, 0x64, 0x20, 0x61,

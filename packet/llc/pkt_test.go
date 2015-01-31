@@ -33,8 +33,8 @@ package llc_test
 import "bytes"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/llc"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/llc"
 
 var test_simple = []byte{
 	0x4e, 0x5e, 0x0b,

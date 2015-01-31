@@ -38,7 +38,7 @@ import "C"
 import "fmt"
 import "unsafe"
 
-import "github.com/ghedo/hype/packet"
+import "github.com/ghedo/go.pkt/packet"
 
 // Compile the given tcpdump-like expression to a BPF filter.
 func Compile(filter string, link_type packet.Type) (*Filter, error) {

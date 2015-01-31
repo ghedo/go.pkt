@@ -33,8 +33,8 @@ package tcp
 
 import "strings"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/ipv4"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/ipv4"
 
 type Packet struct {
 	SrcPort     uint16        `string:"sport"`

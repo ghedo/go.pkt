@@ -33,8 +33,8 @@ package radiotap_test
 import "bytes"
 import "testing"
 
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/packet/radiotap"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/radiotap"
 
 var test_simple = []byte{
 	0x00, 0x00, 0x20, 0x00, 0x67, 0x08, 0x04, 0x00, 0x54, 0xc6, 0xb8, 0x24,

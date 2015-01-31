@@ -36,9 +36,9 @@ package network
 import "fmt"
 import "time"
 
-import "github.com/ghedo/hype/capture"
-import "github.com/ghedo/hype/packet"
-import "github.com/ghedo/hype/layers"
+import "github.com/ghedo/go.pkt/capture"
+import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/layers"
 
 // Pack packets into their binary form and inject them in the given capture
 // handle.. This will stack the packets before encoding them and also calculate
