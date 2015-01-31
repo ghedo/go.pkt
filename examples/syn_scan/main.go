@@ -98,7 +98,7 @@ Simple TCP port scanner.`
 	}
 
 	ipv4_pkt := ipv4.Make()
-	ipv4_pkt.SrcAddr = route.PrefSrc
+	ipv4_pkt.SrcAddr, _ = routing.GetIfaceIPv4Addr(route.Iface)
 	ipv4_pkt.DstAddr = addr_ip
 
 	tcp_pkt := tcp.Make()
@@ -137,7 +137,7 @@ func ResolveARP(c capture.Handle, t time.Duration, r *routing.Route, addr net.IP
 	arp_pkt := arp.Make()
 	arp_pkt.HWSrcAddr = r.Iface.HardwareAddr
 	arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
-	arp_pkt.ProtoSrcAddr = r.PrefSrc
+	arp_pkt.ProtoSrcAddr, _ = routing.GetIfaceIPv4Addr(r.Iface)
 	arp_pkt.ProtoDstAddr = addr
 
 	pkt, err := network.SendRecv(c, t, eth_pkt, arp_pkt)

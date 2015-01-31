@@ -101,9 +101,6 @@ func Routes() ([]*Route, error) {
 
 				route.Default = false
 
-			case syscall.RTA_PREFSRC:
-				route.PrefSrc = net.IP(a.Value)
-
 			case syscall.RTA_GATEWAY:
 				route.Gateway = net.IP(a.Value)
 
@@ -124,4 +121,3 @@ func Routes() ([]*Route, error) {
 
 	return routes, nil
 }
-

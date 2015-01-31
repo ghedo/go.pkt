@@ -44,7 +44,6 @@ type Route struct {
 	DstNet  *net.IPNet
 	Gateway net.IP
 	Iface   *net.Interface
-	PrefSrc net.IP
 }
 
 type route_slice []*Route
@@ -106,6 +105,42 @@ func RouteTo(dst net.IP) (*Route, error) {
 	return def, nil
 }
 
+// Return the default IPv4 address of a network interface.
+func GetIfaceIPv4Addr(iface *net.Interface) (net.IP, error) {
+	addrs, err := iface.Addrs();
+	if err != nil {
+		return nil, err
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok {
+			if ip4 := ipnet.IP.To4(); ip4 != nil {
+				return ip4, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("No address found")
+}
+
+// Return the default IPv6 address of a network interface.
+func GetIfaceIPv6Addr(iface *net.Interface) (net.IP, error) {
+	addrs, err := iface.Addrs();
+	if err != nil {
+		return nil, err
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok {
+			if ip6 := ipnet.IP.To16(); ip6 != nil {
+				return ip6, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("No address found")
+}
+
 func (r *Route) String() string {
 	var parts []string
 
@@ -128,12 +163,6 @@ func (r *Route) String() string {
 	if r.Iface != nil {
 		iface := fmt.Sprintf("dev %s", r.Iface.Name)
 		parts = append(parts, iface)
-	}
-
-
-	if r.PrefSrc != nil {
-		prefsrc := fmt.Sprintf("src %s", r.PrefSrc.String())
-		parts = append(parts, prefsrc)
 	}
 
 	return strings.Join(parts, " ")
