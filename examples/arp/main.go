@@ -86,7 +86,7 @@ Resolve the given IP address using ARP.`
 	arp_pkt := arp.Make()
 	arp_pkt.HWSrcAddr = route.Iface.HardwareAddr
 	arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
-	arp_pkt.ProtoSrcAddr, _ = routing.GetIfaceIPv4Addr(route.Iface)
+	arp_pkt.ProtoSrcAddr, _ = route.GetIfaceIPv4Addr()
 	arp_pkt.ProtoDstAddr = addr_ip
 
 	pkt, err := network.SendRecv(c, timeout, eth_pkt, arp_pkt)

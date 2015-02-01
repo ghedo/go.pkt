@@ -106,7 +106,9 @@ func RouteTo(dst net.IP) (*Route, error) {
 }
 
 // Return the default IPv4 address of a network interface.
-func GetIfaceIPv4Addr(iface *net.Interface) (net.IP, error) {
+func (r *Route) GetIfaceIPv4Addr() (net.IP, error) {
+	iface := r.Iface
+
 	addrs, err := iface.Addrs();
 	if err != nil {
 		return nil, err
@@ -124,7 +126,9 @@ func GetIfaceIPv4Addr(iface *net.Interface) (net.IP, error) {
 }
 
 // Return the default IPv6 address of a network interface.
-func GetIfaceIPv6Addr(iface *net.Interface) (net.IP, error) {
+func (r *Route) GetIfaceIPv6Addr() (net.IP, error) {
+	iface := r.Iface
+
 	addrs, err := iface.Addrs();
 	if err != nil {
 		return nil, err
