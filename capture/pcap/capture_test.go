@@ -30,6 +30,8 @@
 
 package pcap_test
 
+import "log"
+
 import "github.com/ghedo/go.pkt/capture/pcap"
 
 func ExampleCapture() {
@@ -53,7 +55,7 @@ func ExampleCapture() {
 			log.Fatal(err)
 		}
 
-		log.Println("PACKET!!!")
+		log.Println("PACKET!!! %v", buf)
 
 		// do something with the packet
 	}
