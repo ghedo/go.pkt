@@ -38,6 +38,7 @@
  */
 
 typedef unsigned int bpf_u_int32; /* cgo is stupid... */
+typedef unsigned char u_char; /* oh, so stupid... */
 
 struct bpf_program {
 	unsigned int    bf_len; /* u_int */
