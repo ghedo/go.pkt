@@ -114,6 +114,14 @@ func TestMatch(t *testing.T) {
 	}
 }
 
+func BenchmarkMatch(b *testing.B) {
+	port, _ := filter.Compile("port 8338", packet.Eth)
+
+	for n := 0; n < b.N; n++ {
+		port.Match(test_eth_ipv4_tcp);
+	}
+}
+
 func ExampleFilter() {
 	// Match UDP or TCP packets on top of Ethernet
 	flt, err := filter.Compile("udp or tcp", packet.Eth)
