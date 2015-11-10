@@ -58,7 +58,7 @@ func Routes() ([]*Route, error) {
 
 	msgs, err := syscall.ParseNetlinkMessage(rib)
 	if err != nil {
-		return nil, fmt.Errorf("Could not parse messages: %s")
+		return nil, fmt.Errorf("Could not parse messages: %s", err)
 	}
 
 	for _, m := range msgs {
