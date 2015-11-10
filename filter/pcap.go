@@ -47,9 +47,6 @@ func Compile(filter string, link_type packet.Type) (*Filter, error) {
 	fil_str := C.CString(filter)
 	defer C.free(unsafe.Pointer(fil_str))
 
-	err_str := (*C.char)(C.calloc(256, 1))
-	defer C.free(unsafe.Pointer(err_str))
-
 	pcap_type := link_type.ToLinkType()
 
 	err := C.pcap_compile_nopcap(
