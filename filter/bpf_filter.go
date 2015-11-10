@@ -40,6 +40,7 @@ import "C"
 
 import "fmt"
 import "strings"
+import "syscall"
 import "unsafe"
 
 type Filter struct {
@@ -49,41 +50,41 @@ type Filter struct {
 type Code uint16
 
 const (
-	LD Code = 0x00
-	LDX     = 0x01
-	ST      = 0x02
-	STX     = 0x03
-	ALU     = 0x04
-	JMP     = 0x05
-	RET     = 0x06
-	MISC    = 0x07
+	LD Code = syscall.BPF_LD
+	LDX     = syscall.BPF_LDX
+	ST      = syscall.BPF_ST
+	STX     = syscall.BPF_STX
+	ALU     = syscall.BPF_ALU
+	JMP     = syscall.BPF_JMP
+	RET     = syscall.BPF_RET
+	MISC    = syscall.BPF_MISC
 )
 
 type Size uint16
 
 const (
-	Word Size = 0x00
-	Half      = 0x08
-	Byte      = 0x10
+	Word Size = syscall.BPF_W
+	Half      = syscall.BPF_H
+	Byte      = syscall.BPF_B
 )
 
 type Mode uint16
 
 const (
-	IMM Mode = 0x00
-	ABS      = 0x20
-	IND      = 0x40
-	MEM      = 0x60
-	LEN      = 0x80
-	MSH      = 0xa0
+	IMM Mode = syscall.BPF_IMM
+	ABS      = syscall.BPF_ABS
+	IND      = syscall.BPF_IND
+	MEM      = syscall.BPF_MEM
+	LEN      = syscall.BPF_LEN
+	MSH      = syscall.BPF_MSH
 )
 
 type Src uint16
 
 const (
-	Const Src = 0x00
-	Index     = 0x08
-	Acc       = 0x10
+	Const Src = syscall.BPF_K
+	Index     = syscall.BPF_X
+	Acc       = syscall.BPF_A
 )
 
 // Try to match the given buffer against the filter.
