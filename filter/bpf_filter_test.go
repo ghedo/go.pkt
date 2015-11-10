@@ -115,10 +115,10 @@ func TestMatch(t *testing.T) {
 }
 
 func BenchmarkMatch(b *testing.B) {
-	port, _ := filter.Compile("port 8338", packet.Eth)
+	test_filter, _ := filter.Compile("port 8338", packet.Eth)
 
 	for n := 0; n < b.N; n++ {
-		port.Match(test_eth_ipv4_tcp);
+		test_filter.Match(test_eth_ipv4_tcp)
 	}
 }
 
