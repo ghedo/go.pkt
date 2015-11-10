@@ -103,7 +103,7 @@ Options:
 	if args["<expression>"] != nil {
 		expr := args["<expression>"].(string)
 
-		flt, err := filter.Compile(expr, src.LinkType())
+		flt, err := filter.Compile(expr, src.LinkType(), false)
 		if err != nil {
 			log.Fatalf("Error parsing filter: %s", err)
 		}

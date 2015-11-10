@@ -41,7 +41,15 @@ import "unsafe"
 import "github.com/ghedo/go.pkt/packet"
 
 // Compile the given tcpdump-like expression to a BPF filter.
-func Compile(filter string, link_type packet.Type) (*Filter, error) {
+func Compile(filter string, link_type packet.Type, optimize bool) (*Filter, error) {
+	var do_optimize int
+
+	if optimize {
+		do_optimize = 1
+	} else {
+		do_optimize = 0
+	}
+
 	f := &Filter{}
 
 	filter_str := C.CString(filter)
@@ -52,7 +60,7 @@ func Compile(filter string, link_type packet.Type) (*Filter, error) {
 	err := C.pcap_compile_nopcap(
 		C.int(0x7fff), C.int(pcap_type),
 		(*C.struct_bpf_program)(f.Program()),
-		filter_str, 0, 0xffffffff,
+		filter_str, C.int(do_optimize), 0xffffffff,
 	)
 	if err < 0 {
 		return nil, fmt.Errorf("Could not compile filter")

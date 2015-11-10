@@ -69,7 +69,7 @@ func TestCaptureFilter(t *testing.T) {
 	}
 	defer src.Close()
 
-	flt, err := filter.Compile("arp", src.LinkType())
+	flt, err := filter.Compile("arp", src.LinkType(), false)
 	if err != nil {
 		t.Fatalf("Error parsing filter: %s", err)
 	}

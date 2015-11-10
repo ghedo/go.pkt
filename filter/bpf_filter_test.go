@@ -66,7 +66,7 @@ var test_eth_ipv4_tcp = []byte{
 }
 
 func TestMatch(t *testing.T) {
-	arp, err := filter.Compile("arp", packet.Eth)
+	arp, err := filter.Compile("arp", packet.Eth, false)
 	if err != nil {
 		t.Fatalf("Error compiling arp")
 	}
@@ -75,12 +75,12 @@ func TestMatch(t *testing.T) {
 		t.Fatalf("Invalid filter ARP\n%s", arp)
 	}
 
-	udp, err := filter.Compile("udp", packet.Eth)
+	udp, err := filter.Compile("udp", packet.Eth, false)
 	if err != nil {
 		t.Fatalf("Error compiling udp")
 	}
 
-	port, err := filter.Compile("port 8338", packet.Eth)
+	port, err := filter.Compile("port 8338", packet.Eth, false)
 	if err != nil {
 		t.Fatalf("Error compiling port")
 	}
@@ -115,7 +115,7 @@ func TestMatch(t *testing.T) {
 }
 
 func BenchmarkMatch(b *testing.B) {
-	test_filter, _ := filter.Compile("port 8338", packet.Eth)
+	test_filter, _ := filter.Compile("port 8338", packet.Eth, false)
 
 	for n := 0; n < b.N; n++ {
 		test_filter.Match(test_eth_ipv4_tcp)
@@ -124,7 +124,7 @@ func BenchmarkMatch(b *testing.B) {
 
 func ExampleFilter() {
 	// Match UDP or TCP packets on top of Ethernet
-	flt, err := filter.Compile("udp or tcp", packet.Eth)
+	flt, err := filter.Compile("udp or tcp", packet.Eth, false)
 	if err != nil {
 		log.Fatal(err)
 	}
