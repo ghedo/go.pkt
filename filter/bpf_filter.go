@@ -99,6 +99,15 @@ func (f *Filter) Match(buf []byte) bool {
 	return false
 }
 
+// Run filter on the given buffer and return its result.
+func (f *Filter) Filter(buf []byte) uint {
+	cbuf := (*C.char)(unsafe.Pointer(&buf[0]))
+	blen := C.uint(len(buf))
+
+	rc := C.bpf_filter(f.program.bf_insns, cbuf, blen, blen)
+	return uint(rc)
+}
+
 // Validate the filter. The constraints are that each jump be forward and to a
 // valid code. The code must terminate with either an accept or reject.
 func (f *Filter) Validate() bool {
