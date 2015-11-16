@@ -99,6 +99,43 @@ func TestCaptureFilter(t *testing.T) {
 	}
 }
 
+func TestInject(t *testing.T) {
+	src, err := file.Open("capture_test.pcap")
+	if err != nil {
+		t.Fatalf("Error opening: %s", err)
+	}
+	defer src.Close()
+
+	dst, err := file.Open("inject_test.pcap")
+	if err != nil {
+		t.Fatalf("Error opening: %s", err)
+	}
+	defer dst.Close()
+
+	var count uint64
+	for {
+		buf, err := src.Capture()
+		if err != nil {
+			t.Fatalf("Error reading: %s", err)
+		}
+
+		if buf == nil {
+			break
+		}
+
+		err = dst.Inject(buf)
+		if err != nil {
+			t.Fatalf("Error writing: %s", err)
+		}
+
+		count++
+	}
+
+	if count != 16 {
+		t.Fatalf("Count mismatch: %d", count)
+	}
+}
+
 func ExampleCapture() {
 	src, err := file.Open("/path/to/file/dump.pcap")
 	if err != nil {
