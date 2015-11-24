@@ -112,6 +112,8 @@ var pcap_link_type_to_type_map = [][2]uint32{
 	{   1, uint32(Eth)      },
 	{ 113, uint32(SLL)      },
 	{ 127, uint32(RadioTap) },
+	{ 228, uint32(IPv4)     },
+	{ 229, uint32(IPv6)     },
 }
 
 // Create a new type from the given PCAP link type.
