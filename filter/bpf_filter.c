@@ -46,6 +46,10 @@
 #define BPF_ALIGN
 #endif
 
+#define EXTRACT_BYTE(p)\
+	((u_int8_t)\
+		((u_int8_t)*((u_char *)p)))
+
 #ifndef BPF_ALIGN
 #define EXTRACT_SHORT(p)	((u_int16_t)ntohs(*(u_int16_t *)p))
 #define EXTRACT_LONG(p)		(ntohl(*(u_int32_t *)p))
@@ -122,7 +126,7 @@ bpf_filter(const struct bpf_insn *pc, char *p, u_int wirelen, u_int buflen)
 			if (k >= buflen) {
 				return (0);
 			}
-			A = p[k];
+			A = EXTRACT_BYTE(&p[k]);
 			continue;
 
 		case BPF_LD|BPF_W|BPF_LEN:
@@ -161,7 +165,7 @@ bpf_filter(const struct bpf_insn *pc, char *p, u_int wirelen, u_int buflen)
 			if (pc->k >= buflen || X >= buflen - pc->k) {
 				return (0);
 			}
-			A = p[k];
+			A = EXTRACT_BYTE(&p[k]);
 			continue;
 
 		case BPF_LDX|BPF_MSH|BPF_B:
