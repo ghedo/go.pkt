@@ -38,9 +38,9 @@ import "github.com/docopt/docopt-go"
 import "github.com/ghedo/go.pkt/routing"
 
 func main() {
-	log.SetFlags(0)
+    log.SetFlags(0)
 
-	usage := `Usage: route [options] [<dest_addr>]
+    usage := `Usage: route [options] [<dest_addr>]
 
 Find the best route on the local routing table to the given destination IP
 address (or dump all routes).
@@ -48,36 +48,36 @@ address (or dump all routes).
 Options:
   -a  Dump all routes.`
 
-	args, err := docopt.Parse(usage, nil, true, "", false)
-	if err != nil {
-		log.Fatalf("Invalid arguments: %s", err)
-	}
+    args, err := docopt.Parse(usage, nil, true, "", false)
+    if err != nil {
+        log.Fatalf("Invalid arguments: %s", err)
+    }
 
-	if args["-a"].(bool) {
-		routes, err := routing.Routes()
-		if err != err {
-			log.Fatalf("Error: %s", err)
-		}
+    if args["-a"].(bool) {
+        routes, err := routing.Routes()
+        if err != err {
+            log.Fatalf("Error: %s", err)
+        }
 
-		for _, r := range routes {
-			log.Println(r)
-		}
+        for _, r := range routes {
+            log.Println(r)
+        }
 
-		return
-	}
+        return
+    }
 
-	if args["<dest_addr>"] == nil {
-		log.Fatalf("Must pass destination address")
-	}
+    if args["<dest_addr>"] == nil {
+        log.Fatalf("Must pass destination address")
+    }
 
-	route, err := routing.RouteTo(net.ParseIP(args["<dest_addr>"].(string)))
-	if err != nil {
-		log.Fatalf("Error: %s", err)
-	}
+    route, err := routing.RouteTo(net.ParseIP(args["<dest_addr>"].(string)))
+    if err != nil {
+        log.Fatalf("Error: %s", err)
+    }
 
-	if route != nil {
-		log.Println(route)
-	} else {
-		log.Println("No route found")
-	}
+    if route != nil {
+        log.Println(route)
+    } else {
+        log.Println("No route found")
+    }
 }

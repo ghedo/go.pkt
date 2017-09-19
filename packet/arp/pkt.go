@@ -37,127 +37,127 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/eth"
 
 type Packet struct {
-	Operation     Operation        `string:"op"`
+    Operation     Operation        `string:"op"`
 
-	HWType        uint16
-	HWAddrLen     uint8            `string:"hwlen"`
-	HWSrcAddr     net.HardwareAddr `string:"hwsrc"`
-	HWDstAddr     net.HardwareAddr `string:"hwdst"`
+    HWType        uint16
+    HWAddrLen     uint8            `string:"hwlen"`
+    HWSrcAddr     net.HardwareAddr `string:"hwsrc"`
+    HWDstAddr     net.HardwareAddr `string:"hwdst"`
 
-	ProtoType     eth.EtherType    `string:"ptype"`
-	ProtoAddrLen  uint8            `string:"plen"`
-	ProtoSrcAddr  net.IP           `string:"psrc"`
-	ProtoDstAddr  net.IP           `string:"pdst"`
+    ProtoType     eth.EtherType    `string:"ptype"`
+    ProtoAddrLen  uint8            `string:"plen"`
+    ProtoSrcAddr  net.IP           `string:"psrc"`
+    ProtoDstAddr  net.IP           `string:"pdst"`
 }
 
 type Operation uint16
 
 const (
-	Request Operation = 1
-	Reply             = 2
+    Request Operation = 1
+    Reply             = 2
 )
 
 func Make() *Packet {
-	return &Packet {
-		Operation: Request,
+    return &Packet {
+        Operation: Request,
 
-		HWType: 1,
-		HWAddrLen: 6,
+        HWType: 1,
+        HWAddrLen: 6,
 
-		ProtoType: eth.IPv4,
-		ProtoAddrLen: 4,
-	}
+        ProtoType: eth.IPv4,
+        ProtoAddrLen: 4,
+    }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.ARP
+    return packet.ARP
 }
 
 func (p *Packet) GetLength() uint16 {
-	return 8 + uint16(p.HWAddrLen) * 2 + uint16(p.ProtoAddrLen) * 2
+    return 8 + uint16(p.HWAddrLen) * 2 + uint16(p.ProtoAddrLen) * 2
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	if other == nil || other.GetType() != packet.ARP {
-		return false
-	}
+    if other == nil || other.GetType() != packet.ARP {
+        return false
+    }
 
-	if p.Operation == Reply && other.(*Packet).Operation == Request &&
-	   p.ProtoSrcAddr.Equal(other.(*Packet).ProtoDstAddr) {
-		return true
-	}
+    if p.Operation == Reply && other.(*Packet).Operation == Request &&
+       p.ProtoSrcAddr.Equal(other.(*Packet).ProtoDstAddr) {
+        return true
+    }
 
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteN(p.HWType)
-	buf.WriteN(p.ProtoType)
+    buf.WriteN(p.HWType)
+    buf.WriteN(p.ProtoType)
 
-	buf.WriteN(p.HWAddrLen)
-	buf.WriteN(p.ProtoAddrLen)
+    buf.WriteN(p.HWAddrLen)
+    buf.WriteN(p.ProtoAddrLen)
 
-	buf.WriteN(p.Operation)
+    buf.WriteN(p.Operation)
 
-	buf.Write(p.HWSrcAddr[len(p.HWSrcAddr) - int(p.HWAddrLen):])
-	buf.Write(p.ProtoSrcAddr[len(p.ProtoSrcAddr) - int(p.ProtoAddrLen):])
+    buf.Write(p.HWSrcAddr[len(p.HWSrcAddr) - int(p.HWAddrLen):])
+    buf.Write(p.ProtoSrcAddr[len(p.ProtoSrcAddr) - int(p.ProtoAddrLen):])
 
-	buf.Write(p.HWDstAddr[len(p.HWDstAddr) - int(p.HWAddrLen):])
-	buf.Write(p.ProtoDstAddr[len(p.ProtoDstAddr) - int(p.ProtoAddrLen):])
+    buf.Write(p.HWDstAddr[len(p.HWDstAddr) - int(p.HWAddrLen):])
+    buf.Write(p.ProtoDstAddr[len(p.ProtoDstAddr) - int(p.ProtoAddrLen):])
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.HWType)
-	buf.ReadN(&p.ProtoType)
+    buf.ReadN(&p.HWType)
+    buf.ReadN(&p.ProtoType)
 
-	buf.ReadN(&p.HWAddrLen)
-	buf.ReadN(&p.ProtoAddrLen)
+    buf.ReadN(&p.HWAddrLen)
+    buf.ReadN(&p.ProtoAddrLen)
 
-	buf.ReadN(&p.Operation)
+    buf.ReadN(&p.Operation)
 
-	p.HWSrcAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
-	p.ProtoSrcAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))
+    p.HWSrcAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
+    p.ProtoSrcAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))
 
-	p.HWDstAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
-	p.ProtoDstAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))
+    p.HWDstAddr = net.HardwareAddr(buf.Next(int(p.HWAddrLen)))
+    p.ProtoDstAddr = net.IP(buf.Next(int(p.ProtoAddrLen)))
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return nil
+    return nil
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return packet.None
+    return packet.None
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }
 
 func (o Operation) String() string {
-	switch o {
-	case Request:
-		return "request"
+    switch o {
+    case Request:
+        return "request"
 
-	case Reply:
-		return "reply"
+    case Reply:
+        return "reply"
 
-	default:
-		return "invalid"
-	}
+    default:
+        return "invalid"
+    }
 }

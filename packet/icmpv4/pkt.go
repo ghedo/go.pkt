@@ -37,152 +37,152 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/ipv4"
 
 type Packet struct {
-	Type        Type
-	Code        Code
-	Checksum    uint16        `string:"sum"`
-	Id          uint16
-	Seq         uint16
-	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
+    Type        Type
+    Code        Code
+    Checksum    uint16        `string:"sum"`
+    Id          uint16
+    Seq         uint16
+    pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Type uint8
 type Code uint8
 
 const (
-	EchoReply Type = iota
-	Reserved1
-	Reserved2
-	DstUnreachable
-	SrcQuench
-	RedirectMsg
-	Reserved3
-	Reserved4
-	EchoRequest
-	RouterAdv
-	RouterSol
-	TimeExceeded
-	ParamProblem
-	Timestamp
-	TimestampReply
-	InfoRequest
-	InfoReply
-	AddrMaskRequest
-	AddrMaskReply
+    EchoReply Type = iota
+    Reserved1
+    Reserved2
+    DstUnreachable
+    SrcQuench
+    RedirectMsg
+    Reserved3
+    Reserved4
+    EchoRequest
+    RouterAdv
+    RouterSol
+    TimeExceeded
+    ParamProblem
+    Timestamp
+    TimestampReply
+    InfoRequest
+    InfoReply
+    AddrMaskRequest
+    AddrMaskReply
 )
 
 func Make() *Packet {
-	return &Packet{
-		Type: EchoRequest,
-	}
+    return &Packet{
+        Type: EchoRequest,
+    }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.ICMPv4
+    return packet.ICMPv4
 }
 
 func (p *Packet) GetLength() uint16 {
-	return 8
+    return 8
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	if other == nil || other.GetType() != packet.ICMPv4 {
-		return false
-	}
+    if other == nil || other.GetType() != packet.ICMPv4 {
+        return false
+    }
 
-	if (other.(*Packet).Type == EchoRequest && p.Type == EchoReply) ||
-	   (other.(*Packet).Type == Timestamp && p.Type == TimestampReply) ||
-	   (other.(*Packet).Type == InfoRequest && p.Type == InfoReply) ||
-	   (other.(*Packet).Type == AddrMaskRequest && p.Type == AddrMaskReply) {
-		return (other.(*Packet).Seq == p.Seq) &&
-		       (other.(*Packet).Id == p.Id)
-	}
+    if (other.(*Packet).Type == EchoRequest && p.Type == EchoReply) ||
+       (other.(*Packet).Type == Timestamp && p.Type == TimestampReply) ||
+       (other.(*Packet).Type == InfoRequest && p.Type == InfoReply) ||
+       (other.(*Packet).Type == AddrMaskRequest && p.Type == AddrMaskReply) {
+        return (other.(*Packet).Seq == p.Seq) &&
+               (other.(*Packet).Id == p.Id)
+    }
 
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteN(byte(p.Type))
-	buf.WriteN(byte(p.Code))
-	buf.WriteN(uint16(0x0000))
-	buf.WriteN(p.Id)
-	buf.WriteN(p.Seq)
+    buf.WriteN(byte(p.Type))
+    buf.WriteN(byte(p.Code))
+    buf.WriteN(uint16(0x0000))
+    buf.WriteN(p.Id)
+    buf.WriteN(p.Seq)
 
-	p.Checksum = ipv4.CalculateChecksum(buf.LayerBytes(), 0)
-	buf.PutUint16N(2, p.Checksum)
+    p.Checksum = ipv4.CalculateChecksum(buf.LayerBytes(), 0)
+    buf.PutUint16N(2, p.Checksum)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.Type)
-	buf.ReadN(&p.Code)
-	buf.ReadN(&p.Checksum)
-	buf.ReadN(&p.Id)
-	buf.ReadN(&p.Seq)
+    buf.ReadN(&p.Type)
+    buf.ReadN(&p.Code)
+    buf.ReadN(&p.Checksum)
+    buf.ReadN(&p.Id)
+    buf.ReadN(&p.Seq)
 
-	/* TODO: data */
+    /* TODO: data */
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	switch p.Type {
-	case DstUnreachable, SrcQuench, RedirectMsg, TimeExceeded, ParamProblem:
-		return packet.IPv4
-	}
+    switch p.Type {
+    case DstUnreachable, SrcQuench, RedirectMsg, TimeExceeded, ParamProblem:
+        return packet.IPv4
+    }
 
-	return packet.None
+    return packet.None
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	switch p.Type {
-	case DstUnreachable, SrcQuench, RedirectMsg, TimeExceeded, ParamProblem:
-		p.pkt_payload = pl
-	}
+    switch p.Type {
+    case DstUnreachable, SrcQuench, RedirectMsg, TimeExceeded, ParamProblem:
+        p.pkt_payload = pl
+    }
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }
 
 func (t Type) String() string {
-	switch t {
-	case EchoReply:         return "echo-reply"
-	case DstUnreachable:    return "dst-unreach"
-	case SrcQuench:         return "src-quench"
-	case RedirectMsg:       return "redirect"
-	case EchoRequest:       return "echo-request"
-	case RouterAdv:         return "router-adv"
-	case RouterSol:         return "router-sol"
-	case TimeExceeded:      return "time-exceeded"
-	case ParamProblem:      return "param-problem"
-	case Timestamp:         return "timestamp-request"
-	case TimestampReply:    return "timestamp-reply"
-	case InfoRequest:       return "info-request"
-	case InfoReply:         return "info-reply"
-	case AddrMaskRequest:   return "addr-mask-request"
-	case AddrMaskReply:     return "addr-mask-reply"
-	default:                return "unknown"
-	}
+    switch t {
+    case EchoReply:         return "echo-reply"
+    case DstUnreachable:    return "dst-unreach"
+    case SrcQuench:         return "src-quench"
+    case RedirectMsg:       return "redirect"
+    case EchoRequest:       return "echo-request"
+    case RouterAdv:         return "router-adv"
+    case RouterSol:         return "router-sol"
+    case TimeExceeded:      return "time-exceeded"
+    case ParamProblem:      return "param-problem"
+    case Timestamp:         return "timestamp-request"
+    case TimestampReply:    return "timestamp-reply"
+    case InfoRequest:       return "info-request"
+    case InfoReply:         return "info-reply"
+    case AddrMaskRequest:   return "addr-mask-request"
+    case AddrMaskReply:     return "addr-mask-reply"
+    default:                return "unknown"
+    }
 }
 
 func (c Code) String() string {
-	if c != 0 {
-		return fmt.Sprintf("%x", uint8(c))
-	}
+    if c != 0 {
+        return fmt.Sprintf("%x", uint8(c))
+    }
 
-	return ""
+    return ""
 }

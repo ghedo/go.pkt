@@ -39,79 +39,79 @@ import "github.com/ghedo/go.pkt/packet/ipv4"
 import "github.com/ghedo/go.pkt/packet/ipv6"
 
 var test_simple = []byte{
-	0x63, 0x0d, 0x5b, 0x0a, 0x00, 0x08, 0x11, 0x40, 0xfe, 0x80, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x4e, 0x72, 0xb9, 0xff, 0xfe, 0x54, 0xe5, 0x3d,
-	0x07, 0x9a, 0x19, 0xb9, 0x11, 0x15, 0xed, 0x67, 0x99, 0xf5, 0xf0, 0x7a,
-	0x66, 0x87, 0x5b, 0x0f,
+    0x63, 0x0d, 0x5b, 0x0a, 0x00, 0x08, 0x11, 0x40, 0xfe, 0x80, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x4e, 0x72, 0xb9, 0xff, 0xfe, 0x54, 0xe5, 0x3d,
+    0x07, 0x9a, 0x19, 0xb9, 0x11, 0x15, 0xed, 0x67, 0x99, 0xf5, 0xf0, 0x7a,
+    0x66, 0x87, 0x5b, 0x0f,
 }
 
 var ipsrc_str = "fe80::4e72:b9ff:fe54:e53d"
 var ipdst_str = "79a:19b9:1115:ed67:99f5:f07a:6687:5b0f"
 
 func MakeTestSimple() *ipv6.Packet {
-	return &ipv6.Packet{
-		Version: 6,
-		Class: 48,
-		Label: 875274,
-		Length: 8,
-		NextHdr: ipv4.UDP,
-		HopLimit: 64,
-		SrcAddr: net.ParseIP(ipsrc_str),
-		DstAddr: net.ParseIP(ipdst_str),
-	}
+    return &ipv6.Packet{
+        Version: 6,
+        Class: 48,
+        Label: 875274,
+        Length: 8,
+        NextHdr: ipv4.UDP,
+        HopLimit: 64,
+        SrcAddr: net.ParseIP(ipsrc_str),
+        DstAddr: net.ParseIP(ipdst_str),
+    }
 }
 
 func TestPack(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	err := p.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := p.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_simple, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_simple, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func BenchmarkPack(bn *testing.B) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	for n := 0; n < bn.N; n++ {
-		p.Pack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        p.Pack(&b)
+    }
 }
 
 func TestUnpack(t *testing.T) {
-	var p ipv6.Packet
+    var p ipv6.Packet
 
-	cmp := MakeTestSimple()
+    cmp := MakeTestSimple()
 
-	var b packet.Buffer
-	b.Init(test_simple)
+    var b packet.Buffer
+    b.Init(test_simple)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p ipv6.Packet
-	var b packet.Buffer
+    var p ipv6.Packet
+    var b packet.Buffer
 
-	for n := 0; n < bn.N; n++ {
-		b.Init(test_simple)
-		p.Unpack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        b.Init(test_simple)
+        p.Unpack(&b)
+    }
 }

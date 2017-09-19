@@ -35,65 +35,65 @@ import "C"
 
 // A Builder is used to compile a BPF filter from basic BPF instructions.
 type Builder struct {
-	filter    *Filter
-	labels    map[string]int
+    filter    *Filter
+    labels    map[string]int
 
-	jumps_k  map[int]string
-	jumps_jt map[int]string
-	jumps_jf map[int]string
+    jumps_k  map[int]string
+    jumps_jt map[int]string
+    jumps_jf map[int]string
 }
 
 // Allocate and initialize a new Builder.
 func NewBuilder() *Builder {
-	b := &Builder{}
+    b := &Builder{}
 
-	b.filter   = &Filter{}
-	b.labels   = make(map[string]int)
-	b.jumps_k  = make(map[int]string)
-	b.jumps_jt = make(map[int]string)
-	b.jumps_jf = make(map[int]string)
+    b.filter   = &Filter{}
+    b.labels   = make(map[string]int)
+    b.jumps_k  = make(map[int]string)
+    b.jumps_jt = make(map[int]string)
+    b.jumps_jf = make(map[int]string)
 
-	return b
+    return b
 }
 
 // Generate and return the Filter associated with the Builder.
 func (b *Builder) Build() *Filter {
-	prog := (*C.struct_bpf_program)(b.filter.Program())
-	flen := int(C.bpf_get_len(prog))
+    prog := (*C.struct_bpf_program)(b.filter.Program())
+    flen := int(C.bpf_get_len(prog))
 
-	for i := 0; i < flen; i++ {
-		insn := C.bpf_get_insn(prog, C.int(i))
+    for i := 0; i < flen; i++ {
+        insn := C.bpf_get_insn(prog, C.int(i))
 
-		if lbl, ok := b.jumps_k[i]; ok {
-			addr := b.labels[lbl]
-			if addr != 0 {
-				insn.k = C.bpf_u_int32(addr - i - 1)
-			}
-		}
+        if lbl, ok := b.jumps_k[i]; ok {
+            addr := b.labels[lbl]
+            if addr != 0 {
+                insn.k = C.bpf_u_int32(addr - i - 1)
+            }
+        }
 
-		if lbl, ok := b.jumps_jt[i]; ok {
-			addr := b.labels[lbl]
-			if addr != 0 {
-				insn.jt = C.u_char(addr - i - 1)
-			}
-		}
+        if lbl, ok := b.jumps_jt[i]; ok {
+            addr := b.labels[lbl]
+            if addr != 0 {
+                insn.jt = C.u_char(addr - i - 1)
+            }
+        }
 
-		if lbl, ok := b.jumps_jf[i]; ok {
-			addr := b.labels[lbl]
-			if addr != 0  {
-				insn.jf = C.u_char(addr - i - 1)
-			}
-		}
-	}
+        if lbl, ok := b.jumps_jf[i]; ok {
+            addr := b.labels[lbl]
+            if addr != 0  {
+                insn.jf = C.u_char(addr - i - 1)
+            }
+        }
+    }
 
-	return b.filter
+    return b.filter
 }
 
 // Define a new label at the next instruction position. Labels are used in jump
 // instructions to identify the jump target.
 func (b *Builder) Label(name string) *Builder {
-	b.labels[name] = b.filter.Len()
-	return b
+    b.labels[name] = b.filter.Len()
+    return b
 }
 
 // Append an LD instruction to the filter, which loads a value of size s into
@@ -102,9 +102,9 @@ func (b *Builder) Label(name string) *Builder {
 // offset), IND (load packet data at the given relative offset), LEN (load the
 // packet length or MEM (load a value from memory at the given offset).
 func (b *Builder) LD(s Size, m Mode, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(m)) | LD
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(m)) | LD
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append a LDX (load index) instruction to the filter, which loads a value of
@@ -113,23 +113,23 @@ func (b *Builder) LD(s Size, m Mode, val uint32) *Builder {
 // length, MEM (load a value from memory at the given offset) or MSH (load the
 // length of the IP header).
 func (b *Builder) LDX(s Size, m Mode, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(m) | LDX)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(m) | LDX)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append a ST (store) instruction to the filter, which stores the value of the
 // accumulator in memory at the given offset.
 func (b *Builder) ST(off uint32) *Builder {
-	b.filter.append_insn(ST, 0, 0, off)
-	return b
+    b.filter.append_insn(ST, 0, 0, off)
+    return b
 }
 
 // Append a STX (store index) instruction to the filter, which stores the value
 // of the index register in memory at the given offset.
 func (b *Builder) STX(off uint32) *Builder {
-	b.filter.append_insn(STX, 0, 0, off)
-	return b
+    b.filter.append_insn(STX, 0, 0, off)
+    return b
 }
 
 // Append an ADD instruction to the filter, which adds a value to the
@@ -137,9 +137,9 @@ func (b *Builder) STX(off uint32) *Builder {
 // (which adds the supplied value) or Index (which adds the index register
 // value).
 func (b *Builder) ADD(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x00) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x00) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append a SUB instruction to the filter, which subtracts a value from the
@@ -147,9 +147,9 @@ func (b *Builder) ADD(s Src, val uint32) *Builder {
 // (which subtracts the supplied value) or Index (which subtracts the index
 // register value).
 func (b *Builder) SUB(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x10) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x10) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append a MUL instruction to the filter, which multiplies a value to the
@@ -157,9 +157,9 @@ func (b *Builder) SUB(s Src, val uint32) *Builder {
 // (which multiplies the supplied value) or Index (which multiplies the index
 // register value).
 func (b *Builder) MUL(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x20) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x20) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append a DIV instruction to the filter, which divides the accumulator by a
@@ -167,9 +167,9 @@ func (b *Builder) MUL(s Src, val uint32) *Builder {
 // divides by the supplied value) or Index (which divides by the index register
 // value).
 func (b *Builder) DIV(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x30) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x30) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append an AND instruction to the filter, which performs the binary "and"
@@ -177,9 +177,9 @@ func (b *Builder) DIV(s Src, val uint32) *Builder {
 // can be either Const (which uses the supplied value) or Index (which uses the
 // index register value).
 func (b *Builder) AND(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x40) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x40) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append an OR instruction to the filter, which performs the binary "or"
@@ -187,9 +187,9 @@ func (b *Builder) AND(s Src, val uint32) *Builder {
 // can be either Const (which uses the supplied value) or Index (which uses the
 // index register value).
 func (b *Builder) OR(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x50) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x50) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append an LSH instruction to the filter, which shifts to the left the
@@ -197,9 +197,9 @@ func (b *Builder) OR(s Src, val uint32) *Builder {
 // be either Const (which shifts by the supplied value) or Index (which shifts
 // by the index register value).
 func (b *Builder) LSH(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x60) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x60) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append an RSH instruction to the filter, which shifts to the right the
@@ -207,72 +207,72 @@ func (b *Builder) LSH(s Src, val uint32) *Builder {
 // be either Const (which shifts by the supplied value) or Index (which shifts
 // by the index register value).
 func (b *Builder) RSH(s Src, val uint32) *Builder {
-	code := Code(uint16(s) | uint16(0x70) | ALU)
-	b.filter.append_insn(code, 0, 0, val)
-	return b
+    code := Code(uint16(s) | uint16(0x70) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
 }
 
 // Append a NEG instruction to the filter which negates the accumulator.
 func (b *Builder) NEG() *Builder {
-	code := Code(uint16(0x80) | ALU)
-	b.filter.append_insn(code, 0, 0, 0)
-	return b
+    code := Code(uint16(0x80) | ALU)
+    b.filter.append_insn(code, 0, 0, 0)
+    return b
 }
 
 // Append a JA instruction to the filter, which performs a jump to the given
 // label.
 func (b *Builder) JA(j string) *Builder {
-	b.jumps_k[b.filter.Len()] = j
+    b.jumps_k[b.filter.Len()] = j
 
-	code := Code(uint16(0x00) | JMP)
-	b.filter.append_insn(code, 0, 0, 0)
-	return b
+    code := Code(uint16(0x00) | JMP)
+    b.filter.append_insn(code, 0, 0, 0)
+    return b
 }
 
 // Append a JEQ instruction to the filter, which performs a jump to the jt label
 // if the accumulator value equals cmp (if s is Const) or the index register (if
 // s is Index), otherwise jumps to jf.
 func (b *Builder) JEQ(s Src, jt, jf string, cmp uint32) *Builder {
-	b.jumps_jt[b.filter.Len()] = jt
-	b.jumps_jf[b.filter.Len()] = jf
+    b.jumps_jt[b.filter.Len()] = jt
+    b.jumps_jf[b.filter.Len()] = jf
 
-	code := Code(uint16(s) | uint16(0x10) | JMP)
-	b.filter.append_insn(code, 0, 0, cmp)
-	return b
+    code := Code(uint16(s) | uint16(0x10) | JMP)
+    b.filter.append_insn(code, 0, 0, cmp)
+    return b
 }
 
 // Append a JGT instruction to the filter, which performs a jump to the jt label
 // if the accumulator value is greater than cmp (if s is Const) or the index
 // register (if s is Index), otherwise jumps to jf.
 func (b *Builder) JGT(s Src, jt, jf string, cmp uint32) *Builder {
-	b.jumps_jt[b.filter.Len()] = jt
-	b.jumps_jf[b.filter.Len()] = jf
+    b.jumps_jt[b.filter.Len()] = jt
+    b.jumps_jf[b.filter.Len()] = jf
 
-	code := Code(uint16(s) | uint16(0x20) | JMP)
-	b.filter.append_insn(code, 0, 0, cmp)
-	return b
+    code := Code(uint16(s) | uint16(0x20) | JMP)
+    b.filter.append_insn(code, 0, 0, cmp)
+    return b
 }
 
 // Append a JGE instruction to the filter, which performs a jump to the jt label
 // if the accumulator value is greater than or equals cmp (if s is Const) or the
 // index register (if s is Index), otherwise jumps to jf.
 func (b *Builder) JGE(s Src, jt, jf string, cmp uint32) *Builder {
-	b.jumps_jt[b.filter.Len()] = jt
-	b.jumps_jf[b.filter.Len()] = jf
+    b.jumps_jt[b.filter.Len()] = jt
+    b.jumps_jf[b.filter.Len()] = jf
 
-	code := Code(uint16(s) | uint16(0x30) | JMP)
-	b.filter.append_insn(code, 0, 0, cmp)
-	return b
+    code := Code(uint16(s) | uint16(0x30) | JMP)
+    b.filter.append_insn(code, 0, 0, cmp)
+    return b
 }
 
 // Append a JSET instruction to the filter.
 func (b *Builder) JSET(s Src, jt, jf string, cmp uint32) *Builder {
-	b.jumps_jt[b.filter.Len()] = jt
-	b.jumps_jf[b.filter.Len()] = jf
+    b.jumps_jt[b.filter.Len()] = jt
+    b.jumps_jf[b.filter.Len()] = jf
 
-	code := Code(uint16(s) | uint16(0x40) | JMP)
-	b.filter.append_insn(code, 0, 0, cmp)
-	return b
+    code := Code(uint16(s) | uint16(0x40) | JMP)
+    b.filter.append_insn(code, 0, 0, cmp)
+    return b
 }
 
 // Append a RET instruction to the filter, which terminates the filter program
@@ -280,23 +280,23 @@ func (b *Builder) JSET(s Src, jt, jf string, cmp uint32) *Builder {
 // operand type and can be either Const (which returns the supplied value) or
 // Acc (which returns the accumulator value).
 func (b *Builder) RET(s Src, bytes uint32) *Builder {
-	code := Code(uint16(s) | RET)
-	b.filter.append_insn(code, 0, 0, bytes)
-	return b
+    code := Code(uint16(s) | RET)
+    b.filter.append_insn(code, 0, 0, bytes)
+    return b
 }
 
 // Append a TAX instruction to the filter. TAX transfers the accumulator value
 // into the index register.
 func (b *Builder) TAX() *Builder {
-	code := Code(uint16(0x00) | MISC)
-	b.filter.append_insn(code, 0, 0, 0)
-	return b
+    code := Code(uint16(0x00) | MISC)
+    b.filter.append_insn(code, 0, 0, 0)
+    return b
 }
 
 // Append a TXA instruction to the filter. TXA transfers the index register
 // value into the accumulator.
 func (b *Builder) TXA() *Builder {
-	code := Code(uint16(0x80) | MISC)
-	b.filter.append_insn(code, 0, 0, 0)
-	return b
+    code := Code(uint16(0x80) | MISC)
+    b.filter.append_insn(code, 0, 0, 0)
+    return b
 }

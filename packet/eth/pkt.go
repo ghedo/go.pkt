@@ -38,173 +38,173 @@ import "net"
 import "github.com/ghedo/go.pkt/packet"
 
 type Packet struct {
-	DstAddr     net.HardwareAddr `string:"dst"`
-	SrcAddr     net.HardwareAddr `string:"src"`
-	Type        EtherType
-	Length      uint16           `cmp:"skip"`
-	pkt_payload packet.Packet    `cmp:"skip" string:"skip"`
+    DstAddr     net.HardwareAddr `string:"dst"`
+    SrcAddr     net.HardwareAddr `string:"src"`
+    Type        EtherType
+    Length      uint16           `cmp:"skip"`
+    pkt_payload packet.Packet    `cmp:"skip" string:"skip"`
 }
 
 type EtherType uint16
 
 const (
-	None EtherType = 0x0000
-	ARP            = 0x0806
-	IPv4           = 0x0800
-	IPv6           = 0x86dd
-	LLC            = 0x0001  /* pseudo ethertype */
-	LLDP           = 0x088cc
-	QinQ           = 0x88a8
-	TRILL          = 0x22f3
-	VLAN           = 0x8100
-	WoL            = 0x0842
+    None EtherType = 0x0000
+    ARP            = 0x0806
+    IPv4           = 0x0800
+    IPv6           = 0x86dd
+    LLC            = 0x0001  /* pseudo ethertype */
+    LLDP           = 0x088cc
+    QinQ           = 0x88a8
+    TRILL          = 0x22f3
+    VLAN           = 0x8100
+    WoL            = 0x0842
 )
 
 func Make() *Packet {
-	return &Packet{
-		DstAddr: make([]byte, 6),
-		SrcAddr: make([]byte, 6),
-		Length:  14,
-	}
+    return &Packet{
+        DstAddr: make([]byte, 6),
+        SrcAddr: make([]byte, 6),
+        Length:  14,
+    }
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	if other == nil || other.GetType() != packet.Eth {
-		return false
-	}
+    if other == nil || other.GetType() != packet.Eth {
+        return false
+    }
 
-	if p.Type != other.(*Packet).Type {
-		return false
-	}
+    if p.Type != other.(*Packet).Type {
+        return false
+    }
 
-	if p.Payload() != nil {
-		return p.Payload().Answers(other.Payload())
-	}
+    if p.Payload() != nil {
+        return p.Payload().Answers(other.Payload())
+    }
 
-	return true
+    return true
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.Eth
+    return packet.Eth
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 14
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 14
+    }
 
-	return 14
+    return 14
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.Write(p.DstAddr)
-	buf.Write(p.SrcAddr)
+    buf.Write(p.DstAddr)
+    buf.Write(p.SrcAddr)
 
-	if p.Type != LLC {
-		buf.WriteN(p.Type)
-	} else {
-		buf.WriteN(p.Length)
-	}
+    if p.Type != LLC {
+        buf.WriteN(p.Type)
+    } else {
+        buf.WriteN(p.Length)
+    }
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	p.DstAddr = net.HardwareAddr(buf.Next(6))
-	p.SrcAddr = net.HardwareAddr(buf.Next(6))
+    p.DstAddr = net.HardwareAddr(buf.Next(6))
+    p.SrcAddr = net.HardwareAddr(buf.Next(6))
 
-	buf.ReadN(&p.Type)
+    buf.ReadN(&p.Type)
 
-	if p.Type < 0x0600 {
-		p.Length = uint16(p.Type)
-		p.Type   = LLC
-	}
+    if p.Type < 0x0600 {
+        p.Length = uint16(p.Type)
+        p.Type   = LLC
+    }
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return EtherTypeToType(p.Type)
+    return EtherTypeToType(p.Type)
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
-	p.Type        = TypeToEtherType(pl.GetType())
+    p.pkt_payload = pl
+    p.Type        = TypeToEtherType(pl.GetType())
 
-	if p.Type < 0x0600 {
-		p.Length = p.GetLength()
-	}
+    if p.Type < 0x0600 {
+        p.Length = p.GetLength()
+    }
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }
 
 var ethertype_to_type_map = map[EtherType]packet.Type{
-	None:  packet.None,
-	ARP:   packet.ARP,
-	IPv4:  packet.IPv4,
-	IPv6:  packet.IPv6,
-	LLC:   packet.LLC,
-	LLDP:  packet.LLDP,
-	VLAN:  packet.VLAN,
-	QinQ:  packet.VLAN,
-	TRILL: packet.TRILL,
-	WoL:   packet.WoL,
+    None:  packet.None,
+    ARP:   packet.ARP,
+    IPv4:  packet.IPv4,
+    IPv6:  packet.IPv6,
+    LLC:   packet.LLC,
+    LLDP:  packet.LLDP,
+    VLAN:  packet.VLAN,
+    QinQ:  packet.VLAN,
+    TRILL: packet.TRILL,
+    WoL:   packet.WoL,
 }
 
 // Create a new Type from the given EtherType.
 func EtherTypeToType(ethertype EtherType) packet.Type {
-	for e, t := range ethertype_to_type_map {
-		if e == ethertype {
-			return t
-		}
-	}
+    for e, t := range ethertype_to_type_map {
+        if e == ethertype {
+            return t
+        }
+    }
 
-	return packet.Raw
+    return packet.Raw
 }
 
 // Convert the Type to the corresponding EtherType.
 func TypeToEtherType(pkttype packet.Type) EtherType {
-	/* Hack to avoid non-determinism due to map iteration ordering */
-	if pkttype == packet.VLAN {
-		return VLAN
-	}
+    /* Hack to avoid non-determinism due to map iteration ordering */
+    if pkttype == packet.VLAN {
+        return VLAN
+    }
 
-	for e, t := range ethertype_to_type_map {
-		if t == pkttype {
-			return e
-		}
-	}
+    for e, t := range ethertype_to_type_map {
+        if t == pkttype {
+            return e
+        }
+    }
 
-	return None
+    return None
 }
 
 func (t EtherType) String() string {
-	switch t {
-	case ARP:   return "ARP"
-	case IPv4:  return "IPv4"
-	case IPv6:  return "IPv6"
-	case LLC:   return "LLC"
-	case LLDP:  return "LLDP"
-	case None:  return "None"
-	case QinQ:  return "QinQ"
-	case TRILL: return "TRILL"
-	case VLAN:  return "VLAN"
-	case WoL:   return "WoL"
-	default:    return fmt.Sprintf("0x%x", uint16(t))
-	}
+    switch t {
+    case ARP:   return "ARP"
+    case IPv4:  return "IPv4"
+    case IPv6:  return "IPv6"
+    case LLC:   return "LLC"
+    case LLDP:  return "LLDP"
+    case None:  return "None"
+    case QinQ:  return "QinQ"
+    case TRILL: return "TRILL"
+    case VLAN:  return "VLAN"
+    case WoL:   return "WoL"
+    default:    return fmt.Sprintf("0x%x", uint16(t))
+    }
 }

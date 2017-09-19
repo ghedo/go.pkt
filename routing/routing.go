@@ -39,139 +39,139 @@ import "sort"
 import "strings"
 
 type Route struct {
-	Default bool
-	SrcNet  *net.IPNet
-	DstNet  *net.IPNet
-	Gateway net.IP
-	Iface   *net.Interface
+    Default bool
+    SrcNet  *net.IPNet
+    DstNet  *net.IPNet
+    Gateway net.IP
+    Iface   *net.Interface
 }
 
 type route_slice []*Route
 
 func (r route_slice) Len() int {
-	return len(r)
+    return len(r)
 }
 
 func (r route_slice) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
+    r[i], r[j] = r[j], r[i]
 }
 
 func (r route_slice) Less(i, j int) bool {
-	a := r[i]
-	b := r[j]
+    a := r[i]
+    b := r[j]
 
-	if a.Default {
-		return true
-	}
+    if a.Default {
+        return true
+    }
 
-	if b.Default {
-		return false
-	}
+    if b.Default {
+        return false
+    }
 
-	a_len, _ := a.DstNet.Mask.Size()
-	b_len, _ := b.DstNet.Mask.Size()
-	if a_len < b_len {
-		return false
-	}
+    a_len, _ := a.DstNet.Mask.Size()
+    b_len, _ := b.DstNet.Mask.Size()
+    if a_len < b_len {
+        return false
+    }
 
-	return true
+    return true
 }
 
 // Return the route that matches the given destination address.
 func RouteTo(dst net.IP) (*Route, error) {
-	var def *Route
-	var is_ipv4 bool
+    var def *Route
+    var is_ipv4 bool
 
-	is_ipv4 = dst.To4() != nil
+    is_ipv4 = dst.To4() != nil
 
-	routes, err := Routes()
-	if err != nil {
-		return nil, fmt.Errorf("Could not get routes: %s", err)
-	}
+    routes, err := Routes()
+    if err != nil {
+        return nil, fmt.Errorf("Could not get routes: %s", err)
+    }
 
-	sort.Sort(route_slice(routes))
+    sort.Sort(route_slice(routes))
 
-	for _, r := range routes {
-		if r.Default &&
-		   (is_ipv4 && r.Gateway.To4() != nil) &&
-		   r.Iface != nil &&
-		   r.Iface.Flags & net.FlagLoopback == 0 {
-			def = r
-			continue
-		}
+    for _, r := range routes {
+        if r.Default &&
+           (is_ipv4 && r.Gateway.To4() != nil) &&
+           r.Iface != nil &&
+           r.Iface.Flags & net.FlagLoopback == 0 {
+            def = r
+            continue
+        }
 
-		if r.DstNet != nil &&
-		   r.DstNet.Contains(dst) {
-			return r, nil
-		}
-	}
+        if r.DstNet != nil &&
+           r.DstNet.Contains(dst) {
+            return r, nil
+        }
+    }
 
-	return def, nil
+    return def, nil
 }
 
 // Return the default IPv4 address of a network interface.
 func (r *Route) GetIfaceIPv4Addr() (net.IP, error) {
-	iface := r.Iface
+    iface := r.Iface
 
-	addrs, err := iface.Addrs();
-	if err != nil {
-		return nil, err
-	}
+    addrs, err := iface.Addrs();
+    if err != nil {
+        return nil, err
+    }
 
-	for _, a := range addrs {
-		if ipnet, ok := a.(*net.IPNet); ok {
-			if ip4 := ipnet.IP.To4(); ip4 != nil {
-				return ip4, nil
-			}
-		}
-	}
+    for _, a := range addrs {
+        if ipnet, ok := a.(*net.IPNet); ok {
+            if ip4 := ipnet.IP.To4(); ip4 != nil {
+                return ip4, nil
+            }
+        }
+    }
 
-	return nil, fmt.Errorf("No address found")
+    return nil, fmt.Errorf("No address found")
 }
 
 // Return the default IPv6 address of a network interface.
 func (r *Route) GetIfaceIPv6Addr() (net.IP, error) {
-	iface := r.Iface
+    iface := r.Iface
 
-	addrs, err := iface.Addrs();
-	if err != nil {
-		return nil, err
-	}
+    addrs, err := iface.Addrs();
+    if err != nil {
+        return nil, err
+    }
 
-	for _, a := range addrs {
-		if ipnet, ok := a.(*net.IPNet); ok {
-			if ip6 := ipnet.IP.To16(); ip6 != nil {
-				return ip6, nil
-			}
-		}
-	}
+    for _, a := range addrs {
+        if ipnet, ok := a.(*net.IPNet); ok {
+            if ip6 := ipnet.IP.To16(); ip6 != nil {
+                return ip6, nil
+            }
+        }
+    }
 
-	return nil, fmt.Errorf("No address found")
+    return nil, fmt.Errorf("No address found")
 }
 
 func (r *Route) String() string {
-	var parts []string
+    var parts []string
 
-	if r.Default {
-		parts = append(parts, "default")
-	} else if r.DstNet != nil {
-		parts = append(parts, r.DstNet.String())
-	}
+    if r.Default {
+        parts = append(parts, "default")
+    } else if r.DstNet != nil {
+        parts = append(parts, r.DstNet.String())
+    }
 
-	if r.SrcNet != nil {
-		src := fmt.Sprintf("from %s", r.DstNet.String())
-		parts = append(parts, src)
-	}
+    if r.SrcNet != nil {
+        src := fmt.Sprintf("from %s", r.DstNet.String())
+        parts = append(parts, src)
+    }
 
-	if r.Gateway != nil {
-		gateway := fmt.Sprintf("via %s", r.Gateway.String())
-		parts = append(parts, gateway)
-	}
+    if r.Gateway != nil {
+        gateway := fmt.Sprintf("via %s", r.Gateway.String())
+        parts = append(parts, gateway)
+    }
 
-	if r.Iface != nil {
-		iface := fmt.Sprintf("dev %s", r.Iface.Name)
-		parts = append(parts, iface)
-	}
+    if r.Iface != nil {
+        iface := fmt.Sprintf("dev %s", r.Iface.Name)
+        parts = append(parts, iface)
+    }
 
-	return strings.Join(parts, " ")
+    return strings.Join(parts, " ")
 }

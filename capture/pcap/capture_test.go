@@ -35,49 +35,49 @@ import "log"
 import "github.com/ghedo/go.pkt/capture/pcap"
 
 func ExampleCapture() {
-	src, err := pcap.Open("eth0")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer src.Close()
+    src, err := pcap.Open("eth0")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer src.Close()
 
-	// you may configure the source further, e.g. by activating
-	// promiscuous mode.
+    // you may configure the source further, e.g. by activating
+    // promiscuous mode.
 
-	err = src.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
+    err = src.Activate()
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	for {
-		buf, err := src.Capture()
-		if err != nil {
-			log.Fatal(err)
-		}
+    for {
+        buf, err := src.Capture()
+        if err != nil {
+            log.Fatal(err)
+        }
 
-		log.Println("PACKET!!! %v", buf)
+        log.Println("PACKET!!! %v", buf)
 
-		// do something with the packet
-	}
+        // do something with the packet
+    }
 }
 
 func ExampleInject() {
-	dst, err := pcap.Open("eth0")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dst.Close()
+    dst, err := pcap.Open("eth0")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer dst.Close()
 
-	// you may configure the source further, e.g. by activating
-	// promiscuous mode.
+    // you may configure the source further, e.g. by activating
+    // promiscuous mode.
 
-	err = dst.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
+    err = dst.Activate()
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	err = dst.Inject([]byte("random data"))
-	if err != nil {
-		log.Fatal(err)
-	}
+    err = dst.Inject([]byte("random data"))
+    if err != nil {
+        log.Fatal(err)
+    }
 }

@@ -36,107 +36,107 @@ import "fmt"
 import "github.com/ghedo/go.pkt/packet"
 
 type Packet struct {
-	Version         uint8
-	Length          uint16
-	Present         Present
-	Data            []byte        `cmp:"skip" string:"skip"`
-	pkt_payload     packet.Packet `cmp:"skip" string:"skip"`
+    Version         uint8
+    Length          uint16
+    Present         Present
+    Data            []byte        `cmp:"skip" string:"skip"`
+    pkt_payload     packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Present uint32
 
 const (
-	TSFT Present = 1 << iota
-	Flags
-	Rate
-	Channel
-	FHSS
-	DbmAntSignal
-	DbmAntNoise
-	LockQuality
-	TXAttenuation
-	DbTXAttenuation
-	DbmTXPower
-	Antenna
-	DbAntSignal
-	DbAntNoise
-	EXT
+    TSFT Present = 1 << iota
+    Flags
+    Rate
+    Channel
+    FHSS
+    DbmAntSignal
+    DbmAntNoise
+    LockQuality
+    TXAttenuation
+    DbTXAttenuation
+    DbmTXPower
+    Antenna
+    DbAntSignal
+    DbAntNoise
+    EXT
 )
 
 func Make() *Packet {
-	return &Packet{
-	}
+    return &Packet{
+    }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.RadioTap
+    return packet.RadioTap
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 8 + uint16(len(p.Data))
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 8 + uint16(len(p.Data))
+    }
 
-	return 8 + uint16(len(p.Data))
+    return 8 + uint16(len(p.Data))
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteL(p.Version)
-	buf.WriteL(uint8(0x00))
-	buf.WriteL(p.Length)
-	buf.WriteL(p.Present)
+    buf.WriteL(p.Version)
+    buf.WriteL(uint8(0x00))
+    buf.WriteL(p.Length)
+    buf.WriteL(p.Present)
 
-	/* TODO: actually decode fields */
-	buf.Write(p.Data)
+    /* TODO: actually decode fields */
+    buf.Write(p.Data)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.Version)
+    buf.ReadN(&p.Version)
 
-	var pad uint8
-	buf.ReadL(&pad)
+    var pad uint8
+    buf.ReadL(&pad)
 
-	buf.ReadL(&p.Length)
-	buf.ReadL(&p.Present)
+    buf.ReadL(&p.Length)
+    buf.ReadL(&p.Present)
 
-	/* TODO: actually decode fields */
-	p.Data = buf.Next(int(p.Length) - 8)
+    /* TODO: actually decode fields */
+    p.Data = buf.Next(int(p.Length) - 8)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return packet.WiFi
+    return packet.WiFi
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
-	p.Length      = p.GetLength()
+    p.pkt_payload = pl
+    p.Length      = p.GetLength()
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }
 
 func (p Present) String() string {
-	return fmt.Sprintf("0x%x", uint32(p))
+    return fmt.Sprintf("0x%x", uint32(p))
 }

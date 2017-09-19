@@ -35,72 +35,72 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/eth"
 
 type Packet struct {
-	OUI         [3]byte
-	Type        eth.EtherType
+    OUI         [3]byte
+    Type        eth.EtherType
 
-	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
+    pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 func Make() *Packet {
-	return &Packet{ }
+    return &Packet{ }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.SNAP
+    return packet.SNAP
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 5
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 5
+    }
 
-	return 5
+    return 5
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteN(p.OUI)
-	buf.WriteN(p.Type)
+    buf.WriteN(p.OUI)
+    buf.WriteN(p.Type)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.OUI)
-	buf.ReadN(&p.Type)
+    buf.ReadN(&p.OUI)
+    buf.ReadN(&p.Type)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	if p.OUI[0] == 0x00 && p.OUI[1] == 0x00 && p.OUI[2] == 0x00 {
-		return eth.EtherTypeToType(p.Type)
-	} else {
-		return packet.Raw
-	}
+    if p.OUI[0] == 0x00 && p.OUI[1] == 0x00 && p.OUI[2] == 0x00 {
+        return eth.EtherTypeToType(p.Type)
+    } else {
+        return packet.Raw
+    }
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
-	p.Type        = eth.TypeToEtherType(pl.GetType())
+    p.pkt_payload = pl
+    p.Type        = eth.TypeToEtherType(pl.GetType())
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }

@@ -37,67 +37,67 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/raw"
 
 var test_simple = []byte{
-	0x61, 0x73, 0x64, 0x61, 0x73, 0x64, 0x20, 0x61, 0x73, 0x64, 0x20, 0x61,
-	0x73, 0x64, 0x20, 0x61, 0x73,
+    0x61, 0x73, 0x64, 0x61, 0x73, 0x64, 0x20, 0x61, 0x73, 0x64, 0x20, 0x61,
+    0x73, 0x64, 0x20, 0x61, 0x73,
 }
 
 func MakeTestSimple() *raw.Packet {
-	return &raw.Packet{
-		Data: []byte("asdasd asd asd as"),
-	}
+    return &raw.Packet{
+        Data: []byte("asdasd asd asd as"),
+    }
 }
 
 func TestPack(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	err := p.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := p.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_simple, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_simple, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func BenchmarkPack(bn *testing.B) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	for n := 0; n < bn.N; n++ {
-		p.Pack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        p.Pack(&b)
+    }
 }
 
 func TestUnpack(t *testing.T) {
-	var p raw.Packet
+    var p raw.Packet
 
-	cmp := MakeTestSimple()
+    cmp := MakeTestSimple()
 
-	var b packet.Buffer
-	b.Init(test_simple)
+    var b packet.Buffer
+    b.Init(test_simple)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p raw.Packet
-	var b packet.Buffer
+    var p raw.Packet
+    var b packet.Buffer
 
-	for n := 0; n < bn.N; n++ {
-		b.Init(test_simple)
-		p.Unpack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        b.Init(test_simple)
+        p.Unpack(&b)
+    }
 }

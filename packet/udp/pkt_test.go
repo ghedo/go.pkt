@@ -39,120 +39,120 @@ import "github.com/ghedo/go.pkt/packet/ipv4"
 import "github.com/ghedo/go.pkt/packet/udp"
 
 var test_simple = []byte{
-	0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x00, 0x00,
+    0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x00, 0x00,
 }
 
 func MakeTestSimple() *udp.Packet {
-	return &udp.Packet{
-		SrcPort: 52134,
-		DstPort: 80,
-		Length: 18,
-	}
+    return &udp.Packet{
+        SrcPort: 52134,
+        DstPort: 80,
+        Length: 18,
+    }
 }
 
 func TestPack(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	err := p.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := p.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_simple, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_simple, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func BenchmarkPack(bn *testing.B) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	for n := 0; n < bn.N; n++ {
-		p.Pack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        p.Pack(&b)
+    }
 }
 
 func TestUnpack(t *testing.T) {
-	var p udp.Packet
+    var p udp.Packet
 
-	cmp := MakeTestSimple()
+    cmp := MakeTestSimple()
 
-	var b packet.Buffer
-	b.Init(test_simple)
+    var b packet.Buffer
+    b.Init(test_simple)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p udp.Packet
-	var b packet.Buffer
+    var p udp.Packet
+    var b packet.Buffer
 
-	for n := 0; n < bn.N; n++ {
-		b.Init(test_simple)
-		p.Unpack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        b.Init(test_simple)
+        p.Unpack(&b)
+    }
 }
 
 var test_with_ipv4 = []byte{
-	0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x61, 0x9e,
+    0xcb, 0xa6, 0x00, 0x50, 0x00, 0x12, 0x61, 0x9e,
 }
 
 var ipsrc_str = "192.168.1.135"
 var ipdst_str = "8.8.8.8"
 
 func TestPackWithIPv4(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_with_ipv4)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_with_ipv4)))
 
-	ip4 := ipv4.Make()
-	ip4.SrcAddr = net.ParseIP(ipsrc_str)
-	ip4.DstAddr = net.ParseIP(ipdst_str)
+    ip4 := ipv4.Make()
+    ip4.SrcAddr = net.ParseIP(ipsrc_str)
+    ip4.DstAddr = net.ParseIP(ipdst_str)
 
-	udp := &udp.Packet{
-		SrcPort: 52134,
-		DstPort: 80,
-		Length: 18,
-	}
+    udp := &udp.Packet{
+        SrcPort: 52134,
+        DstPort: 80,
+        Length: 18,
+    }
 
-	ip4.SetPayload(udp)
+    ip4.SetPayload(udp)
 
-	err := udp.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := udp.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_with_ipv4, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_with_ipv4, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func TestUnpackWithIPv4(t *testing.T) {
-	var p udp.Packet
+    var p udp.Packet
 
-	cmp := MakeTestSimple()
-	cmp.Checksum = 0x619e
+    cmp := MakeTestSimple()
+    cmp.Checksum = 0x619e
 
-	var b packet.Buffer
-	b.Init(test_with_ipv4)
+    var b packet.Buffer
+    b.Init(test_with_ipv4)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }

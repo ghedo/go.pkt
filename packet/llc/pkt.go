@@ -34,87 +34,87 @@ package llc
 import "github.com/ghedo/go.pkt/packet"
 
 type Packet struct {
-	DSAP        uint8
-	SSAP        uint8
-	Control     uint16        `string:"ctrl"`
+    DSAP        uint8
+    SSAP        uint8
+    Control     uint16        `string:"ctrl"`
 
-	pkt_payload packet.Packet `string:"skip"`
+    pkt_payload packet.Packet `string:"skip"`
 }
 
 func Make() *Packet {
-	return &Packet{ }
+    return &Packet{ }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.LLC
+    return packet.LLC
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 2
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 2
+    }
 
-	return 2
+    return 2
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteN(p.DSAP)
-	buf.WriteN(p.SSAP)
+    buf.WriteN(p.DSAP)
+    buf.WriteN(p.SSAP)
 
-	if p.Control & 0x1 == 0 || p.Control & 0x3 == 0x1 {
-		buf.WriteN(p.Control)
-	} else {
-		buf.WriteN(uint8(p.Control))
-	}
+    if p.Control & 0x1 == 0 || p.Control & 0x3 == 0x1 {
+        buf.WriteN(p.Control)
+    } else {
+        buf.WriteN(uint8(p.Control))
+    }
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.DSAP)
-	buf.ReadN(&p.SSAP)
+    buf.ReadN(&p.DSAP)
+    buf.ReadN(&p.SSAP)
 
-	if buf.Bytes()[:1][0] & 0x1 == 0 ||
-	   buf.Bytes()[:1][0] & 0x3 == 0x1 {
-		buf.ReadN(&p.Control)
-	} else {
-		var ctrl uint8
-		buf.ReadN(&ctrl)
-		p.Control = uint16(ctrl)
-	}
+    if buf.Bytes()[:1][0] & 0x1 == 0 ||
+       buf.Bytes()[:1][0] & 0x3 == 0x1 {
+        buf.ReadN(&p.Control)
+    } else {
+        var ctrl uint8
+        buf.ReadN(&ctrl)
+        p.Control = uint16(ctrl)
+    }
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	if p.DSAP == 0xaa && p.SSAP == 0xaa {
-		return packet.SNAP
-	}
+    if p.DSAP == 0xaa && p.SSAP == 0xaa {
+        return packet.SNAP
+    }
 
-	return packet.None
+    return packet.None
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
+    p.pkt_payload = pl
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }

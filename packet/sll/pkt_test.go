@@ -41,73 +41,73 @@ import "github.com/ghedo/go.pkt/packet/sll"
 var hwsrc_str = "4c:72:b9:54:e5:3d"
 
 var test_simple = []byte{
-	0x00, 0x04, 0x00, 0x01, 0x00, 0x06, 0x4c, 0x72, 0xb9, 0x54, 0xe5, 0x3d,
-	0x00, 0x00, 0x08, 0x00,
+    0x00, 0x04, 0x00, 0x01, 0x00, 0x06, 0x4c, 0x72, 0xb9, 0x54, 0xe5, 0x3d,
+    0x00, 0x00, 0x08, 0x00,
 }
 
 func MakeTestSimple() *sll.Packet {
-	hwsrc, _ := net.ParseMAC(hwsrc_str)
+    hwsrc, _ := net.ParseMAC(hwsrc_str)
 
-	return &sll.Packet{
-		Type: sll.Outgoing,
-		AddrType: 1,
-		AddrLen: 6,
-		SrcAddr: hwsrc,
-		EtherType: eth.IPv4,
-	}
+    return &sll.Packet{
+        Type: sll.Outgoing,
+        AddrType: 1,
+        AddrLen: 6,
+        SrcAddr: hwsrc,
+        EtherType: eth.IPv4,
+    }
 }
 
 func TestPack(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	err := p.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := p.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_simple, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_simple, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func BenchmarkPack(bn *testing.B) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	for n := 0; n < bn.N; n++ {
-		p.Pack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        p.Pack(&b)
+    }
 }
 
 func TestUnpack(t *testing.T) {
-	var p sll.Packet
+    var p sll.Packet
 
-	cmp := MakeTestSimple()
+    cmp := MakeTestSimple()
 
-	var b packet.Buffer
-	b.Init(test_simple)
+    var b packet.Buffer
+    b.Init(test_simple)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p sll.Packet
-	var b packet.Buffer
+    var p sll.Packet
+    var b packet.Buffer
 
-	for n := 0; n < bn.N; n++ {
-		b.Init(test_simple)
-		p.Unpack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        b.Init(test_simple)
+        p.Unpack(&b)
+    }
 }

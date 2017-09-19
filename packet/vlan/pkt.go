@@ -35,93 +35,93 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/eth"
 
 type Packet struct {
-	Priority     uint8         `string:"prio"`
-	DropEligible bool          `string:"drop"`
-	VLAN         uint16
-	Type         eth.EtherType
-	pkt_payload  packet.Packet `cmp:"skip" string:"skip"`
+    Priority     uint8         `string:"prio"`
+    DropEligible bool          `string:"drop"`
+    VLAN         uint16
+    Type         eth.EtherType
+    pkt_payload  packet.Packet `cmp:"skip" string:"skip"`
 }
 
 func Make() *Packet {
-	return &Packet{ }
+    return &Packet{ }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.VLAN
+    return packet.VLAN
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 4
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 4
+    }
 
-	return 4
+    return 4
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	if other == nil {
-		return false
-	}
+    if other == nil {
+        return false
+    }
 
-	if  other.GetType() == packet.VLAN &&
-	    p.VLAN != other.(*Packet).VLAN {
-		return false
-	}
+    if  other.GetType() == packet.VLAN &&
+        p.VLAN != other.(*Packet).VLAN {
+        return false
+    }
 
-	if p.Payload() != nil {
-		return p.Payload().Answers(other.Payload())
-	}
+    if p.Payload() != nil {
+        return p.Payload().Answers(other.Payload())
+    }
 
-	return true
+    return true
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	tci := uint16(p.Priority) << 13 | p.VLAN
-	if p.DropEligible {
-		tci |= 0x10
-	}
+    tci := uint16(p.Priority) << 13 | p.VLAN
+    if p.DropEligible {
+        tci |= 0x10
+    }
 
-	buf.WriteN(tci)
-	buf.WriteN(p.Type)
+    buf.WriteN(tci)
+    buf.WriteN(p.Type)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	var tci uint16
-	buf.ReadN(&tci)
+    var tci uint16
+    buf.ReadN(&tci)
 
-	p.Priority     = (uint8(tci >> 8) & 0xE0) >> 5
-	p.DropEligible = uint8(tci) & 0x10 != 0
-	p.VLAN         = tci & 0x0FFF
+    p.Priority     = (uint8(tci >> 8) & 0xE0) >> 5
+    p.DropEligible = uint8(tci) & 0x10 != 0
+    p.VLAN         = tci & 0x0FFF
 
-	buf.ReadN(&p.Type)
+    buf.ReadN(&p.Type)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return eth.EtherTypeToType(p.Type)
+    return eth.EtherTypeToType(p.Type)
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
-	p.Type        = eth.TypeToEtherType(pl.GetType())
+    p.pkt_payload = pl
+    p.Type        = eth.TypeToEtherType(pl.GetType())
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }

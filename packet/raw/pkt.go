@@ -36,56 +36,56 @@ import "fmt"
 import "github.com/ghedo/go.pkt/packet"
 
 type Packet struct {
-	Data   []byte `string:"skip"`
+    Data   []byte `string:"skip"`
 }
 
 func Make() *Packet {
-	return &Packet{ }
+    return &Packet{ }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.Raw
+    return packet.Raw
 }
 
 func (p *Packet) GetLength() uint16 {
-	return uint16(len(p.Data))
+    return uint16(len(p.Data))
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.Write(p.Data)
+    buf.Write(p.Data)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	p.Data   = buf.Next(buf.Len())
+    p.Data   = buf.Next(buf.Len())
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return nil
+    return nil
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return packet.None
+    return packet.None
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return fmt.Sprintf("data(len=%d)", len(p.Data))
+    return fmt.Sprintf("data(len=%d)", len(p.Data))
 }

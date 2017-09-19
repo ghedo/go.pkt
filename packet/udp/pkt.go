@@ -35,92 +35,92 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/ipv4"
 
 type Packet struct {
-	SrcPort     uint16        `string:"sport"`
-	DstPort     uint16        `string:"dport"`
-	Length      uint16        `string:"len"`
-	Checksum    uint16        `string:"sum"`
-	csum_seed   uint32        `cmp:"skip" string:"skip"`
-	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
+    SrcPort     uint16        `string:"sport"`
+    DstPort     uint16        `string:"dport"`
+    Length      uint16        `string:"len"`
+    Checksum    uint16        `string:"sum"`
+    csum_seed   uint32        `cmp:"skip" string:"skip"`
+    pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 func Make() *Packet {
-	return &Packet{
-		Length: 8,
-	}
+    return &Packet{
+        Length: 8,
+    }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.UDP
+    return packet.UDP
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 8
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 8
+    }
 
-	return 8
+    return 8
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	if other == nil || other.GetType() != packet.TCP {
-		return false
-	}
+    if other == nil || other.GetType() != packet.TCP {
+        return false
+    }
 
-	if p.SrcPort != other.(*Packet).DstPort ||
-	   p.DstPort != other.(*Packet).SrcPort {
-		return false
-	}
+    if p.SrcPort != other.(*Packet).DstPort ||
+       p.DstPort != other.(*Packet).SrcPort {
+        return false
+    }
 
-	return true
+    return true
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteN(p.SrcPort)
-	buf.WriteN(p.DstPort)
-	buf.WriteN(p.Length)
+    buf.WriteN(p.SrcPort)
+    buf.WriteN(p.DstPort)
+    buf.WriteN(p.Length)
 
-	if p.csum_seed != 0 {
-		p.Checksum =
-		  ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
-	}
+    if p.csum_seed != 0 {
+        p.Checksum =
+          ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
+    }
 
-	buf.WriteN(p.Checksum)
+    buf.WriteN(p.Checksum)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.SrcPort)
-	buf.ReadN(&p.DstPort)
-	buf.ReadN(&p.Length)
-	buf.ReadN(&p.Checksum)
+    buf.ReadN(&p.SrcPort)
+    buf.ReadN(&p.DstPort)
+    buf.ReadN(&p.Length)
+    buf.ReadN(&p.Checksum)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return packet.Raw
+    return packet.Raw
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
-	p.Length      = p.GetLength()
+    p.pkt_payload = pl
+    p.Length      = p.GetLength()
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
-	p.csum_seed = csum
+    p.csum_seed = csum
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }

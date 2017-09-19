@@ -53,97 +53,97 @@ import "github.com/ghedo/go.pkt/network"
 import "github.com/ghedo/go.pkt/routing"
 
 func main() {
-	log.SetFlags(0)
+    log.SetFlags(0)
 
-	usage := `Usage: syn_scan <addr>
+    usage := `Usage: syn_scan <addr>
 
 Simple TCP port scanner.`
 
-	args, err := docopt.Parse(usage, nil, true, "", false)
-	if err != nil {
-		log.Fatalf("Invalid arguments: %s", err)
-	}
+    args, err := docopt.Parse(usage, nil, true, "", false)
+    if err != nil {
+        log.Fatalf("Invalid arguments: %s", err)
+    }
 
-	addr    := args["<addr>"].(string)
-	addr_ip := net.ParseIP(addr)
-	timeout := 1 * time.Second
+    addr    := args["<addr>"].(string)
+    addr_ip := net.ParseIP(addr)
+    timeout := 1 * time.Second
 
-	route, err := routing.RouteTo(addr_ip)
-	if err != nil {
-		log.Fatalf("Error: %s", err)
-	}
+    route, err := routing.RouteTo(addr_ip)
+    if err != nil {
+        log.Fatalf("Error: %s", err)
+    }
 
-	if route == nil {
-		log.Println("No route found")
-	}
+    if route == nil {
+        log.Println("No route found")
+    }
 
-	c, err := pcap.Open(route.Iface.Name)
-	if err != nil {
-		log.Fatalf("Error opening interface: %s", err)
-	}
-	defer c.Close()
+    c, err := pcap.Open(route.Iface.Name)
+    if err != nil {
+        log.Fatalf("Error opening interface: %s", err)
+    }
+    defer c.Close()
 
-	err = c.Activate()
-	if err != nil {
-		log.Fatalf("Error activating source: %s", err)
-	}
+    err = c.Activate()
+    if err != nil {
+        log.Fatalf("Error activating source: %s", err)
+    }
 
-	eth_pkt := eth.Make()
-	eth_pkt.SrcAddr = route.Iface.HardwareAddr
+    eth_pkt := eth.Make()
+    eth_pkt.SrcAddr = route.Iface.HardwareAddr
 
-	if route.Default {
-		eth_pkt.DstAddr = ResolveARP(c, timeout, route, route.Gateway)
-	} else {
-		eth_pkt.DstAddr = ResolveARP(c, timeout, route, addr_ip)
-	}
+    if route.Default {
+        eth_pkt.DstAddr = ResolveARP(c, timeout, route, route.Gateway)
+    } else {
+        eth_pkt.DstAddr = ResolveARP(c, timeout, route, addr_ip)
+    }
 
-	ipv4_pkt := ipv4.Make()
-	ipv4_pkt.SrcAddr, _ = route.GetIfaceIPv4Addr()
-	ipv4_pkt.DstAddr = addr_ip
+    ipv4_pkt := ipv4.Make()
+    ipv4_pkt.SrcAddr, _ = route.GetIfaceIPv4Addr()
+    ipv4_pkt.DstAddr = addr_ip
 
-	tcp_pkt := tcp.Make()
-	tcp_pkt.SrcPort = 49152
-	tcp_pkt.DstPort = 1
-	tcp_pkt.Flags   = tcp.Syn
-	tcp_pkt.Seq     = uint32(rand.Intn(math.MaxUint32))
-	tcp_pkt.WindowSize = 5840
+    tcp_pkt := tcp.Make()
+    tcp_pkt.SrcPort = 49152
+    tcp_pkt.DstPort = 1
+    tcp_pkt.Flags   = tcp.Syn
+    tcp_pkt.Seq     = uint32(rand.Intn(math.MaxUint32))
+    tcp_pkt.WindowSize = 5840
 
-	for port := uint16(1); port < math.MaxUint16; port ++ {
-		tcp_pkt.DstPort = port
+    for port := uint16(1); port < math.MaxUint16; port ++ {
+        tcp_pkt.DstPort = port
 
-		fmt.Printf("Scanning port %.5d: ", port)
+        fmt.Printf("Scanning port %.5d: ", port)
 
-		pkt, err := network.SendRecv(c, timeout, eth_pkt, ipv4_pkt, tcp_pkt)
-		if err != nil {
-			fmt.Printf("%s\n", err)
-			continue
-		}
+        pkt, err := network.SendRecv(c, timeout, eth_pkt, ipv4_pkt, tcp_pkt)
+        if err != nil {
+            fmt.Printf("%s\n", err)
+            continue
+        }
 
-		tcp_pkt := layers.FindLayer(pkt, packet.TCP).(*tcp.Packet)
+        tcp_pkt := layers.FindLayer(pkt, packet.TCP).(*tcp.Packet)
 
-		if tcp_pkt.Flags & tcp.Rst == 0 {
-			fmt.Printf("OPEN\n")
-		} else if tcp_pkt.Flags & tcp.Syn == 0{
-			fmt.Printf("CLOSED\n")
-		}
-	}
+        if tcp_pkt.Flags & tcp.Rst == 0 {
+            fmt.Printf("OPEN\n")
+        } else if tcp_pkt.Flags & tcp.Syn == 0{
+            fmt.Printf("CLOSED\n")
+        }
+    }
 }
 
 func ResolveARP(c capture.Handle, t time.Duration, r *routing.Route, addr net.IP) net.HardwareAddr {
-	eth_pkt := eth.Make()
-	eth_pkt.SrcAddr = r.Iface.HardwareAddr
-	eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
+    eth_pkt := eth.Make()
+    eth_pkt.SrcAddr = r.Iface.HardwareAddr
+    eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
 
-	arp_pkt := arp.Make()
-	arp_pkt.HWSrcAddr = r.Iface.HardwareAddr
-	arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
-	arp_pkt.ProtoSrcAddr, _ = r.GetIfaceIPv4Addr()
-	arp_pkt.ProtoDstAddr = addr
+    arp_pkt := arp.Make()
+    arp_pkt.HWSrcAddr = r.Iface.HardwareAddr
+    arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
+    arp_pkt.ProtoSrcAddr, _ = r.GetIfaceIPv4Addr()
+    arp_pkt.ProtoDstAddr = addr
 
-	pkt, err := network.SendRecv(c, t, eth_pkt, arp_pkt)
-	if err != nil {
-		log.Fatal(err)
-	}
+    pkt, err := network.SendRecv(c, t, eth_pkt, arp_pkt)
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	return pkt.Payload().(*arp.Packet).HWSrcAddr
+    return pkt.Payload().(*arp.Packet).HWSrcAddr
 }

@@ -37,153 +37,153 @@ import "github.com/ghedo/go.pkt/capture/file"
 import "github.com/ghedo/go.pkt/filter"
 
 func TestCapture(t *testing.T) {
-	src, err := file.Open("capture_test.pcap")
-	if err != nil {
-		t.Fatalf("Error opening: %s", err)
-	}
-	defer src.Close()
+    src, err := file.Open("capture_test.pcap")
+    if err != nil {
+        t.Fatalf("Error opening: %s", err)
+    }
+    defer src.Close()
 
-	var count uint64
-	for {
-		buf, err := src.Capture()
-		if err != nil {
-			t.Fatalf("Error reading: %s", err)
-		}
+    var count uint64
+    for {
+        buf, err := src.Capture()
+        if err != nil {
+            t.Fatalf("Error reading: %s", err)
+        }
 
-		if buf == nil {
-			break
-		}
+        if buf == nil {
+            break
+        }
 
-		count++
-	}
+        count++
+    }
 
-	if count != 16 {
-		t.Fatalf("Count mismatch: %d", count)
-	}
+    if count != 16 {
+        t.Fatalf("Count mismatch: %d", count)
+    }
 }
 
 func TestCaptureFilter(t *testing.T) {
-	src, err := file.Open("capture_test.pcap")
-	if err != nil {
-		t.Fatalf("Error opening: %s", err)
-	}
-	defer src.Close()
+    src, err := file.Open("capture_test.pcap")
+    if err != nil {
+        t.Fatalf("Error opening: %s", err)
+    }
+    defer src.Close()
 
-	flt, err := filter.Compile("arp", src.LinkType(), false)
-	if err != nil {
-		t.Fatalf("Error parsing filter: %s", err)
-	}
-	defer flt.Cleanup()
+    flt, err := filter.Compile("arp", src.LinkType(), false)
+    if err != nil {
+        t.Fatalf("Error parsing filter: %s", err)
+    }
+    defer flt.Cleanup()
 
-	err = src.ApplyFilter(flt)
-	if err != nil {
-		t.Fatalf("Error applying filter: %s", err)
-	}
+    err = src.ApplyFilter(flt)
+    if err != nil {
+        t.Fatalf("Error applying filter: %s", err)
+    }
 
-	var count uint64
-	for {
-		buf, err := src.Capture()
-		if err != nil {
-			t.Fatalf("Error reading: %s %d", err, count)
-		}
+    var count uint64
+    for {
+        buf, err := src.Capture()
+        if err != nil {
+            t.Fatalf("Error reading: %s %d", err, count)
+        }
 
-		if buf == nil {
-			break
-		}
+        if buf == nil {
+            break
+        }
 
-		count++
-	}
+        count++
+    }
 
-	if count != 2 {
-		t.Fatalf("Count mismatch: %d", count)
-	}
+    if count != 2 {
+        t.Fatalf("Count mismatch: %d", count)
+    }
 }
 
 func TestInject(t *testing.T) {
-	src, err := file.Open("capture_test.pcap")
-	if err != nil {
-		t.Fatalf("Error opening: %s", err)
-	}
-	defer src.Close()
+    src, err := file.Open("capture_test.pcap")
+    if err != nil {
+        t.Fatalf("Error opening: %s", err)
+    }
+    defer src.Close()
 
-	dst, err := file.Open("inject_test.pcap")
-	if err != nil {
-		t.Fatalf("Error opening: %s", err)
-	}
-	defer dst.Close()
+    dst, err := file.Open("inject_test.pcap")
+    if err != nil {
+        t.Fatalf("Error opening: %s", err)
+    }
+    defer dst.Close()
 
-	var count uint64
-	for {
-		buf, err := src.Capture()
-		if err != nil {
-			t.Fatalf("Error reading: %s", err)
-		}
+    var count uint64
+    for {
+        buf, err := src.Capture()
+        if err != nil {
+            t.Fatalf("Error reading: %s", err)
+        }
 
-		if buf == nil {
-			break
-		}
+        if buf == nil {
+            break
+        }
 
-		err = dst.Inject(buf)
-		if err != nil {
-			t.Fatalf("Error writing: %s", err)
-		}
+        err = dst.Inject(buf)
+        if err != nil {
+            t.Fatalf("Error writing: %s", err)
+        }
 
-		count++
-	}
+        count++
+    }
 
-	if count != 16 {
-		t.Fatalf("Count mismatch: %d", count)
-	}
+    if count != 16 {
+        t.Fatalf("Count mismatch: %d", count)
+    }
 }
 
 func ExampleCapture() {
-	src, err := file.Open("/path/to/file/dump.pcap")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer src.Close()
+    src, err := file.Open("/path/to/file/dump.pcap")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer src.Close()
 
-	// you may configure the source further, e.g. by activating
-	// promiscuous mode.
+    // you may configure the source further, e.g. by activating
+    // promiscuous mode.
 
-	err = src.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
+    err = src.Activate()
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	for {
-		buf, err := src.Capture()
-		if err != nil {
-			log.Fatal(err)
-		}
+    for {
+        buf, err := src.Capture()
+        if err != nil {
+            log.Fatal(err)
+        }
 
-		if buf == nil {
-			break
-		}
+        if buf == nil {
+            break
+        }
 
-		log.Println("PACKET!!!")
+        log.Println("PACKET!!!")
 
-		// do something with the packet
-	}
+        // do something with the packet
+    }
 }
 
 func ExampleInject() {
-	dst, err := file.Open("/path/to/file/dump.pcap")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dst.Close()
+    dst, err := file.Open("/path/to/file/dump.pcap")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer dst.Close()
 
-	// you may configure the source further, e.g. by activating
-	// promiscuous mode.
+    // you may configure the source further, e.g. by activating
+    // promiscuous mode.
 
-	err = dst.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
+    err = dst.Activate()
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	err = dst.Inject([]byte("random data"))
-	if err != nil {
-		log.Fatal(err)
-	}
+    err = dst.Inject([]byte("random data"))
+    if err != nil {
+        log.Fatal(err)
+    }
 }

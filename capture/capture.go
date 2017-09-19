@@ -36,18 +36,18 @@ import "github.com/ghedo/go.pkt/filter"
 import "github.com/ghedo/go.pkt/packet"
 
 type Handle interface {
-	LinkType() packet.Type
+    LinkType() packet.Type
 
-	SetMTU(mtu int) error
-	SetPromiscMode(promisc bool) error
-	SetMonitorMode(monitor bool) error
+    SetMTU(mtu int) error
+    SetPromiscMode(promisc bool) error
+    SetMonitorMode(monitor bool) error
 
-	ApplyFilter(filter *filter.Filter) error
+    ApplyFilter(filter *filter.Filter) error
 
-	Activate() error
+    Activate() error
 
-	Capture() ([]byte, error)
-	Inject(buf []byte) error
+    Capture() ([]byte, error)
+    Inject(buf []byte) error
 
-	Close()
+    Close()
 }

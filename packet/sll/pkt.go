@@ -37,109 +37,109 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/eth"
 
 type Packet struct {
-	Type        Type
-	AddrType    uint16           `string:"atype"`
-	AddrLen     uint16           `string:"alen"`
-	SrcAddr     net.HardwareAddr `string:"src"`
-	EtherType   eth.EtherType
-	pkt_payload packet.Packet    `cmp:"skip" string:"skip"`
+    Type        Type
+    AddrType    uint16           `string:"atype"`
+    AddrLen     uint16           `string:"alen"`
+    SrcAddr     net.HardwareAddr `string:"src"`
+    EtherType   eth.EtherType
+    pkt_payload packet.Packet    `cmp:"skip" string:"skip"`
 }
 
 type Type uint16
 
 const (
-	Host      Type = 0
-	Broadcast Type = 1
-	Multicast Type = 2
-	OtherHost Type = 3
-	Outgoing  Type = 4
+    Host      Type = 0
+    Broadcast Type = 1
+    Multicast Type = 2
+    OtherHost Type = 3
+    Outgoing  Type = 4
 )
 
 func Make() *Packet {
-	return &Packet{
-		Type: Host,
-		AddrType: 2,
-		AddrLen: 6,
-	}
+    return &Packet{
+        Type: Host,
+        AddrType: 2,
+        AddrLen: 6,
+    }
 }
 
 func (p *Packet) GetType() packet.Type {
-	return packet.SLL
+    return packet.SLL
 }
 
 func (p *Packet) GetLength() uint16 {
-	if p.pkt_payload != nil {
-		return p.pkt_payload.GetLength() + 16
-	}
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 16
+    }
 
-	return p.AddrLen + 16
+    return p.AddrLen + 16
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-	return packet.Compare(p, other)
+    return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-	return false
+    return false
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-	buf.WriteN(p.Type)
-	buf.WriteN(p.AddrType)
-	buf.WriteN(p.AddrLen)
-	buf.WriteN(p.SrcAddr)
+    buf.WriteN(p.Type)
+    buf.WriteN(p.AddrType)
+    buf.WriteN(p.AddrLen)
+    buf.WriteN(p.SrcAddr)
 
-	for i := 0; i < 8 - int(p.AddrLen); i++ {
-		buf.WriteN(uint8(0x00))
-	}
+    for i := 0; i < 8 - int(p.AddrLen); i++ {
+        buf.WriteN(uint8(0x00))
+    }
 
-	buf.WriteN(p.EtherType)
+    buf.WriteN(p.EtherType)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-	buf.ReadN(&p.Type)
-	buf.ReadN(&p.AddrType)
-	buf.ReadN(&p.AddrLen)
+    buf.ReadN(&p.Type)
+    buf.ReadN(&p.AddrType)
+    buf.ReadN(&p.AddrLen)
 
-	p.SrcAddr = net.HardwareAddr(buf.Next(int(p.AddrLen)))
-	buf.Next(8 - int(p.AddrLen))
+    p.SrcAddr = net.HardwareAddr(buf.Next(int(p.AddrLen)))
+    buf.Next(8 - int(p.AddrLen))
 
-	buf.ReadN(&p.EtherType)
+    buf.ReadN(&p.EtherType)
 
-	return nil
+    return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-	return p.pkt_payload
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-	return eth.EtherTypeToType(p.EtherType)
+    return eth.EtherTypeToType(p.EtherType)
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-	p.pkt_payload = pl
-	p.EtherType   = eth.TypeToEtherType(pl.GetType())
+    p.pkt_payload = pl
+    p.EtherType   = eth.TypeToEtherType(pl.GetType())
 
-	return nil
+    return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
 }
 
 func (p *Packet) String() string {
-	return packet.Stringify(p)
+    return packet.Stringify(p)
 }
 
 func (t Type) String() string {
-	switch t {
-	case Host:      return "host"
-	case Broadcast: return "broadcast"
-	case Multicast: return "multicast"
-	case OtherHost: return "other"
-	case Outgoing:  return "outgoing"
-	default:        return "unknown"
-	}
+    switch t {
+    case Host:      return "host"
+    case Broadcast: return "broadcast"
+    case Multicast: return "multicast"
+    case OtherHost: return "other"
+    case Outgoing:  return "outgoing"
+    default:        return "unknown"
+    }
 }

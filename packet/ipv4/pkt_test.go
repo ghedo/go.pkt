@@ -38,80 +38,80 @@ import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/ipv4"
 
 var test_simple = []byte{
-	0x45, 0x03, 0x00, 0x14, 0x00, 0x0f, 0x40, 0x00, 0x64, 0x06, 0x48, 0x97,
-	0xc0, 0xa8, 0x01, 0x87, 0x08, 0x08, 0x04, 0x04,
+    0x45, 0x03, 0x00, 0x14, 0x00, 0x0f, 0x40, 0x00, 0x64, 0x06, 0x48, 0x97,
+    0xc0, 0xa8, 0x01, 0x87, 0x08, 0x08, 0x04, 0x04,
 }
 
 var ipsrc_str = "192.168.1.135"
 var ipdst_str = "8.8.4.4"
 
 func MakeTestSimple() *ipv4.Packet {
-	return &ipv4.Packet{
-		Version: 4,
-		IHL: 5,
-		Length: 20,
-		TOS: 3,
-		Id: 15,
-		TTL: 100,
-		Flags: ipv4.DontFragment,
-		Protocol: ipv4.TCP,
-		SrcAddr: net.ParseIP(ipsrc_str),
-		DstAddr: net.ParseIP(ipdst_str),
-	}
+    return &ipv4.Packet{
+        Version: 4,
+        IHL: 5,
+        Length: 20,
+        TOS: 3,
+        Id: 15,
+        TTL: 100,
+        Flags: ipv4.DontFragment,
+        Protocol: ipv4.TCP,
+        SrcAddr: net.ParseIP(ipsrc_str),
+        DstAddr: net.ParseIP(ipdst_str),
+    }
 }
 
 func TestPack(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	err := p.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := p.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_simple, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_simple, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func BenchmarkPack(bn *testing.B) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	for n := 0; n < bn.N; n++ {
-		p.Pack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        p.Pack(&b)
+    }
 }
 
 func TestUnpack(t *testing.T) {
-	var p ipv4.Packet
+    var p ipv4.Packet
 
-	cmp := MakeTestSimple()
-	cmp.Checksum = 0x4897
+    cmp := MakeTestSimple()
+    cmp.Checksum = 0x4897
 
-	var b packet.Buffer
-	b.Init(test_simple)
+    var b packet.Buffer
+    b.Init(test_simple)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p ipv4.Packet
-	var b packet.Buffer
+    var p ipv4.Packet
+    var b packet.Buffer
 
-	for n := 0; n < bn.N; n++ {
-		b.Init(test_simple)
-		p.Unpack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        b.Init(test_simple)
+        p.Unpack(&b)
+    }
 }

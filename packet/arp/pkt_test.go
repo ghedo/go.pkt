@@ -39,9 +39,9 @@ import "github.com/ghedo/go.pkt/packet/arp"
 import "github.com/ghedo/go.pkt/packet/eth"
 
 var test_simple = []byte{
-	0x00, 0x01, 0x08, 0x00, 0x06, 0x04, 0x00, 0x01, 0x4C, 0x72, 0xB9, 0x54,
-	0xE5, 0x3D, 0xC0, 0xA8, 0x01, 0x87, 0x1F, 0x92, 0x2B, 0x56, 0xED, 0x77,
-	0x1C, 0x3C, 0x09, 0xBF,
+    0x00, 0x01, 0x08, 0x00, 0x06, 0x04, 0x00, 0x01, 0x4C, 0x72, 0xB9, 0x54,
+    0xE5, 0x3D, 0xC0, 0xA8, 0x01, 0x87, 0x1F, 0x92, 0x2B, 0x56, 0xED, 0x77,
+    0x1C, 0x3C, 0x09, 0xBF,
 }
 
 var hwsrc_str = "4c:72:b9:54:e5:3d"
@@ -50,77 +50,77 @@ var ipsrc_str = "192.168.1.135"
 var ipdst_str = "28.60.9.191"
 
 func MakeTestSimple() *arp.Packet {
-	hwsrc, _ := net.ParseMAC(hwsrc_str)
-	hwdst, _ := net.ParseMAC(hwdst_str)
-	ipsrc := net.ParseIP(ipsrc_str)
-	ipdst := net.ParseIP(ipdst_str)
+    hwsrc, _ := net.ParseMAC(hwsrc_str)
+    hwdst, _ := net.ParseMAC(hwdst_str)
+    ipsrc := net.ParseIP(ipsrc_str)
+    ipdst := net.ParseIP(ipdst_str)
 
-	return &arp.Packet{
-		Operation: arp.Request,
+    return &arp.Packet{
+        Operation: arp.Request,
 
-		HWType: 1,
-		HWAddrLen: 6,
-		HWSrcAddr: hwsrc,
-		HWDstAddr: hwdst,
+        HWType: 1,
+        HWAddrLen: 6,
+        HWSrcAddr: hwsrc,
+        HWDstAddr: hwdst,
 
-		ProtoType:    eth.IPv4,
-		ProtoAddrLen: 4,
-		ProtoSrcAddr: ipsrc,
-		ProtoDstAddr: ipdst,
-	}
+        ProtoType:    eth.IPv4,
+        ProtoAddrLen: 4,
+        ProtoSrcAddr: ipsrc,
+        ProtoDstAddr: ipdst,
+    }
 }
 
 func TestPack(t *testing.T) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	err := p.Pack(&b)
-	if err != nil {
-		t.Fatalf("Error packing: %s", err)
-	}
+    err := p.Pack(&b)
+    if err != nil {
+        t.Fatalf("Error packing: %s", err)
+    }
 
-	if !bytes.Equal(test_simple, b.Buffer()) {
-		t.Fatalf("Raw packet mismatch: %x", b.Buffer())
-	}
+    if !bytes.Equal(test_simple, b.Buffer()) {
+        t.Fatalf("Raw packet mismatch: %x", b.Buffer())
+    }
 }
 
 func BenchmarkPack(bn *testing.B) {
-	var b packet.Buffer
-	b.Init(make([]byte, len(test_simple)))
+    var b packet.Buffer
+    b.Init(make([]byte, len(test_simple)))
 
-	p := MakeTestSimple()
+    p := MakeTestSimple()
 
-	for n := 0; n < bn.N; n++ {
-		p.Pack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        p.Pack(&b)
+    }
 }
 
 func TestUnpack(t *testing.T) {
-	var p arp.Packet
+    var p arp.Packet
 
-	cmp := MakeTestSimple()
+    cmp := MakeTestSimple()
 
-	var b packet.Buffer
-	b.Init(test_simple)
+    var b packet.Buffer
+    b.Init(test_simple)
 
-	err := p.Unpack(&b)
-	if err != nil {
-		t.Fatalf("Error unpacking: %s", err)
-	}
+    err := p.Unpack(&b)
+    if err != nil {
+        t.Fatalf("Error unpacking: %s", err)
+    }
 
-	if !p.Equals(cmp) {
-		t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
-	}
+    if !p.Equals(cmp) {
+        t.Fatalf("Packet mismatch:\n%s\n%s", &p, cmp)
+    }
 }
 
 func BenchmarkUnpack(bn *testing.B) {
-	var p arp.Packet
-	var b packet.Buffer
+    var p arp.Packet
+    var b packet.Buffer
 
-	for n := 0; n < bn.N; n++ {
-		b.Init(test_simple)
-		p.Unpack(&b)
-	}
+    for n := 0; n < bn.N; n++ {
+        b.Init(test_simple)
+        p.Unpack(&b)
+    }
 }
