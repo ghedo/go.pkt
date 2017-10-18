@@ -1,15 +1,21 @@
 language: go
 
+sudo: false
+
+addons:
+ apt:
+   packages:
+    - libpcap0.8-dev
+
+go:
+ - 1.7
+ - 1.8
+ - 1.9
+ - tip
+
 install:
- - sudo apt-get install libpcap0.8-dev
- - go get -d -v ./... && go build -v ./...
+ - go get -d -v ./...
 
 script:
+ - go build -v ./...
  - go test -v ./...
-
-notifications:
-  recipient:
-   - alessandro@ghedini.me
-  email:
-    on_success: change
-    on_failure: always
