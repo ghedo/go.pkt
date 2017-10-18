@@ -42,6 +42,7 @@ type Packet struct {
     Checksum  uint16 `string:"sum"`
     csum_seed uint32 `cmp:"skip" string:"skip"`
     Body      uint32 `cmp:"skip" string:"skip"`
+    pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Type uint8
@@ -71,6 +72,10 @@ func (p *Packet) GetType() packet.Type {
 }
 
 func (p *Packet) GetLength() uint16 {
+    if p.pkt_payload != nil {
+        return p.pkt_payload.GetLength() + 8
+    }
+
     return 8
 }
 
@@ -116,14 +121,24 @@ func (p *Packet) Unpack(buf *packet.Buffer) error {
 }
 
 func (p *Packet) Payload() packet.Packet {
-    return nil
+    return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
+    switch p.Type {
+    case DstUnreachable, PacketTooBig, TimeExceeded, ParamProblem:
+        return packet.IPv6
+    }
+
     return packet.None
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
+    switch p.Type {
+    case DstUnreachable, PacketTooBig, TimeExceeded, ParamProblem:
+        p.pkt_payload = pl
+    }
+
     return nil
 }
 
