@@ -49,9 +49,9 @@ type Type uint8
 type Code uint8
 
 const (
-    DstUnreachable Type = 0
-    PacketTooBig        = 1
-    TimeExceeded        = 2
+    DstUnreachable Type = 1
+    PacketTooBig        = 2
+    TimeExceeded        = 3
     ParamProblem        = 4
     Private1            = 100
     Private2            = 101
