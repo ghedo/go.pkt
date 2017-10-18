@@ -11,6 +11,8 @@ import "github.com/songgao/water"
 import "github.com/ghedo/go.pkt/packet"
 import "github.com/ghedo/go.pkt/packet/ipv6"
 import "github.com/ghedo/go.pkt/packet/icmpv6"
+import "github.com/ghedo/go.pkt/packet/tcp"
+import "github.com/ghedo/go.pkt/packet/udp"
 import "github.com/ghedo/go.pkt/layers"
 
 func main() {
@@ -62,23 +64,16 @@ Reply to ICMPv6 traceroutes.`
             continue;
         }
 
-        icmp_pkt := layers.FindLayer(pkt, packet.ICMPv6)
-        if icmp_pkt == nil {
-            continue;
-        }
-
-        if icmp_pkt.(*icmpv6.Packet).Type != icmpv6.EchoRequest {
-            continue;
+        if ip_pkt.Payload() == nil {
+            continue
         }
 
         reply_ip_pkt := ipv6.Make()
         reply_ip_pkt.DstAddr = ip_pkt.(*ipv6.Packet).SrcAddr
 
-        reply_icmp_pkt := icmpv6.Make()
-
         ttl := ip_pkt.(*ipv6.Packet).HopLimit
 
-        reply_pkts := []packet.Packet{ reply_ip_pkt, reply_icmp_pkt }
+        reply_pkts := []packet.Packet{ reply_ip_pkt }
 
         switch {
         case uint64(ttl) < hops:
@@ -86,17 +81,44 @@ Reply to ICMPv6 traceroutes.`
 
             reply_ip_pkt.SrcAddr = ip
 
-            reply_icmp_pkt.Type = icmpv6.TimeExceeded
-            reply_icmp_pkt.Code = 0
+            reply_pkt := icmpv6.Make()
 
-            reply_pkts = append(reply_pkts, ip_pkt, icmp_pkt)
+            reply_pkt.Type = icmpv6.TimeExceeded
+            reply_pkt.Code = 0
+
+            reply_pkts = append(reply_pkts, reply_pkt, ip_pkt, ip_pkt.Payload())
 
         case uint64(ttl) >= hops:
             reply_ip_pkt.SrcAddr = ip_pkt.(*ipv6.Packet).DstAddr
 
-            reply_icmp_pkt.Type = icmpv6.EchoReply
-            reply_icmp_pkt.Code = 0
-            reply_icmp_pkt.Body = icmp_pkt.(*icmpv6.Packet).Body
+            switch ip_pkt.Payload().GetType() {
+            case packet.ICMPv6:
+                reply_pkt := icmpv6.Make()
+
+                reply_pkt.Type = icmpv6.EchoReply
+                reply_pkt.Code = 0
+                reply_pkt.Body = ip_pkt.Payload().(*icmpv6.Packet).Body
+
+                reply_pkts = append(reply_pkts, reply_pkt)
+
+            case packet.TCP:
+                reply_pkt := tcp.Make()
+
+                reply_pkt.SrcPort = ip_pkt.Payload().(*tcp.Packet).DstPort
+                reply_pkt.DstPort = ip_pkt.Payload().(*tcp.Packet).SrcPort
+                reply_pkt.Flags   = tcp.Rst
+
+                reply_pkts = append(reply_pkts, reply_pkt)
+
+            case packet.UDP:
+                reply_pkt := udp.Make()
+
+                reply_pkt.SrcPort = ip_pkt.Payload().(*udp.Packet).DstPort
+                reply_pkt.DstPort = ip_pkt.Payload().(*udp.Packet).SrcPort
+
+                reply_pkts = append(reply_pkts, reply_pkt,
+                                    ip_pkt.Payload().Payload())
+            }
         }
 
         reply_buf, err := layers.Pack(reply_pkts...)
