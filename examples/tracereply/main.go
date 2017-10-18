@@ -48,8 +48,6 @@ Reply to ICMPv6 traceroutes.`
             log.Fatalf("Error reading packet from interface: %s", err)
         }
 
-        log.Println("PACKET!!!")
-
         buf = buf[:buf_len]
 
         pkt, err := layers.UnpackAll(buf, packet.IPv6)
@@ -60,23 +58,19 @@ Reply to ICMPv6 traceroutes.`
 
         ip_pkt := layers.FindLayer(pkt, packet.IPv6)
         if ip_pkt == nil {
-            log.Printf("Not an IPv6 packet")
             continue;
         }
 
         if ip_pkt.Payload() == nil {
-            log.Printf("No payload")
             continue;
         }
 
         icmp_pkt := layers.FindLayer(pkt, packet.ICMPv6)
         if ip_pkt == nil {
-            log.Printf("Not an IPv6 packet")
             continue;
         }
 
         if icmp_pkt.(*icmpv6.Packet).Type != icmpv6.EchoRequest {
-            log.Printf("Not a ping")
             continue;
         }
 
@@ -89,8 +83,6 @@ Reply to ICMPv6 traceroutes.`
 
         switch {
         case uint64(ttl) < hops:
-            log.Println("TimeExceeded")
-
             []byte(ip)[len(ip) - 1] = ttl
 
             reply_ip_pkt.SrcAddr = ip
@@ -98,32 +90,29 @@ Reply to ICMPv6 traceroutes.`
             reply_icmp_pkt.Type = icmpv6.TimeExceeded
             reply_icmp_pkt.Code = 0
 
-        reply_buf, err := layers.Pack(reply_ip_pkt, reply_icmp_pkt, ip_pkt, icmp_pkt)
-        if err != nil {
-            log.Printf("Error while packing: %s\n", err)
-            continue;
-        }
+            reply_buf, err := layers.Pack(reply_ip_pkt, reply_icmp_pkt,
+                                                ip_pkt,       icmp_pkt)
+            if err != nil {
+                log.Printf("Error while packing: %s\n", err)
+                continue;
+            }
 
-        capture.Write(reply_buf)
-
-        log.Println(len(reply_buf))
+            capture.Write(reply_buf)
 
         case uint64(ttl) >= hops:
-            log.Println("EchoReply")
-
             reply_ip_pkt.SrcAddr = ip_pkt.(*ipv6.Packet).DstAddr
 
             reply_icmp_pkt.Type = icmpv6.EchoReply
             reply_icmp_pkt.Code = 0
             reply_icmp_pkt.Body = icmp_pkt.(*icmpv6.Packet).Body
 
-        reply_buf, err := layers.Pack(reply_ip_pkt, reply_icmp_pkt)
-        if err != nil {
-            log.Printf("Error while packing: %s\n", err)
-            continue;
-        }
+            reply_buf, err := layers.Pack(reply_ip_pkt, reply_icmp_pkt)
+            if err != nil {
+                log.Printf("Error while packing: %s\n", err)
+                continue;
+            }
 
-        capture.Write(reply_buf)
+            capture.Write(reply_buf)
         }
     }
 }
