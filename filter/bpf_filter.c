@@ -34,6 +34,7 @@
  *      @(#)bpf_filter.c	8.1 (Berkeley) 6/10/93
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <strings.h>
 
