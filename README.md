@@ -39,7 +39,7 @@ decoding network packets.
 [network]: http://godoc.org/github.com/ghedo/go.pkt/network
 [routing]: http://godoc.org/github.com/ghedo/go.pkt/routing
 
-## GETTING STARTED
+## Getting Started
 
 ### Capturing
 
@@ -226,11 +226,11 @@ TODO
 For more examples have a look at the [examples](examples/) directory in the
 source repository.
 
-## DEPENDENCIES
+## Dependencies
 
  * `libpcap`
 
-## COPYRIGHT
+## Copyright
 
 Copyright (C) 2014 Alessandro Ghedini <alessandro@ghedini.me>
 
