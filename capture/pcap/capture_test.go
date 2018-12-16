@@ -55,7 +55,7 @@ func ExampleCapture() {
             log.Fatal(err)
         }
 
-        log.Println("PACKET!!! %v", buf)
+        log.Printf("PACKET!!! %v", buf)
 
         // do something with the packet
     }
