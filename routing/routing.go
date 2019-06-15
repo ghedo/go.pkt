@@ -80,9 +80,6 @@ func (r route_slice) Less(i, j int) bool {
 // Return the route that matches the given destination address.
 func RouteTo(dst net.IP) (*Route, error) {
     var def *Route
-    var is_ipv4 bool
-
-    is_ipv4 = dst.To4() != nil
 
     routes, err := Routes()
     if err != nil {
@@ -93,7 +90,6 @@ func RouteTo(dst net.IP) (*Route, error) {
 
     for _, r := range routes {
         if r.Default &&
-           (is_ipv4 && r.Gateway.To4() != nil) &&
            r.Iface != nil &&
            r.Iface.Flags & net.FlagLoopback == 0 {
             def = r
