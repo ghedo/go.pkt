@@ -37,10 +37,8 @@ import "time"
 
 import "github.com/docopt/docopt-go"
 
-import "github.com/ghedo/go.pkt/capture"
 import "github.com/ghedo/go.pkt/capture/pcap"
 
-import "github.com/ghedo/go.pkt/packet/arp"
 import "github.com/ghedo/go.pkt/packet/eth"
 import "github.com/ghedo/go.pkt/packet/icmpv4"
 import "github.com/ghedo/go.pkt/packet/ipv4"
@@ -86,12 +84,7 @@ Ping the given IP address.`
 
     eth_pkt := eth.Make()
     eth_pkt.SrcAddr = route.Iface.HardwareAddr
-
-    if route.Default {
-        eth_pkt.DstAddr = ResolveARP(c, timeout, route, route.Gateway)
-    } else {
-        eth_pkt.DstAddr = ResolveARP(c, timeout, route, addr_ip)
-    }
+    eth_pkt.DstAddr, _ = network.NextHopMAC(c, timeout, route, addr_ip)
 
     ipv4_pkt := ipv4.Make()
     ipv4_pkt.SrcAddr, _ = route.GetIfaceIPv4Addr()
@@ -108,23 +101,4 @@ Ping the given IP address.`
     }
 
     log.Println("ping")
-}
-
-func ResolveARP(c capture.Handle, t time.Duration, r *routing.Route, addr net.IP) net.HardwareAddr {
-    eth_pkt := eth.Make()
-    eth_pkt.SrcAddr = r.Iface.HardwareAddr
-    eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
-
-    arp_pkt := arp.Make()
-    arp_pkt.HWSrcAddr = r.Iface.HardwareAddr
-    arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
-    arp_pkt.ProtoSrcAddr, _ = r.GetIfaceIPv4Addr()
-    arp_pkt.ProtoDstAddr = addr
-
-    pkt, err := network.SendRecv(c, t, eth_pkt, arp_pkt)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    return pkt.Payload().(*arp.Packet).HWSrcAddr
 }

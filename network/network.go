@@ -34,11 +34,15 @@
 package network
 
 import "fmt"
+import "net"
 import "time"
 
 import "github.com/ghedo/go.pkt/capture"
 import "github.com/ghedo/go.pkt/packet"
+import "github.com/ghedo/go.pkt/packet/arp"
+import "github.com/ghedo/go.pkt/packet/eth"
 import "github.com/ghedo/go.pkt/layers"
+import "github.com/ghedo/go.pkt/routing"
 
 // Pack packets into their binary form and inject them in the given capture
 // handle.. This will stack the packets before encoding them and also calculate
@@ -110,4 +114,30 @@ func SendRecv(c capture.Handle, t time.Duration, pkts ...packet.Packet) (packet.
     }
 
     return nil, fmt.Errorf("WTF")
+}
+
+// Determine the next hop's MAX address to reach the given IP address and route
+// by doing an ARP resolution.
+func NextHopMAC(c capture.Handle, t time.Duration, r *routing.Route, addr net.IP) (net.HardwareAddr, error) {
+    eth_pkt := eth.Make()
+    eth_pkt.SrcAddr = r.Iface.HardwareAddr
+    eth_pkt.DstAddr, _ = net.ParseMAC("ff:ff:ff:ff:ff:ff")
+
+    arp_pkt := arp.Make()
+    arp_pkt.HWSrcAddr = r.Iface.HardwareAddr
+    arp_pkt.HWDstAddr, _ = net.ParseMAC("00:00:00:00:00:00")
+    arp_pkt.ProtoSrcAddr, _ = r.GetIfaceIPv4Addr()
+
+    if r.Default {
+        arp_pkt.ProtoDstAddr = r.Gateway
+    } else {
+        arp_pkt.ProtoDstAddr = addr
+    }
+
+    pkt, err := SendRecv(c, t, eth_pkt, arp_pkt)
+    if err != nil {
+        return nil, err
+    }
+
+    return pkt.Payload().(*arp.Packet).HWSrcAddr, nil
 }
