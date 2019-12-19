@@ -253,6 +253,10 @@ func CalculateChecksum(raw_bytes []byte, csum uint32) uint16 {
         csum += uint32(raw_bytes[i + 1])
     }
 
+	if len(raw_bytes)%2 == 1 {
+		csum += uint32(raw_bytes[length]) << 8
+	}
+
     csum = (csum >> 16) + (csum & 0xffff)
 
     return ^uint16(csum + (csum >> 16))
