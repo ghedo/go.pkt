@@ -31,310 +31,328 @@
 // Provides encoding and decoding for TCP packets.
 package tcp
 
-import "strings"
+import (
+	"strings"
 
-import "github.com/ghedo/go.pkt/packet"
-import "github.com/ghedo/go.pkt/packet/ipv4"
+	"github.com/ghedo/go.pkt/packet"
+)
 
 type Packet struct {
-    SrcPort     uint16        `string:"sport"`
-    DstPort     uint16        `string:"dport"`
-    Seq         uint32
-    Ack         uint32
-    DataOff     uint8         `string:"off"`
-    Flags       Flags
-    WindowSize  uint16        `string:"win"`
-    Checksum    uint16        `string:"sum"`
-    Urgent      uint16        `string:"urg"`
-    Options     []Option      `cmp:"skip" string:"skip"`
-    csum_seed   uint32        `cmp:"skip" string:"skip"`
-    pkt_payload packet.Packet `cmp:"skip" string:"skip"`
+	SrcPort     uint16 `string:"sport"`
+	DstPort     uint16 `string:"dport"`
+	Seq         uint32
+	Ack         uint32
+	DataOff     uint8 `string:"off"`
+	Flags       Flags
+	WindowSize  uint16        `string:"win"`
+	Checksum    uint16        `string:"sum"`
+	Urgent      uint16        `string:"urg"`
+	Options     []Option      `cmp:"skip" string:"skip"`
+	csum_seed   uint32        `cmp:"skip" string:"skip"`
+	pkt_payload packet.Packet `cmp:"skip" string:"skip"`
 }
 
 type Flags uint16
 
 const (
-    Syn Flags = 1<<1
-    Fin       = 1<<2
-    Rst       = 1<<3
-    PSH       = 1<<4
-    Ack       = 1<<5
-    Urg       = 1<<6
-    ECE       = 1<<7
-    Cwr       = 1<<8
-    NS        = 1<<9
+	Syn Flags = 1 << 1
+	Fin       = 1 << 2
+	Rst       = 1 << 3
+	PSH       = 1 << 4
+	Ack       = 1 << 5
+	Urg       = 1 << 6
+	ECE       = 1 << 7
+	Cwr       = 1 << 8
+	NS        = 1 << 9
 )
 
 type Option struct {
-    Type OptType
-    Len  uint8
-    Data []byte
+	Type OptType
+	Len  uint8
+	Data []byte
 }
 
 type OptType uint8
 
 const (
-    End OptType = 0x00
-    Nop         = 0x01
-    MSS         = 0x02
-    WindowScale = 0x03
-    SAckOk      = 0x04
-    SAck        = 0x05
-    Timestamp   = 0x08
+	End         OptType = 0x00
+	Nop                 = 0x01
+	MSS                 = 0x02
+	WindowScale         = 0x03
+	SAckOk              = 0x04
+	SAck                = 0x05
+	Timestamp           = 0x08
 )
 
 func Make() *Packet {
-    return &Packet{
-        Flags: Syn,
-        DataOff: 5,
-        WindowSize: 5840,
-    }
+	return &Packet{
+		Flags:      Syn,
+		DataOff:    5,
+		WindowSize: 5840,
+	}
 }
 
 func (p *Packet) GetType() packet.Type {
-    return packet.TCP
+	return packet.TCP
 }
 
 func (p *Packet) GetLength() uint16 {
-    if p.pkt_payload != nil {
-        return p.pkt_payload.GetLength() + uint16(p.DataOff) * 4
-    }
+	if p.pkt_payload != nil {
+		return p.pkt_payload.GetLength() + uint16(p.DataOff)*4
+	}
 
-    return uint16(p.DataOff) * 4
+	return uint16(p.DataOff) * 4
 }
 
 func (p *Packet) Equals(other packet.Packet) bool {
-    return packet.Compare(p, other)
+	return packet.Compare(p, other)
 }
 
 func (p *Packet) Answers(other packet.Packet) bool {
-    if other == nil || other.GetType() != packet.TCP {
-        return false
-    }
+	if other == nil || other.GetType() != packet.TCP {
+		return false
+	}
 
-    if p.SrcPort != other.(*Packet).DstPort ||
-       p.DstPort != other.(*Packet).SrcPort {
-        return false
-    }
+	if p.SrcPort != other.(*Packet).DstPort ||
+		p.DstPort != other.(*Packet).SrcPort {
+		return false
+	}
 
-    return true
+	return true
 }
 
 func (p *Packet) Pack(buf *packet.Buffer) error {
-    buf.WriteN(p.SrcPort)
-    buf.WriteN(p.DstPort)
-    buf.WriteN(p.Seq)
-    buf.WriteN(p.Ack)
+	buf.WriteN(p.SrcPort)
+	buf.WriteN(p.DstPort)
+	buf.WriteN(p.Seq)
+	buf.WriteN(p.Ack)
 
-    flags := uint16(p.DataOff) << 12
+	flags := uint16(p.DataOff) << 12
 
-    if p.Flags & Fin != 0 {
-        flags |= 0x0001
-    }
+	if p.Flags&Fin != 0 {
+		flags |= 0x0001
+	}
 
-    if p.Flags & Syn != 0 {
-        flags |= 0x0002
-    }
+	if p.Flags&Syn != 0 {
+		flags |= 0x0002
+	}
 
-    if p.Flags & Rst != 0 {
-        flags |= 0x0004
-    }
+	if p.Flags&Rst != 0 {
+		flags |= 0x0004
+	}
 
-    if p.Flags & PSH != 0 {
-        flags |= 0x0008
-    }
+	if p.Flags&PSH != 0 {
+		flags |= 0x0008
+	}
 
-    if p.Flags & Ack != 0 {
-        flags |= 0x0010
-    }
+	if p.Flags&Ack != 0 {
+		flags |= 0x0010
+	}
 
-    if p.Flags & Urg != 0 {
-        flags |= 0x0020
-    }
+	if p.Flags&Urg != 0 {
+		flags |= 0x0020
+	}
 
-    if p.Flags & ECE != 0 {
-        flags |= 0x0040
-    }
+	if p.Flags&ECE != 0 {
+		flags |= 0x0040
+	}
 
-    if p.Flags & Cwr != 0 {
-        flags |= 0x0080
-    }
+	if p.Flags&Cwr != 0 {
+		flags |= 0x0080
+	}
 
-    if p.Flags & NS != 0 {
-        flags |= 0x0100
-    }
+	if p.Flags&NS != 0 {
+		flags |= 0x0100
+	}
 
-    buf.WriteN(flags)
+	buf.WriteN(flags)
 
-    buf.WriteN(p.WindowSize)
-    buf.WriteN(uint16(0x0000))
-    buf.WriteN(p.Urgent)
+	buf.WriteN(p.WindowSize)
+	buf.WriteN(uint16(0x0000))
+	buf.WriteN(p.Urgent)
 
-    for _, opt := range p.Options {
-        buf.WriteN(opt.Type)
-        buf.WriteN(opt.Len)
-        buf.WriteN(opt.Data)
-    }
+	for _, opt := range p.Options {
+		buf.WriteN(opt.Type)
+		buf.WriteN(opt.Len)
+		buf.WriteN(opt.Data)
+	}
 
-    if p.csum_seed != 0 {
-        p.Checksum =
-          ipv4.CalculateChecksum(buf.LayerBytes(), p.csum_seed)
-    }
+	if p.csum_seed != 0 {
+		p.Checksum = CalculateChecksum(buf.LayerBytes(), p.csum_seed)
+	}
 
-    buf.PutUint16N(16, p.Checksum)
+	buf.PutUint16N(16, p.Checksum)
 
-    /* add padding */
-    for buf.LayerLen() < int(p.DataOff) * 4 {
-        buf.WriteN(uint8(0x00))
-    }
+	/* add padding */
+	for buf.LayerLen() < int(p.DataOff)*4 {
+		buf.WriteN(uint8(0x00))
+	}
 
-    return nil
+	return nil
+}
+
+func CalculateChecksum(raw_bytes []byte, csum uint32) uint16 {
+	length := len(raw_bytes) - 1
+
+	for i := 0; i < length; i += 2 {
+		csum += uint32(raw_bytes[i]) << 8
+		csum += uint32(raw_bytes[i+1])
+	}
+
+	if len(raw_bytes)%2 == 1 {
+		csum += uint32(raw_bytes[length]) << 8
+	}
+
+	csum = (csum >> 16) + (csum & 0xffff)
+	csum += (csum >> 16)
+
+	return ^uint16(csum)
 }
 
 func (p *Packet) Unpack(buf *packet.Buffer) error {
-    buf.ReadN(&p.SrcPort)
-    buf.ReadN(&p.DstPort)
-    buf.ReadN(&p.Seq)
-    buf.ReadN(&p.Ack)
+	buf.ReadN(&p.SrcPort)
+	buf.ReadN(&p.DstPort)
+	buf.ReadN(&p.Seq)
+	buf.ReadN(&p.Ack)
 
-    var offns uint8
-    buf.ReadN(&offns)
+	var offns uint8
+	buf.ReadN(&offns)
 
-    p.DataOff = offns >> 4
+	p.DataOff = offns >> 4
 
-    if offns & 0x01 != 0 {
-        p.Flags |= NS
-    }
+	if offns&0x01 != 0 {
+		p.Flags |= NS
+	}
 
-    var flags uint8
-    buf.ReadN(&flags)
+	var flags uint8
+	buf.ReadN(&flags)
 
-    if flags & 0x01 != 0 {
-        p.Flags |= Fin
-    }
+	if flags&0x01 != 0 {
+		p.Flags |= Fin
+	}
 
-    if flags & 0x02 != 0 {
-        p.Flags |= Syn
-    }
+	if flags&0x02 != 0 {
+		p.Flags |= Syn
+	}
 
-    if flags & 0x04 != 0 {
-        p.Flags |= Rst
-    }
+	if flags&0x04 != 0 {
+		p.Flags |= Rst
+	}
 
-    if flags & 0x08 != 0 {
-        p.Flags |= PSH
-    }
+	if flags&0x08 != 0 {
+		p.Flags |= PSH
+	}
 
-    if flags & 0x10 != 0 {
-        p.Flags |= Ack
-    }
+	if flags&0x10 != 0 {
+		p.Flags |= Ack
+	}
 
-    if flags & 0x20 != 0 {
-        p.Flags |= Urg
-    }
+	if flags&0x20 != 0 {
+		p.Flags |= Urg
+	}
 
-    if flags & 0x40 != 0 {
-        p.Flags |= ECE
-    }
+	if flags&0x40 != 0 {
+		p.Flags |= ECE
+	}
 
-    if flags & 0x80 != 0 {
-        p.Flags |= Cwr
-    }
+	if flags&0x80 != 0 {
+		p.Flags |= Cwr
+	}
 
-    buf.ReadN(&p.WindowSize)
-    buf.ReadN(&p.Checksum)
-    buf.ReadN(&p.Urgent)
+	buf.ReadN(&p.WindowSize)
+	buf.ReadN(&p.Checksum)
+	buf.ReadN(&p.Urgent)
 
 options:
-    for buf.LayerLen() < int(p.DataOff) * 4 {
-        var opt_type OptType
-        buf.ReadN(&opt_type)
+	for buf.LayerLen() < int(p.DataOff)*4 {
+		var opt_type OptType
+		buf.ReadN(&opt_type)
 
-        switch opt_type {
-        case End: /* end of options */
-            break options
+		switch opt_type {
+		case End: /* end of options */
+			break options
 
-        case Nop: /* padding */
-            continue
+		case Nop: /* padding */
+			continue
 
-        default:
-            opt := Option{ Type: opt_type }
+		default:
+			opt := Option{Type: opt_type}
 
-            buf.ReadN(&opt.Len)
-            opt.Data = buf.Next(int(opt.Len) - 2)
+			buf.ReadN(&opt.Len)
+			opt.Data = buf.Next(int(opt.Len) - 2)
 
-            p.Options = append(p.Options, opt)
-        }
-    }
+			p.Options = append(p.Options, opt)
+		}
+	}
 
-    /* remove padding */
-    if buf.LayerLen() < int(p.DataOff) * 4 {
-        buf.Next(int(p.DataOff) * 4 - buf.LayerLen())
-    }
+	/* remove padding */
+	if buf.LayerLen() < int(p.DataOff)*4 {
+		buf.Next(int(p.DataOff)*4 - buf.LayerLen())
+	}
 
-    return nil
+	return nil
 }
 
 func (p *Packet) Payload() packet.Packet {
-    return p.pkt_payload
+	return p.pkt_payload
 }
 
 func (p *Packet) GuessPayloadType() packet.Type {
-    return packet.Raw
+	return packet.Raw
 }
 
 func (p *Packet) SetPayload(pl packet.Packet) error {
-    p.pkt_payload = pl
+	p.pkt_payload = pl
 
-    return nil
+	return nil
 }
 
 func (p *Packet) InitChecksum(csum uint32) {
-    p.csum_seed = csum
+	p.csum_seed = csum
 }
 
 func (p *Packet) String() string {
-    return packet.Stringify(p)
+	return packet.Stringify(p)
 }
 
 func (f Flags) String() string {
-    var flags []string
+	var flags []string
 
-    if f & Fin != 0 {
-        flags = append(flags, "fin")
-    }
+	if f&Fin != 0 {
+		flags = append(flags, "fin")
+	}
 
-    if f & Syn != 0 {
-        flags = append(flags, "syn")
-    }
+	if f&Syn != 0 {
+		flags = append(flags, "syn")
+	}
 
-    if f & Rst != 0 {
-        flags = append(flags, "rst")
-    }
+	if f&Rst != 0 {
+		flags = append(flags, "rst")
+	}
 
-    if f & PSH != 0 {
-        flags = append(flags, "psh")
-    }
+	if f&PSH != 0 {
+		flags = append(flags, "psh")
+	}
 
-    if f & Ack != 0 {
-        flags = append(flags, "ack")
-    }
+	if f&Ack != 0 {
+		flags = append(flags, "ack")
+	}
 
-    if f & Urg != 0 {
-        flags = append(flags, "urg")
-    }
+	if f&Urg != 0 {
+		flags = append(flags, "urg")
+	}
 
-    if f & ECE != 0 {
-        flags = append(flags, "ece")
-    }
+	if f&ECE != 0 {
+		flags = append(flags, "ece")
+	}
 
-    if f & Cwr != 0 {
-        flags = append(flags, "cwr")
-    }
+	if f&Cwr != 0 {
+		flags = append(flags, "cwr")
+	}
 
-    if f & NS != 0 {
-        flags = append(flags, "ns")
-    }
+	if f&NS != 0 {
+		flags = append(flags, "ns")
+	}
 
-    return strings.Join(flags, "|")
+	return strings.Join(flags, "|")
 }
