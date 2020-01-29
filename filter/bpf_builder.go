@@ -300,3 +300,9 @@ func (b *Builder) TXA() *Builder {
     b.filter.append_insn(code, 0, 0, 0)
     return b
 }
+
+// Append a raw BPF instruction
+func (b *Builder) AppendInstruction(code Code, jt, jf uint8, k uint32) *Builder {
+    b.filter.append_insn(code, jt, jf, k)
+    return b
+}
