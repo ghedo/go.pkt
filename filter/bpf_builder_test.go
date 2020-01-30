@@ -64,6 +64,19 @@ func TestARP(t *testing.T) {
     }
 }
 
+func TestARPcBPF(t *testing.T) {
+    arp := filter.NewBuilder().
+    AppendInstruction(40, 0, 0, 12).
+    AppendInstruction(21, 0, 1, 2054).
+    AppendInstruction(6, 0, 0, 262144).
+    AppendInstruction(6, 0, 0, 0).
+    Build()
+
+    if arp.String() != test_arp {
+        t.Fatalf("Program mismatch: %s", arp.String())
+    }
+}
+
 var test_dns = `{ 0x00,   0,   0, 0x00000014 },
 { 0xb1,   0,   0, 0x00000000 },
 { 0x0c,   0,   0, 0x00000000 },
