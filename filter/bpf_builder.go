@@ -172,21 +172,21 @@ func (b *Builder) DIV(s Src, val uint32) *Builder {
     return b
 }
 
-// Append an AND instruction to the filter, which performs the binary "and"
-// between the accumulator and a value. s represents the source operand type and
-// can be either Const (which uses the supplied value) or Index (which uses the
-// index register value).
-func (b *Builder) AND(s Src, val uint32) *Builder {
-    code := Code(uint16(s) | uint16(0x40) | ALU)
-    b.filter.append_insn(code, 0, 0, val)
-    return b
-}
-
 // Append an OR instruction to the filter, which performs the binary "or"
 // between the accumulator and a value. s represents the source operand type and
 // can be either Const (which uses the supplied value) or Index (which uses the
 // index register value).
 func (b *Builder) OR(s Src, val uint32) *Builder {
+    code := Code(uint16(s) | uint16(0x40) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
+}
+
+// Append an AND instruction to the filter, which performs the binary "and"
+// between the accumulator and a value. s represents the source operand type and
+// can be either Const (which uses the supplied value) or Index (which uses the
+// index register value).
+func (b *Builder) AND(s Src, val uint32) *Builder {
     code := Code(uint16(s) | uint16(0x50) | ALU)
     b.filter.append_insn(code, 0, 0, val)
     return b
