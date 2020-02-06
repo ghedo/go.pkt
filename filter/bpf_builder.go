@@ -219,6 +219,26 @@ func (b *Builder) NEG() *Builder {
     return b
 }
 
+// Append a MOD instruction to the filter, which computes the accumulator modulo a
+// value. s represents the source operand type and can be either Const (which
+// divides by the supplied value) or Index (which divides by the index register
+// value).
+func (b *Builder) MOD(s Src, val uint32) *Builder {
+    code := Code(uint16(s) | uint16(0x90) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
+}
+
+// Append an XOR instruction to the filter, which performs the binary "xor"
+// between the accumulator and a value. s represents the source operand type and
+// can be either Const (which uses the supplied value) or Index (which uses the
+// index register value).
+func (b *Builder) XOR(s Src, val uint32) *Builder {
+    code := Code(uint16(s) | uint16(0xa0) | ALU)
+    b.filter.append_insn(code, 0, 0, val)
+    return b
+}
+
 // Append a JA instruction to the filter, which performs a jump to the given
 // label.
 func (b *Builder) JA(j string) *Builder {
