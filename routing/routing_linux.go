@@ -32,6 +32,7 @@ package routing
 
 import "fmt"
 import "net"
+import "sort"
 import "syscall"
 import "unsafe"
 
@@ -120,4 +121,32 @@ func Routes() ([]*Route, error) {
 	}
 
 	return routes, nil
+}
+
+// Return the route that matches the given destination address.
+func RouteTo(dst net.IP) (*Route, error) {
+	var def *Route
+
+	routes, err := Routes()
+	if err != nil {
+		return nil, fmt.Errorf("Could not get routes: %s", err)
+	}
+
+	sort.Sort(route_slice(routes))
+
+	for _, r := range routes {
+		if r.Default &&
+			r.Iface != nil &&
+			r.Iface.Flags&net.FlagLoopback == 0 {
+			def = r
+			continue
+		}
+
+		if r.DstNet != nil &&
+			r.DstNet.Contains(dst) {
+			return r, nil
+		}
+	}
+
+	return def, nil
 }
