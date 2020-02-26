@@ -1,6 +1,4 @@
-module github.com/aporeto-inc/gopkt
-
-replace github.com/ghedo/go.pkt => github.com/aporeto-inc/gopkt
+module github.com/ghedo/go.pkt
 
 require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
