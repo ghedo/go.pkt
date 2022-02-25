@@ -107,8 +107,10 @@ func (r *Route) GetIfaceIPv6Addr() (net.IP, error) {
 
     for _, a := range addrs {
         if ipnet, ok := a.(*net.IPNet); ok {
-            if ip6 := ipnet.IP.To16(); ip6 != nil {
-                return ip6, nil
+            // The best way to check for IPv6 is to convert it to IPv4
+            // and check for nil. Converting an IPv4 to IPv6 will always succeed.
+            if ip4 := ipnet.IP.To4(); ip4 == nil {
+                return ipnet.IP, nil
             }
         }
     }
